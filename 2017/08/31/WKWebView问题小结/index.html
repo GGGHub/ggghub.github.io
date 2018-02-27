@@ -1,0 +1,777 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="en">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="iOS," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="内存泄漏当需要拦截Web页面的Javascript函数时会使用以下方法1- (void)addScriptMessageHandler:(id &amp;lt;WKScriptMessageHandler&amp;gt;)scriptMessageHandler name:(NSString *)name; 在Web页面需要调用以下方法1window.webkit.messageHandlers.name.pos">
+<meta name="keywords" content="iOS">
+<meta property="og:type" content="article">
+<meta property="og:title" content="WKWebView问题小结">
+<meta property="og:url" content="http://ggghub.com/2017/08/31/WKWebView问题小结/index.html">
+<meta property="og:site_name" content="GGGHub&#39;s Blog">
+<meta property="og:description" content="内存泄漏当需要拦截Web页面的Javascript函数时会使用以下方法1- (void)addScriptMessageHandler:(id &amp;lt;WKScriptMessageHandler&amp;gt;)scriptMessageHandler name:(NSString *)name; 在Web页面需要调用以下方法1window.webkit.messageHandlers.name.pos">
+<meta property="og:locale" content="en">
+<meta property="og:updated_time" content="2018-02-27T07:54:56.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="WKWebView问题小结">
+<meta name="twitter:description" content="内存泄漏当需要拦截Web页面的Javascript函数时会使用以下方法1- (void)addScriptMessageHandler:(id &amp;lt;WKScriptMessageHandler&amp;gt;)scriptMessageHandler name:(NSString *)name; 在Web页面需要调用以下方法1window.webkit.messageHandlers.name.pos">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://ggghub.com/2017/08/31/WKWebView问题小结/"/>
+
+
+
+
+
+  <title>WKWebView问题小结 | GGGHub's Blog</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="en">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">GGGHub's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">Coding Obsession</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            Archives
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://ggghub.com/2017/08/31/WKWebView问题小结/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="LiSiYuan">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="GGGHub's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">WKWebView问题小结</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-08-31T20:10:00+08:00">
+                2017-08-31
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/iOS/" itemprop="url" rel="index">
+                    <span itemprop="name">iOS</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2017/08/31/WKWebView问题小结/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2017/08/31/WKWebView问题小结/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h3 id="内存泄漏"><a href="#内存泄漏" class="headerlink" title="内存泄漏"></a>内存泄漏</h3><p>当需要拦截Web页面的Javascript函数时会使用以下方法<br><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">- (<span class="keyword">void</span>)addScriptMessageHandler:(<span class="keyword">id</span> &lt;<span class="built_in">WKScriptMessageHandler</span>&gt;)scriptMessageHandler name:(<span class="built_in">NSString</span> *)name;</span><br></pre></td></tr></table></figure></p>
+<p>在Web页面需要调用以下方法<br><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">window.webkit.messageHandlers.name.postMessage();</span><br></pre></td></tr></table></figure></p>
+<p>这两个方法的<code>name</code>必须一样才能被<code>WKWebView</code>拦截到。<br>但是如果不及时移除<code>Handler</code>的话<code>WebView</code>不会被释放。所以只要调用了<code>addScriptMessageHandler</code>方法就要调用相对应的方法移除<br><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">- (<span class="keyword">void</span>)removeScriptMessageHandlerForName:(<span class="built_in">NSString</span> *)name;</span><br></pre></td></tr></table></figure></p>
+<a id="more"></a>
+<h3 id="内嵌在Cell里显示不全"><a href="#内嵌在Cell里显示不全" class="headerlink" title="内嵌在Cell里显示不全"></a>内嵌在Cell里显示不全</h3><p>在iOS10及以上系统里在TableViewCell中嵌入WKWebView时，滚动TableView时WebView渲染会出错。往往内容显示不出来。</p>
+<p>具体解决办法在TableView的代理方法中调用WKWebView的<strong>setNeedsLayout</strong>方法：<br><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">- (<span class="keyword">void</span>)scrollViewDidScroll:(<span class="built_in">UIScrollView</span> *)scrollView</span><br><span class="line">&#123;</span><br><span class="line">    [webView setNeedsLayout];</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h3 id="WKWebView不能打开新窗口-lt-a-target-blank-gt"><a href="#WKWebView不能打开新窗口-lt-a-target-blank-gt" class="headerlink" title="WKWebView不能打开新窗口&lt;a target=_blank /&gt;"></a>WKWebView不能打开新窗口<code>&lt;a target=_blank /&gt;</code></h3><p>如果Web页面的链接是<code>&lt;a target=_blank /&gt;</code>时，正常结果是新建窗口打开这个页面。但在<code>WKWebView</code>中，如果没有实现相关的代理方法，那么这个方法失效，点击网页中任何外部链接都没有反应。期望的结果是通过<code>Safari</code>来打开这个外部链接。原来的<code>WebView</code>不进行任何处理。如果这样需要在<code>WebView</code>的代理方法中进行如下处理：</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">- (<span class="keyword">void</span>)webView:(<span class="built_in">WKWebView</span>*)webView decidePolicyForNavigationAction:(<span class="built_in">WKNavigationAction</span>*)navigationAction decisionHandler:(<span class="keyword">void</span> (^)(<span class="built_in">WKNavigationActionPolicy</span>))decisionHandler</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">if</span> (!navigationAction.targetFrame) &#123;    <span class="comment">//处理&lt;a target=_blank /&gt;这种情况</span></span><br><span class="line">        <span class="built_in">NSURL</span> *url = navigationAction.request.URL;</span><br><span class="line">        <span class="built_in">UIApplication</span> *app = [<span class="built_in">UIApplication</span> sharedApplication];</span><br><span class="line">        <span class="keyword">if</span> ([app canOpenURL:url]) &#123;</span><br><span class="line">            [app openURL:url];</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="在WKWebView中动态更改UserAgent"><a href="#在WKWebView中动态更改UserAgent" class="headerlink" title="在WKWebView中动态更改UserAgent"></a>在WKWebView中动态更改UserAgent</h3><p>往往在访问我们自己的域名时会修改相关<code>UserAgent</code>上传。而访问其他域名时会将UserAgent修改成默认的。这样就需要选择性的修改<code>UserAgent</code><br>首先在程序加载时我们先获取系统默认的<code>UserAgent</code>并将它保存在本地：<br><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">+(<span class="keyword">void</span>)load</span><br><span class="line">&#123;</span><br><span class="line">    <span class="built_in">UIWebView</span> *webView = [[<span class="built_in">UIWebView</span> alloc] initWithFrame:<span class="built_in">CGRectZero</span>];</span><br><span class="line">    <span class="built_in">NSString</span> *oldAgent = [webView stringByEvaluatingJavaScriptFromString:<span class="string">@"navigator.userAgent"</span>];</span><br><span class="line">    <span class="built_in">NSDictionary</span> *dictionnary = [[<span class="built_in">NSDictionary</span> alloc] initWithObjectsAndKeys:oldAgent, <span class="string">@"originAgent"</span>, <span class="literal">nil</span>];</span><br><span class="line">    [[<span class="built_in">NSUserDefaults</span> standardUserDefaults] registerDefaults:dictionnary];    </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>然后在加载新页面时来判断是否为我们自己的域名，调用如下方法针对性的修改<code>UserAgent</code>：<br><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">- (<span class="keyword">void</span>)setUserAgent:(<span class="built_in">NSString</span> *)userAgent</span><br><span class="line">&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> ([URL.host hasSuffix:baseDomain] &#123;   </span><br><span class="line">      <span class="comment">//如果是我们自己的域名将传进来的userAgent设置到http的请求header中</span></span><br><span class="line">        <span class="built_in">NSDictionary</span> *dictionnary = [[<span class="built_in">NSDictionary</span> alloc] initWithObjectsAndKeys:userAgent, <span class="string">@"UserAgent"</span>, <span class="literal">nil</span>];</span><br><span class="line">        [[<span class="built_in">NSUserDefaults</span> standardUserDefaults] registerDefaults:dictionnary];</span><br><span class="line">        &#125;</span><br><span class="line">    <span class="keyword">else</span>&#123;</span><br><span class="line">        <span class="comment">//否则设置成系统默认的UserAgent</span></span><br><span class="line">        <span class="built_in">NSString</span> *string = [[<span class="built_in">NSUserDefaults</span> standardUserDefaults] objectForKey:<span class="string">@"originAgent"</span>];</span><br><span class="line">        <span class="built_in">NSDictionary</span> *dictionnary = [[<span class="built_in">NSDictionary</span> alloc] initWithObjectsAndKeys:OutNull(string), <span class="string">@"UserAgent"</span>, <span class="literal">nil</span>];</span><br><span class="line">        [[<span class="built_in">NSUserDefaults</span> standardUserDefaults] registerDefaults:dictionnary];</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h3 id="本地Request的Cookies与WKWebView的Cookies共享"><a href="#本地Request的Cookies与WKWebView的Cookies共享" class="headerlink" title="本地Request的Cookies与WKWebView的Cookies共享"></a>本地Request的Cookies与WKWebView的Cookies共享</h3><p>往往我们想将本地URL请求的Cookies同步到WKWebView中，在使用UIWebView时会自动同步我们请求URL的Cookies，但在WKWebView中会失效，因为WKWebView自己独立管理Cookies，不与NSURLRequest的公用。因此要通过一下方法进行设置WKWebview的Cookies。</p>
+<p>首先在初始化是执行一下脚本来设置<code>Cookies</code></p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">-(<span class="keyword">void</span>)initWebView</span><br><span class="line">&#123;</span><br><span class="line">    <span class="built_in">WKWebViewConfiguration</span> *webViewconfiguration = [[<span class="built_in">WKWebViewConfiguration</span> alloc] init];</span><br><span class="line">    <span class="built_in">WKUserContentController</span> *wkUController = [[<span class="built_in">WKUserContentController</span> alloc] init];</span><br><span class="line">    <span class="keyword">if</span>(URL.host hasSuffix:baseDomain)&#123;</span><br><span class="line">        <span class="comment">//在此处要判断域名是否是自己网站。</span></span><br><span class="line">        <span class="built_in">NSString</span> *jScript = [<span class="keyword">self</span> setCookies];</span><br><span class="line">        <span class="built_in">WKUserScript</span> *wkUScript = [[<span class="built_in">WKUserScript</span> alloc] initWithSource:jScript injectionTime:<span class="built_in">WKUserScriptInjectionTimeAtDocumentStart</span> forMainFrameOnly:<span class="literal">NO</span>];</span><br><span class="line">                        [wkUController addUserScript:wkUScript];</span><br><span class="line">    &#125;</span><br><span class="line">    webViewconfiguration.userContentController = wkUController;</span><br><span class="line">    <span class="built_in">WKWebView</span> *webView = [[<span class="built_in">WKWebView</span> alloc] initWithFrame:<span class="built_in">CGRectMake</span>(<span class="number">0</span>, <span class="number">0</span>, width, height) configuration:webViewconfiguration];</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">//执行的脚本，可能略有不同</span></span><br><span class="line">+(<span class="built_in">NSString</span> *)setCookies</span><br><span class="line">&#123;</span><br><span class="line">    <span class="built_in">NSString</span> *script = [<span class="built_in">NSString</span> string];</span><br><span class="line">       </span><br><span class="line">    <span class="keyword">for</span> (<span class="built_in">NSHTTPCookie</span> *httpCookie <span class="keyword">in</span> [[<span class="built_in">NSHTTPCookieStorage</span> sharedHTTPCookieStorage] cookies])</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="built_in">NSString</span> *cookie = [<span class="built_in">NSString</span> stringWithFormat:<span class="string">@"%@=%@;domain=%@;path=%@"</span>,httpCookie.name,httpCookie.value,httpCookie.domain,httpCookie.path?:<span class="string">@"/"</span>];</span><br><span class="line">        script = [script stringByAppendingString:[<span class="built_in">NSString</span> stringWithFormat:<span class="string">@"document.cookie='%@';"</span>,cookie]];</span><br><span class="line">        </span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> script;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>然后在创建<code>NSURLRequest</code>对象时手动添加<code>cookies</code>到HTTP的Header中：<br><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">- (<span class="keyword">void</span>)loadRequest:(<span class="built_in">NSURLRequest</span> *)request</span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">//此处也要判断要加载的url是否是我们自己的域名</span></span><br><span class="line">    <span class="keyword">if</span> ([request.URL.host hasSuffix:baseDomain])&#123;</span><br><span class="line">        <span class="built_in">NSMutableURLRequest</span> *mutableRequest = [[<span class="built_in">NSMutableURLRequest</span> alloc] initWithURL:request.URL];</span><br><span class="line">        <span class="built_in">NSString</span> *cookies = <span class="string">@""</span>; <span class="comment">//设置Cookies</span></span><br><span class="line">        [mutableRequest addValue:cookies forHTTPHeaderField:<span class="string">@"Cookie"</span>];</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// do request  </span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h3 id="WKWebView在iOS10及以上系统设置新的Cookies不能覆盖旧的Cookies"><a href="#WKWebView在iOS10及以上系统设置新的Cookies不能覆盖旧的Cookies" class="headerlink" title="WKWebView在iOS10及以上系统设置新的Cookies不能覆盖旧的Cookies"></a>WKWebView在iOS10及以上系统设置新的Cookies不能覆盖旧的Cookies</h3><p>在使用WKWebView时发现在iOS10以下的系统中如果按照上面的方法设置完<code>Cookies</code>后会生效，并且会自动覆盖旧的<code>Cookies</code>。而在iOS10及以上系统时设置新的<code>Cookies</code>并不会生效，WKWebView还会使用之前的设置过的<code>Cookies</code>。所以我们在切换用户时需要调用以下方法手动删除<code>Cookies</code>。</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">-(<span class="keyword">void</span>)clearCookies</span><br><span class="line">&#123;</span><br><span class="line">    <span class="built_in">WKWebsiteDataStore</span> *dateStore = [<span class="built_in">WKWebsiteDataStore</span> defaultDataStore];</span><br><span class="line">            [dateStore fetchDataRecordsOfTypes:[<span class="built_in">WKWebsiteDataStore</span> allWebsiteDataTypes]</span><br><span class="line">                             completionHandler:^(<span class="built_in">NSArray</span>&lt;<span class="built_in">WKWebsiteDataRecord</span> *&gt; * __<span class="keyword">nonnull</span> records) &#123;</span><br><span class="line">                                <span class="keyword">for</span> (<span class="built_in">WKWebsiteDataRecord</span> *record  <span class="keyword">in</span> records)&#123;</span><br><span class="line">                                    <span class="keyword">if</span> ([record.displayName isEqualToString:baseDomain])&#123;   </span><br><span class="line">                                        <span class="comment">//判断如果是我们自己的域名那么删除该域名下的Cookies</span></span><br><span class="line">                                        [[<span class="built_in">WKWebsiteDataStore</span> defaultDataStore] removeDataOfTypes:record.dataTypes forDataRecords:@[record] completionHandler:^&#123;</span><br><span class="line"></span><br><span class="line">                                            &#125;];</span><br><span class="line">                                    &#125;</span><br><span class="line">                                &#125;</span><br><span class="line">                             &#125;];</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="WKWebView在在iOS10及以上系统清除Cookies失效"><a href="#WKWebView在在iOS10及以上系统清除Cookies失效" class="headerlink" title="WKWebView在在iOS10及以上系统清除Cookies失效"></a>WKWebView在在iOS10及以上系统清除Cookies失效</h3><p>使用上面的方法清除<code>Cookies</code>时会发现有时会清除失败。加载新的页面时还会使用旧的<code>Cookies</code>。这是因为清除<code>Cookies</code>的时机不对，我们应该在清除完成的回调内再加载新的页面。</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">- (<span class="keyword">void</span>)loadRequest:(<span class="built_in">NSURLRequest</span> *)request&#123;</span><br><span class="line">    <span class="built_in">WKWebsiteDataStore</span> *dateStore = [<span class="built_in">WKWebsiteDataStore</span> defaultDataStore];</span><br><span class="line">            [dateStore fetchDataRecordsOfTypes:[<span class="built_in">WKWebsiteDataStore</span> allWebsiteDataTypes]</span><br><span class="line">                             completionHandler:^(<span class="built_in">NSArray</span>&lt;<span class="built_in">WKWebsiteDataRecord</span> *&gt; * __<span class="keyword">nonnull</span> records) &#123;</span><br><span class="line">                                <span class="built_in">BOOL</span> isExit = <span class="literal">NO</span>;</span><br><span class="line">                                <span class="keyword">for</span> (<span class="built_in">WKWebsiteDataRecord</span> *record  <span class="keyword">in</span> records)&#123;</span><br><span class="line">                                    <span class="keyword">if</span> ([record.displayName isEqualToString:baseDomain])&#123;   </span><br><span class="line">                                        <span class="comment">//判断如果是我们自己的域名那么删除该域名下的Cookies</span></span><br><span class="line">                                        isExit = <span class="literal">YES</span>;</span><br><span class="line">                                        [[<span class="built_in">WKWebsiteDataStore</span> defaultDataStore] removeDataOfTypes:record.dataTypes forDataRecords:@[record] completionHandler:^&#123;</span><br><span class="line">                                                [webView loadRequest:request];</span><br><span class="line">                                            &#125;];</span><br><span class="line">                                            <span class="keyword">break</span>;</span><br><span class="line">                                    &#125;</span><br><span class="line">                                &#125;</span><br><span class="line">                                <span class="keyword">if</span> (!isExit) &#123;</span><br><span class="line">                                     [webView loadRequest:[mutableRequest <span class="keyword">copy</span>]];</span><br><span class="line">                                 &#125;</span><br><span class="line">                             &#125;];</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><code>注意：如果在退出页面时清除Cookies，也会出现清除失败的情况。</code></p>
+<h3 id="Native页面内嵌WKWebView高度计算问题"><a href="#Native页面内嵌WKWebView高度计算问题" class="headerlink" title="Native页面内嵌WKWebView高度计算问题"></a>Native页面内嵌WKWebView高度计算问题</h3><p>计算WKWebView的高度是我们往往调用<code>document.body.scrollHeight</code>这个方法来计算。如果在下面的代理方法里调用那么计算的高度是不准确的：<br><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">- (<span class="keyword">void</span>)webView:(<span class="built_in">WKWebView</span>*)webView decidePolicyForNavigationAction:(<span class="built_in">WKNavigationAction</span>*)navigationAction decisionHandler:(<span class="keyword">void</span> (^)(<span class="built_in">WKNavigationActionPolicy</span>))decisionHandler&#123;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>因为页面内部有很多图片还没有加载出来。所以此时调用<code>document.body.scrollHeight</code>这个方法计算的高度是未加载完的页面高度。<br>如果在加载结束的代理方法里面调用<code>document.body.scrollHeight</code>，那么页面只能在全部资源下载后才会显示。如果我们想要边加载资源边动态的改变页面高度需要做如下处理：</p>
+<p>我们在初始化WebView时监听WebView的加载进度<br><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">-(<span class="keyword">void</span>)initWebView</span><br><span class="line">&#123;</span><br><span class="line">    <span class="built_in">WKWebView</span> *webView = [[<span class="built_in">WKWebView</span> alloc] initWithFrame:<span class="built_in">CGRectMake</span>(<span class="number">0</span>, <span class="number">0</span>, width, height)];</span><br><span class="line">    [webView addObserver:<span class="keyword">self</span> forKeyPath:<span class="string">@"estimatedProgress"</span> options:<span class="built_in">NSKeyValueObservingOptionNew</span>|<span class="built_in">NSKeyValueObservingOptionOld</span> context:<span class="literal">NULL</span>];</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>然后边加载边计算WebView的高度，这样就不必等页面全部加载完再计算WebView的高度了。</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">-(<span class="keyword">void</span>)observeValueForKeyPath:(<span class="built_in">NSString</span> *)keyPath ofObject:(<span class="keyword">id</span>)object change:(<span class="built_in">NSDictionary</span>&lt;<span class="built_in">NSString</span> *,<span class="keyword">id</span>&gt; *)change context:(<span class="keyword">void</span> *)context</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">if</span> ([keyPath isEqualToString:<span class="string">@"estimatedProgress"</span>]) &#123;</span><br><span class="line">        <span class="keyword">self</span>.estimatedProgress = [change[<span class="built_in">NSKeyValueChangeNewKey</span>] doubleValue];</span><br><span class="line">        <span class="keyword">if</span> ([change[<span class="built_in">NSKeyValueChangeOldKey</span>] doubleValue]) &#123;</span><br><span class="line">            [<span class="keyword">self</span> evaluateJavaScript:<span class="string">@"document.body.scrollHeight"</span> completionHandler:^(<span class="keyword">id</span> heitht, <span class="built_in">NSError</span> *error) &#123;</span><br><span class="line">                <span class="keyword">if</span> (!error) &#123;</span><br><span class="line">                    <span class="keyword">self</span>.pageHeight = [heitht floatValue];</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;];</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/iOS/" rel="tag"># iOS</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/07/28/iOS崩溃日志解析脚本/" rel="next" title="iOS崩溃日志解析脚本">
+                <i class="fa fa-chevron-left"></i> iOS崩溃日志解析脚本
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/02/24/算法相关问题以及对应解/" rel="prev" title="算法相关问题以及对应解">
+                算法相关问题以及对应解 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      <div class="ds-thread" data-thread-key="2017/08/31/WKWebView问题小结/"
+           data-title="WKWebView问题小结" data-url="http://ggghub.com/2017/08/31/WKWebView问题小结/">
+      </div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">LiSiYuan</p>
+              <p class="site-description motion-element" itemprop="description">Hi! I'm GGGHub, Welcome here！</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">29</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                
+                  <span class="site-state-item-count">8</span>
+                  <span class="site-state-item-name">categories</span>
+                
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                
+                  <span class="site-state-item-count">19</span>
+                  <span class="site-state-item-name">tags</span>
+                
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/ggghub" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-globe"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://www.developboot.com" target="_blank" title="developboot">
+                      
+                        <i class="fa fa-fw fa-globe"></i>developboot</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://blog.csdn.net/ggghub" target="_blank" title="CSDN">
+                      
+                        <i class="fa fa-fw fa-globe"></i>CSDN</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#内存泄漏"><span class="nav-number">1.</span> <span class="nav-text">内存泄漏</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#内嵌在Cell里显示不全"><span class="nav-number">2.</span> <span class="nav-text">内嵌在Cell里显示不全</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#WKWebView不能打开新窗口-lt-a-target-blank-gt"><span class="nav-number">3.</span> <span class="nav-text">WKWebView不能打开新窗口&lt;a target=_blank /&gt;</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#在WKWebView中动态更改UserAgent"><span class="nav-number">4.</span> <span class="nav-text">在WKWebView中动态更改UserAgent</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#本地Request的Cookies与WKWebView的Cookies共享"><span class="nav-number">5.</span> <span class="nav-text">本地Request的Cookies与WKWebView的Cookies共享</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#WKWebView在iOS10及以上系统设置新的Cookies不能覆盖旧的Cookies"><span class="nav-number">6.</span> <span class="nav-text">WKWebView在iOS10及以上系统设置新的Cookies不能覆盖旧的Cookies</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#WKWebView在在iOS10及以上系统清除Cookies失效"><span class="nav-number">7.</span> <span class="nav-text">WKWebView在在iOS10及以上系统清除Cookies失效</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Native页面内嵌WKWebView高度计算问题"><span class="nav-number">8.</span> <span class="nav-text">Native页面内嵌WKWebView高度计算问题</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">LiSiYuan</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Muse</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"ggghub"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+    
+    <script src="/lib/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/js/src/hook-duoshuo.js"></script>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

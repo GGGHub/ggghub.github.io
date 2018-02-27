@@ -1,0 +1,992 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="en">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="iOS," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="在应用开发中为了给用户更好操作体验与精准信息的展示，往往会收集一些用户行为信息，比如应用中用户习惯的操作流程，相关页面访问次数，用户个人信息等等。大多数应用会集成第三方厂商提供的服务来统计这些数据，当然这样做带来的好处就是不用花费时间来写相关日志收集的功能，后台也不用专门搭建相关的服务，而且第三方提供的工具也比较稳定。这让我们能有更多的时间去开发产品主要业务功能上。 开发应用前期为了让产品快速的推">
+<meta name="keywords" content="iOS">
+<meta property="og:type" content="article">
+<meta property="og:title" content="浅谈iOS日志收集系统">
+<meta property="og:url" content="http://ggghub.com/2017/05/08/浅谈iOS日志收集系统/index.html">
+<meta property="og:site_name" content="GGGHub&#39;s Blog">
+<meta property="og:description" content="在应用开发中为了给用户更好操作体验与精准信息的展示，往往会收集一些用户行为信息，比如应用中用户习惯的操作流程，相关页面访问次数，用户个人信息等等。大多数应用会集成第三方厂商提供的服务来统计这些数据，当然这样做带来的好处就是不用花费时间来写相关日志收集的功能，后台也不用专门搭建相关的服务，而且第三方提供的工具也比较稳定。这让我们能有更多的时间去开发产品主要业务功能上。 开发应用前期为了让产品快速的推">
+<meta property="og:locale" content="en">
+<meta property="og:updated_time" content="2018-02-27T07:56:18.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="浅谈iOS日志收集系统">
+<meta name="twitter:description" content="在应用开发中为了给用户更好操作体验与精准信息的展示，往往会收集一些用户行为信息，比如应用中用户习惯的操作流程，相关页面访问次数，用户个人信息等等。大多数应用会集成第三方厂商提供的服务来统计这些数据，当然这样做带来的好处就是不用花费时间来写相关日志收集的功能，后台也不用专门搭建相关的服务，而且第三方提供的工具也比较稳定。这让我们能有更多的时间去开发产品主要业务功能上。 开发应用前期为了让产品快速的推">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://ggghub.com/2017/05/08/浅谈iOS日志收集系统/"/>
+
+
+
+
+
+  <title>浅谈iOS日志收集系统 | GGGHub's Blog</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="en">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">GGGHub's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">Coding Obsession</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            Archives
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://ggghub.com/2017/05/08/浅谈iOS日志收集系统/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="LiSiYuan">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="GGGHub's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">浅谈iOS日志收集系统</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-05-08T19:52:00+08:00">
+                2017-05-08
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/iOS/" itemprop="url" rel="index">
+                    <span itemprop="name">iOS</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2017/05/08/浅谈iOS日志收集系统/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2017/05/08/浅谈iOS日志收集系统/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>在应用开发中为了给用户更好操作体验与精准信息的展示，往往会收集一些用户行为信息，比如应用中用户习惯的操作流程，相关页面访问次数，用户个人信息等等。大多数应用会集成第三方厂商提供的服务来统计这些数据，当然这样做带来的好处就是不用花费时间来写相关日志收集的功能，后台也不用专门搭建相关的服务，而且第三方提供的工具也比较稳定。这让我们能有更多的时间去开发产品主要业务功能上。</p>
+<p>开发应用前期为了让产品快速的推向市场与不断的功能变更，往往不会花费时间在这些非主要业务的功能上。但当产品逐渐成熟进入到一个平台期，如果我们想要获取更多的用户增长与留存，就要想办法在针对自身的产品功能在不用的场景获取更多的用户行为来改进产品，获取更多用户信息来精准针对不同用户展示他们更感兴趣的内容。而且这些数据也不希望保存在其他厂商的服务器上。这样我们就不得不设计一套自己的日志收集系统。本篇博客只是讲解自己对iOS日志收集框架设计的一些思路与实现。<br><a id="more"></a></p>
+<h2 id="日志分类"><a href="#日志分类" class="headerlink" title="日志分类"></a>日志分类</h2><p>首先收集日志根据日志上传的时机分为实时日志与非实时日志</p>
+<ul>
+<li><p>实时日志：收集结束后立刻上传到服务器。</p>
+</li>
+<li><p>非实时日志：当日志累计到一定数量时上传到服务器。</p>
+</li>
+</ul>
+<p>对于实时日志来说文件大小实际上在一定范围之内的。而非实时日志由于是信息累积一段时间后才会上传到服务器，所以对于非实时日志我们需要控制日志的大小不能让日志文件无限增加。当然仅仅控制大小也是不行的，如果用户使用次数很少而且我们的数据要一天统计一次那么就会出现很多天都统计不到用户的相关数据。所有我们也要控制非实时日志的过期时间。如果日志已经过期但大小没有达到限制或者大小已经达到限制但没有到达过期时间都是要上传到服务器的。</p>
+<p>对于实时日志与非实时日志上传服务器来说都要有相关的错误处理。对于实时日志来说，如果上传失败的话如果网络连接正常要尝试重新上传，当然这不是无限上传的要有重试的次数，如果超出重试次数，那么上传失败。对于非实时日志来说也是一样的处理逻辑。</p>
+<p>更根据收集的数据来分类日志可以分为事件日志，用户信息日志，崩溃日志</p>
+<ul>
+<li><p>事件日志：也可以理解为用户行为数据。当用户使用某个功能或者进入某个页面时会收集相关的信息来统计每个用户使用应用时习惯性操作，与偏好的功能还有页面的PV等。当然也可以获取到每个用户在当前页面所停留的时间。来判断当前页面是否能过吸引用户。</p>
+</li>
+<li><p>用户信息日志：这些信息主要是为了针对不同的用户来展示不同的功能或者内容，当然也包括当前使用机型的信息有些基本信息可以直接放在请求头的UserAgent中而不需要单独来统计。</p>
+</li>
+<li><p>崩溃日志：应用崩溃信息。</p>
+</li>
+</ul>
+<h2 id="日志收集框架"><a href="#日志收集框架" class="headerlink" title="日志收集框架"></a>日志收集框架</h2><p>日志收集主要用了两个开源框架来实现：<a href="https://github.com/plausiblelabs/plcrashreporter" target="_blank" rel="noopener">plcrashreporter</a>与<a href="https://github.com/CocoaLumberjack/CocoaLumberjack" target="_blank" rel="noopener">CocoaLumberjack</a>。plcrashreporter主要用来崩溃日志收集，CocoaLumberjack用来非崩溃日志收集。<br>下面将主要介绍这两个框架的使用。</p>
+<h3 id="CocoaLumberjack"><a href="#CocoaLumberjack" class="headerlink" title="CocoaLumberjack"></a>CocoaLumberjack</h3><p>关于CocoaLumberjack的相关说明与使用主要参考了<a href="https://github.com/CocoaLumberjack/CocoaLumberjack/tree/master/Documentation" target="_blank" rel="noopener">这里</a>的文档。</p>
+<p>首先是集成CocoaLumberjack主要有三个途径，CocoaPods，Carthage，与手动集成。继承这里不多描述参考<a href="https://github.com/CocoaLumberjack/CocoaLumberjack/blob/master/Documentation/GettingStarted.md" target="_blank" rel="noopener">这里</a>。</p>
+<h4 id="配置CocoaLumberjack框架"><a href="#配置CocoaLumberjack框架" class="headerlink" title="配置CocoaLumberjack框架"></a>配置CocoaLumberjack框架</h4><ul>
+<li>将下面的代码添加到<code>.pch</code>文件中<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#define LOG_LEVEL_DEF ddLogLevel</span></span><br><span class="line"><span class="meta">#import <span class="meta-string">&lt;CocoaLumberjack/CocoaLumberjack.h&gt;</span></span></span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<p>在后面我们设置ddLogLevel的优先级后，<code>DDLog</code>宏会通过<code>LOG_LEVEL_DEF</code>来得知我们定义的优先级。</p>
+<ul>
+<li>在程序启动时（一般在<code>applicationDidFinishLaunching</code>方法中）添加如下代码：<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[DDLog addLogger:[DDASLLogger sharedInstance]];</span><br><span class="line">[DDLog addLogger:[DDTTYLogger sharedInstance]];</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<p>这两行代码添加了两个<code>loggers</code>到框架中，也就是说你的日志会被发送到Mac系统的<code>Console.app</code>与Xcode的控制台（与NSLog的效果一样）中。<br>如果想把日志写入文件中可以用下面的<code>logger</code><br><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">DDFileLogger *fileLogger = [[DDFileLogger alloc] init];</span><br><span class="line">fileLogger.rollingFrequency = <span class="number">60</span> * <span class="number">60</span> * <span class="number">24</span>; <span class="comment">// 每个文件超过24小时后会被新的日志覆盖</span></span><br><span class="line">fileLogger.logFileManager.maximumNumberOfLogFiles = <span class="number">7</span>;  <span class="comment">//最多保存7个日志文件</span></span><br><span class="line">[DDLog addLogger:fileLogger];</span><br></pre></td></tr></table></figure></p>
+<p>我们主要使用<code>DDFileLogger</code>这个来记录相关事件，并且配合<code>DDLogFileManager</code>来讲相关的事件上传到服务器。在后面会介绍相关的用法。</p>
+<p>可以设置全局的日志等级，并且可以在单独的文件中修改日志等级。<br>在前面我们定义了<code>LOG_LEVEL_DEF</code>宏。在<code>.pch</code>文件定义<code>ddLogLevel</code>常量<br><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">static</span> <span class="keyword">const</span> DDLogLevel ddLogLevel = DDLogLevelDebug;</span><br></pre></td></tr></table></figure></p>
+<p>上面定义了全局的宏同一为<code>DDLogLevelDebug</code><br>如果想要在不同的文件中更改日志的等级只需要在使用DDLog前修改<code>ddLogLevel</code>的值即可</p>
+<p>。关于日志输出一共5个语句，当然也可以自己自定义日志的语句    </p>
+<pre><code>- DDLogError
+- DDLogWarn
+- DDLogInfo
+- DDLogDebug
+- DDLogVerbose
+</code></pre><ul>
+<li>将<code>NSLog</code>语句转换成<code>DDLog</code><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Convert from this:</span></span><br><span class="line"><span class="built_in">NSLog</span>(<span class="string">@"Broken sprocket detected!"</span>);</span><br><span class="line"><span class="built_in">NSLog</span>(<span class="string">@"User selected file:%@ withSize:%u"</span>, filePath, fileSize);</span><br><span class="line"></span><br><span class="line"><span class="comment">// To this:</span></span><br><span class="line">DDLogError(<span class="string">@"Broken sprocket detected!"</span>);</span><br><span class="line">DDLogVerbose(<span class="string">@"User selected file:%@ withSize:%u"</span>, filePath, fileSize);</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<p>使用不同的日志等级将会看到不同的日志输出</p>
+<pre><code>如果设置DDLogLevelError等级，那么只会看到Error语句
+如果设置DDLogLevelWarn等级，那么会看到Error和Warn语句
+如果设置DDLogLevelInfo等级，那么会看到Error，Warn，Info语句
+如果设置DDLogLevelDebug等级，那么会看到Error，Warn，Info，Debug语句
+如果设置DDLogLevelVerbose等级，会看到所有的DDLog语句
+如果设置DDLogLevelOff等级，不会看到任何DDLog语句
+</code></pre><h4 id="CocoaLumberjack架构"><a href="#CocoaLumberjack架构" class="headerlink" title="CocoaLumberjack架构"></a>CocoaLumberjack架构</h4><p>这个框架的核心是<code>DDLog</code>文件，这个文件提供不同的<code>DDLog</code>宏定义来替换系你的<code>NSLog</code>语句，例如<br><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">DDLogWarn(<span class="string">@"Specified file does not exist"</span>);</span><br></pre></td></tr></table></figure></p>
+<p>这个语句实际上起到一个筛选的作用只有在相关的等级下才会输出<br><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span>(LOG_WARN) <span class="comment">/* Execute log statement */</span></span><br></pre></td></tr></table></figure></p>
+<p>而且当每输出一个DDLog语句时，<code>DDLog</code>都会将日志消息转发给所有的前面注册的<code>logger</code>。</p>
+<ul>
+<li><p>Loggers<br>logger是使用日志消息执行某些操作的类。<code>CocoaLumberjack</code>带有几个少数的loggers(当然也可以自定义logger)。例如：DDASLLogger，DDASLLogger。前面已经说过可以将消息发送到系统和Xcode的控制台。DDFileLogger可以将消息写入到文件中。可以同时注册多个logger。<br>当然也可以配置相关的Logger。例如<code>DDFileLogger</code>自带很多选项来供设置。每一个Logger都可以设置一个<code>formatter</code>。<code>formatter</code>主要用来格式化日志信息的。</p>
+</li>
+<li><p>Formatters<br>Formatters可以允许你在Logger接受日志前格式化日志信息。例如可以给日志添加时间戳或者过滤日志的一些不必要信息。<br>Formatters可以单独应用不同的loggers。可以为每个logger提供不同的Formatters。</p>
+</li>
+</ul>
+<h4 id="自定义日志消息"><a href="#自定义日志消息" class="headerlink" title="自定义日志消息"></a>自定义日志消息</h4><p>每一个日志消息结构都有一个<code>context</code>字段。<code>context</code>字段是一个整数，它与日志信息一起传递给CocoaLumberjack框架。因此可以自由的定义这个字段。<br>这个context字段可以使用在很多方面，这里列举了几个例子</p>
+<ul>
+<li>有些应用模块化，有多个逻辑组件，如果每个组件都使用不同的context字段，那么如果使用这个框架很容易知道是哪一个模块打印的日志。可以根据来自不同模块的日志对日志进行不同的格式化处理。</li>
+<li>如果开发一个框架给其他人使用。希望别人在使用你的框架是可以很清楚的知道你的框架都做了什么操作，这对发现和诊断问题很有帮助，如果使用这个框架那么根据自定义的context字段你很容易区分这个日志消息到底是来自于你开发的框架还是其他应用的日志信息。</li>
+</ul>
+<h5 id="日志消息结构"><a href="#日志消息结构" class="headerlink" title="日志消息结构"></a>日志消息结构</h5><p>每一个日志消息都会转换成<code>DDLogMessage</code>对象<br><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">@interface</span> <span class="title">DDLogMessage</span> : <span class="title">NSObject</span> &lt;<span class="title">NSCopying</span>&gt;</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">// Direct accessors to be used only for performance</span></span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">@property</span> (<span class="keyword">readonly</span>, <span class="keyword">nonatomic</span>) <span class="built_in">NSString</span> *message;</span><br><span class="line"><span class="keyword">@property</span> (<span class="keyword">readonly</span>, <span class="keyword">nonatomic</span>) DDLogLevel level;</span><br><span class="line"><span class="keyword">@property</span> (<span class="keyword">readonly</span>, <span class="keyword">nonatomic</span>) DDLogFlag flag;</span><br><span class="line"><span class="keyword">@property</span> (<span class="keyword">readonly</span>, <span class="keyword">nonatomic</span>) <span class="built_in">NSInteger</span> context;</span><br><span class="line"><span class="keyword">@property</span> (<span class="keyword">readonly</span>, <span class="keyword">nonatomic</span>) <span class="built_in">NSString</span> *file;</span><br><span class="line"><span class="keyword">@property</span> (<span class="keyword">readonly</span>, <span class="keyword">nonatomic</span>) <span class="built_in">NSString</span> *fileName;</span><br><span class="line"><span class="keyword">@property</span> (<span class="keyword">readonly</span>, <span class="keyword">nonatomic</span>) <span class="built_in">NSString</span> *function;</span><br><span class="line"><span class="keyword">@property</span> (<span class="keyword">readonly</span>, <span class="keyword">nonatomic</span>) <span class="built_in">NSUInteger</span> line;</span><br><span class="line"><span class="keyword">@property</span> (<span class="keyword">readonly</span>, <span class="keyword">nonatomic</span>) <span class="keyword">id</span> tag;</span><br><span class="line"><span class="keyword">@property</span> (<span class="keyword">readonly</span>, <span class="keyword">nonatomic</span>) DDLogMessageOptions options;</span><br><span class="line"><span class="keyword">@property</span> (<span class="keyword">readonly</span>, <span class="keyword">nonatomic</span>) <span class="built_in">NSDate</span> *timestamp;</span><br><span class="line"><span class="keyword">@property</span> (<span class="keyword">readonly</span>, <span class="keyword">nonatomic</span>) <span class="built_in">NSString</span> *threadID; <span class="comment">// ID as it appears in NSLog calculated from the machThreadID</span></span><br><span class="line"><span class="keyword">@property</span> (<span class="keyword">readonly</span>, <span class="keyword">nonatomic</span>) <span class="built_in">NSString</span> *threadName;</span><br><span class="line"><span class="keyword">@property</span> (<span class="keyword">readonly</span>, <span class="keyword">nonatomic</span>) <span class="built_in">NSString</span> *queueLabel;</span><br></pre></td></tr></table></figure></p>
+<p>可以注意到<code>context</code>这个字段，默认的这个字段没个信息都是0。<br>当然我们可以很容易自定义这个字段<br><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#define LSY_CONTEXT 100</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#define LSYEventVerbose(frmt, ...) LOG_MAYBE(LOG_ASYNC_ENABLED, LOG_LEVEL_DEF, DDLogFlagVerbose, LSY_CONTEXT, nil, __PRETTY_FUNCTION__, frmt, ##__VA_ARGS__)</span></span><br></pre></td></tr></table></figure></p>
+<p>这样我们可以得到一个日志等级<code>DDLogFlagVerbose</code>的<code>LSYEventVerbose</code>宏。使用这个宏输出的日志得到的<code>context</code>字段值为100。</p>
+<h4 id="自定义Logger"><a href="#自定义Logger" class="headerlink" title="自定义Logger"></a>自定义Logger</h4><p>Logger允许你直接将日志消息指向任何地方。<br>在<code>DDLog</code>头文件中定义了DDLoger协议。由三个强制方法组成</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">@protocol</span> <span class="title">DDLogger</span> &lt;<span class="title">NSObject</span>&gt;</span></span><br><span class="line">- (<span class="keyword">void</span>)logMessage:(DDLogMessage *)logMessage;</span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * Formatters may optionally be added to any logger.</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * If no formatter is set, the logger simply logs the message as it is given in logMessage,</span></span><br><span class="line"><span class="comment"> * or it may use its own built in formatting style.</span></span><br><span class="line"><span class="comment"> **/</span></span><br><span class="line"><span class="keyword">@property</span> (<span class="keyword">nonatomic</span>, <span class="keyword">strong</span>) <span class="keyword">id</span> &lt;DDLogFormatter&gt; logFormatter;</span><br><span class="line"><span class="keyword">@optional</span></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * Since logging is asynchronous, adding and removing loggers is also asynchronous.</span></span><br><span class="line"><span class="comment"> * In other words, the loggers are added and removed at appropriate times with regards to log messages.</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * - Loggers will not receive log messages that were executed prior to when they were added.</span></span><br><span class="line"><span class="comment"> * - Loggers will not receive log messages that were executed after they were removed.</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * These methods are executed in the logging thread/queue.</span></span><br><span class="line"><span class="comment"> * This is the same thread/queue that will execute every logMessage: invocation.</span></span><br><span class="line"><span class="comment"> * Loggers may use these methods for thread synchronization or other setup/teardown tasks.</span></span><br><span class="line"><span class="comment"> **/</span></span><br><span class="line">- (<span class="keyword">void</span>)didAddLogger;</span><br><span class="line">- (<span class="keyword">void</span>)willRemoveLogger;</span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * Some loggers may buffer IO for optimization purposes.</span></span><br><span class="line"><span class="comment"> * For example, a database logger may only save occasionaly as the disk IO is slow.</span></span><br><span class="line"><span class="comment"> * In such loggers, this method should be implemented to flush any pending IO.</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * This allows invocations of DDLog's flushLog method to be propogated to loggers that need it.</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * Note that DDLog's flushLog method is invoked automatically when the application quits,</span></span><br><span class="line"><span class="comment"> * and it may be also invoked manually by the developer prior to application crashes, or other such reasons.</span></span><br><span class="line"><span class="comment"> **/</span></span><br><span class="line">- (<span class="keyword">void</span>)flush;</span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * Each logger is executed concurrently with respect to the other loggers.</span></span><br><span class="line"><span class="comment"> * Thus, a dedicated dispatch queue is used for each logger.</span></span><br><span class="line"><span class="comment"> * Logger implementations may optionally choose to provide their own dispatch queue.</span></span><br><span class="line"><span class="comment"> **/</span></span><br><span class="line"><span class="keyword">@property</span> (<span class="keyword">nonatomic</span>, DISPATCH_QUEUE_REFERENCE_TYPE, <span class="keyword">readonly</span>) <span class="built_in">dispatch_queue_t</span> loggerQueue;</span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * If the logger implementation does not choose to provide its own queue,</span></span><br><span class="line"><span class="comment"> * one will automatically be created for it.</span></span><br><span class="line"><span class="comment"> * The created queue will receive its name from this method.</span></span><br><span class="line"><span class="comment"> * This may be helpful for debugging or profiling reasons.</span></span><br><span class="line"><span class="comment"> **/</span></span><br><span class="line"><span class="keyword">@property</span> (<span class="keyword">nonatomic</span>, <span class="keyword">readonly</span>) <span class="built_in">NSString</span> *loggerName;</span><br><span class="line"><span class="keyword">@end</span></span><br></pre></td></tr></table></figure>
+<p>此外，如果自定义的logger继承<code>DDAbstractLogger</code>那么会自动实现 (<code>logFormatter</code> &amp; <code>setLogFormatter:</code>)这两个强制的方法，因此实现一个logger很容易：</p>
+<p>MyCustomLogger.h:<br><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#import <span class="meta-string">&lt;Foundation/Foundation.h&gt;</span></span></span><br><span class="line"><span class="meta">#import <span class="meta-string">"DDLog.h"</span></span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">@interface</span> <span class="title">MyCustomLogger</span> : <span class="title">DDAbstractLogger</span> &lt;<span class="title">DDLogger</span>&gt;</span></span><br><span class="line">&#123;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">@end</span></span><br></pre></td></tr></table></figure></p>
+<p>MyCustomLogger.m<br><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#import <span class="meta-string">"MyCustomLogger.h"</span></span></span><br><span class="line"><span class="class"><span class="keyword">@implementation</span> <span class="title">MyCustomLogger</span></span></span><br><span class="line"></span><br><span class="line">- (<span class="keyword">void</span>)logMessage:(DDLogMessage *)logMessage &#123;</span><br><span class="line">    <span class="built_in">NSString</span> *logMsg = logMessage.message;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (<span class="keyword">self</span>-&gt;logFormatter)</span><br><span class="line">        logMsg = [<span class="keyword">self</span>-&gt;logFormatter formatLogMessage:logMessage];</span><br><span class="line">    <span class="keyword">if</span> (logMsg) &#123;</span><br><span class="line">        <span class="comment">// Write logMsg to wherever...</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">@end</span></span><br></pre></td></tr></table></figure></p>
+<p>logFormatter设计为logger的可选组件。 这是为了简单。如果不需要格式化任何信息则不需要添加<code>logFormatter</code>这个属性。并且logFormatter和logger之间是可重用的。 单个logFormatter可应用于多个logger。</p>
+<h4 id="自定义格式化消息-Formatters"><a href="#自定义格式化消息-Formatters" class="headerlink" title="自定义格式化消息(Formatters)"></a>自定义格式化消息(Formatters)</h4><p>格式化日志消息对于不同的logger来说是可选的属性，如果设置了这个属性，那么在操作日志消息前可以对日志消息的结构做更改，还可以加上其他的一些信息。<br>格式化日志消息还可以用来筛选日志消息，你可以自由的觉得哪些消息需要被展示出来或者写入文件，哪些消息需要过滤掉。<br>记住自定义格式化消息(Formatters)可以单于的应用于Logger，因此可以对每个logger的消息进行格式化或者筛选过滤。</p>
+<h5 id="使用"><a href="#使用" class="headerlink" title="使用"></a>使用</h5><p>如果想自定义一个Formatters是很简单的，至于要实现在头文件 <code>DDLog.h</code> 中的<code>DDLogFormatter</code>协议即可，这个协议仅仅有一个必须实现的方法：<br><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">@protocol</span> <span class="title">DDLogFormatter</span> &lt;<span class="title">NSObject</span>&gt;</span></span><br><span class="line"><span class="keyword">@required</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * Formatters may optionally be added to any logger.</span></span><br><span class="line"><span class="comment"> * This allows for increased flexibility in the logging environment.</span></span><br><span class="line"><span class="comment"> * For example, log messages for log files may be formatted differently than log messages for the console.</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * For more information about formatters, see the "Custom Formatters" page:</span></span><br><span class="line"><span class="comment"> * Documentation/CustomFormatters.md</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * The formatter may also optionally filter the log message by returning nil,</span></span><br><span class="line"><span class="comment"> * in which case the logger will not log the message.</span></span><br><span class="line"><span class="comment"> **/</span></span><br><span class="line">- (<span class="built_in">NSString</span> *)formatLogMessage:(DDLogMessage *)logMessage;</span><br><span class="line"></span><br><span class="line"><span class="keyword">@optional</span></span><br><span class="line"><span class="comment">// ...</span></span><br><span class="line"><span class="keyword">@end</span></span><br></pre></td></tr></table></figure></p>
+<p>下面通过一个实例来说明如果自定义<code>Formatters</code><br>MyCustomFormatter.h<br><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#import <span class="meta-string">&lt;Foundation/Foundation.h&gt;</span></span></span><br><span class="line"><span class="meta">#import <span class="meta-string">"DDLog.h"</span></span></span><br><span class="line"><span class="class"><span class="keyword">@interface</span> <span class="title">MyCustomFormatter</span> : <span class="title">NSObject</span> &lt;<span class="title">DDLogFormatter</span>&gt;</span></span><br><span class="line"><span class="keyword">@end</span></span><br></pre></td></tr></table></figure></p>
+<p>MyCustomFormatter.m<br><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#import <span class="meta-string">"MyCustomFormatter.h"</span></span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">@implementation</span> <span class="title">MyCustomFormatter</span></span></span><br><span class="line"></span><br><span class="line">- (<span class="built_in">NSString</span> *)formatLogMessage:(DDLogMessage *)logMessage &#123;</span><br><span class="line">    <span class="built_in">NSString</span> *logLevel;</span><br><span class="line">    <span class="keyword">switch</span> (logMessage-&gt;_flag) &#123;</span><br><span class="line">        <span class="keyword">case</span> DDLogFlagError    : logLevel = <span class="string">@"E"</span>; <span class="keyword">break</span>;</span><br><span class="line">        <span class="keyword">case</span> DDLogFlagWarning  : logLevel = <span class="string">@"W"</span>; <span class="keyword">break</span>;</span><br><span class="line">        <span class="keyword">case</span> DDLogFlagInfo     : logLevel = <span class="string">@"I"</span>; <span class="keyword">break</span>;</span><br><span class="line">        <span class="keyword">case</span> DDLogFlagDebug    : logLevel = <span class="string">@"D"</span>; <span class="keyword">break</span>;</span><br><span class="line">        <span class="keyword">default</span>                : logLevel = <span class="string">@"V"</span>; <span class="keyword">break</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">return</span> [<span class="built_in">NSString</span> stringWithFormat:<span class="string">@"%@ | %@"</span>, logLevel, logMessage-&gt;_message];</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">@end</span></span><br></pre></td></tr></table></figure></p>
+<p><strong>如果此时想要过滤掉这条日志消息那么直接返回nil即可</strong></p>
+<p>然后将这个自定义的Formatters添加到Logger中：<br><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[DDTTYLogger sharedInstance].logFormatter = [[MyCustomFormatter alloc] init];</span><br></pre></td></tr></table></figure></p>
+<h4 id="日志文件管理"><a href="#日志文件管理" class="headerlink" title="日志文件管理"></a>日志文件管理</h4><p>我们可以将写入本地的日志文件压缩或者上传到服务器<br>日志文件有两个组件，一个组件是将日志信息写入到本地文件中，然后根据文件大小或者过期时间来决定是否刷新文件，另一个组件是用来管理这些日志文件的。一旦日志文件写入完成来决定这些文件是应该被压缩还是被上传到服务器，或者两者都需要。<br>框架自带的<code>DDFileLogger</code>实现被分为两个组件。<code>DDFileLogger</code>是将日志消息写入文件的组件。而<code>DDLogFileManager</code>是一个管理日志文件的协议，并决定文件将要被刷新时如何处理它。</p>
+<p>首先看一下<code>DDFileLogger</code>的初始化：<br><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">@interface</span> <span class="title">DDFileLogger</span> : <span class="title">NSObject</span> &lt;<span class="title">DDLogger</span>&gt;</span></span><br><span class="line">...</span><br><span class="line"></span><br><span class="line">- (<span class="keyword">instancetype</span>)init;</span><br><span class="line">- (<span class="keyword">instancetype</span>)initWithLogFileManager:(<span class="keyword">id</span> &lt;DDLogFileManager&gt;)logFileManager <span class="built_in">NS_DESIGNATED_INITIALIZER</span>;</span><br><span class="line">...</span><br><span class="line"><span class="keyword">@end</span></span><br></pre></td></tr></table></figure></p>
+<p>默认初始化方法简单的使用了<code>DDLogFileManagerDefault</code>这个类。这个类只提供了删除旧日志文件的方法。<br>还有一个初始化方法就需要传入一个自定义的日志文件管理类。</p>
+<h5 id="使用-1"><a href="#使用-1" class="headerlink" title="使用"></a>使用</h5><p>如果想使用<code>DDFileLogger</code>，这个框架自带将日志写入文件的类，并且需要自定义一个文件管理，那么就需要实现<code>DDLogFileManager</code>协议。当然，如果连Logger都是自定义的话那么就不需要按照框架这样分两个组件去实现。这个前提是使用<code>DDFileLogger</code>并想自定义文件管理。</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">@protocol</span> <span class="title">DDLogFileManager</span> &lt;<span class="title">NSObject</span>&gt;</span></span><br><span class="line"><span class="keyword">@required</span></span><br><span class="line"><span class="comment">// Public properties</span></span><br><span class="line"><span class="keyword">@property</span> (<span class="keyword">readwrite</span>, <span class="keyword">assign</span>) <span class="built_in">NSUInteger</span> maximumNumberOfLogFiles;</span><br><span class="line"><span class="comment">// Public methods</span></span><br><span class="line">- (<span class="built_in">NSString</span> *)logsDirectory;</span><br><span class="line">- (<span class="built_in">NSArray</span> *)unsortedLogFilePaths;</span><br><span class="line">- (<span class="built_in">NSArray</span> *)unsortedLogFileNames;</span><br><span class="line">- (<span class="built_in">NSArray</span> *)unsortedLogFileInfos;</span><br><span class="line">- (<span class="built_in">NSArray</span> *)sortedLogFilePaths;</span><br><span class="line">- (<span class="built_in">NSArray</span> *)sortedLogFileNames;</span><br><span class="line">- (<span class="built_in">NSArray</span> *)sortedLogFileInfos;</span><br><span class="line"><span class="comment">// Private methods (only to be used by DDFileLogger)</span></span><br><span class="line">- (<span class="built_in">NSString</span> *)createNewLogFile;</span><br><span class="line"><span class="keyword">@optional</span></span><br><span class="line"><span class="comment">// Notifications from DDFileLogger</span></span><br><span class="line">- (<span class="keyword">void</span>)didArchiveLogFile:(<span class="built_in">NSString</span> *)logFilePath;</span><br><span class="line">- (<span class="keyword">void</span>)didRollAndArchiveLogFile:(<span class="built_in">NSString</span> *)logFilePath;</span><br><span class="line"></span><br><span class="line"><span class="keyword">@end</span></span><br></pre></td></tr></table></figure>
+<p>如果自定义实现日志文件管理，那么需要实现上面<code>@required</code>的方法。当文件需要刷新时会通知<code>@optional</code>的两个方法。</p>
+<p>可能对<code>@required</code>的方法有些困惑，查看<code>DDFileLogger</code>的实现实际上只用到了<code>sortedLogFileInfos</code>的方法来获取当前操作文件的信息。如果自定义日志文件管理的话只需要实现<code>sortedLogFileInfos</code>就可以了。但是如果在外部访问这些属性不发生错误那么最好全部都实现。</p>
+<h4 id="简单实现"><a href="#简单实现" class="headerlink" title="简单实现"></a>简单实现</h4><p>下面我们将会通过代码，自定义一条消息来过滤不需要的日志，并且将相关日志写入文件并上传的服务器。<br>在.pch文件中，进行如下配置<br><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#import <span class="meta-string">"CocoaLumberjack.h"</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">static</span> DDLogLevel ddLogLevel = DDLogLevelVerbose;</span><br><span class="line"></span><br><span class="line"><span class="meta">#define JHEVENT_CONTEXT 100</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#define JHEventVerbose(frmt, ...) LOG_MAYBE(LOG_ASYNC_ENABLED, LOG_LEVEL_DEF, DDLogFlagVerbose, JHEVENT_CONTEXT, nil, __PRETTY_FUNCTION__, frmt, ##__VA_ARGS__)</span></span><br></pre></td></tr></table></figure></p>
+<p>上面定义了日志输出的优先级为<code>DDLogLevelDebug</code>。并且自定义了日志输出的消息类型，<code>CONTEXT</code>为100，用于筛选日志消息。</p>
+<p>在程序启动时<br><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">- (<span class="built_in">BOOL</span>)application:(<span class="built_in">UIApplication</span> *)application didFinishLaunchingWithOptions:(<span class="built_in">NSDictionary</span> *)launchOptions &#123;</span><br><span class="line">    </span><br><span class="line">    </span><br><span class="line">    [DDLog addLogger:[DDASLLogger sharedInstance]]; </span><br><span class="line">    [DDLog addLogger:[DDTTYLogger sharedInstance]]; </span><br><span class="line">    JHEventFileManager *fileManager = [[JHEventFileManager alloc] init];    <span class="comment">//自定义日志文件管理</span></span><br><span class="line">    JHEventLogger *fileLogger = [[JHEventLogger alloc] initWithLogFileManager:fileManager]; <span class="comment">//自定义文件Logger</span></span><br><span class="line">    fileLogger.rollingFrequency = <span class="number">60</span> * <span class="number">60</span> * <span class="number">24</span>; <span class="comment">// 有效期是24小时</span></span><br><span class="line">    fileLogger.logFileManager.maximumNumberOfLogFiles = <span class="number">2</span>;  <span class="comment">//最多文件数量为2个</span></span><br><span class="line">    fileLogger.logFormatter = [[JHEventFormatter alloc] init];  <span class="comment">//日志消息格式化</span></span><br><span class="line">    fileLogger.maximumFileSize = <span class="number">1024</span>*<span class="number">50</span>;   <span class="comment">//每个文件数量最大尺寸为50k</span></span><br><span class="line">    fileLogger.logFileManager.logFilesDiskQuota = <span class="number">200</span>*<span class="number">1024</span>;     <span class="comment">//所有文件的尺寸最大为200k</span></span><br><span class="line">    [DDLog addLogger:fileLogger];</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">return</span> <span class="literal">YES</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>上面一共添加了三种Logger，通过<code>DDLog</code>输出的消息会被这三种<code>Logger</code>接收。上面使用时定义了几个参数相互约束来控制日志文件的有效期和大小的。当单个文件大于50k时会新建一个日志文件。当第二个文件大于50k时会将最早的文件删除掉。当文件有限期超过24小时或者所有文件的尺寸大于200k时也会将最早的日志文件删除掉。</p>
+<p><code>JHEventFileManager</code>的实现如下：<br>JHEventFileManager.h<br><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">@interface</span> <span class="title">JHEventFileManager</span> : <span class="title">DDLogFileManagerDefault</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">@end</span></span><br></pre></td></tr></table></figure></p>
+<p>JHEventFileManager.m</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">@implementation</span> <span class="title">JHEventFileManager</span></span></span><br><span class="line">- (<span class="keyword">void</span>)didArchiveLogFile:(<span class="built_in">NSString</span> *)logFilePath</span><br><span class="line">&#123;</span><br><span class="line">    </span><br><span class="line">&#125;</span><br><span class="line">- (<span class="keyword">void</span>)didRollAndArchiveLogFile:(<span class="built_in">NSString</span> *)logFilePath</span><br><span class="line">&#123;</span><br><span class="line">    </span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">@end</span></span><br></pre></td></tr></table></figure>
+<p>这个类直接继承框架自带的<code>DDLogFileManagerDefault</code>类，并没有重写一个实现<code>&lt;DDLogFileManager&gt;</code>协议的新类。根据不同的业务可以参考<code>DDLogFileManagerDefault</code>类，重新写一个新的日志文件管理。</p>
+<p>实现上面的方法主要当日志文件将要被刷新删除时会调用，此时我们可以获取到这个文件将文件上传到服务器。<br>关于<code>JHEventLogger</code>类的实现也是直接继承系统的<code>DDFileLogger</code>。<br>JHEventLogger.h<br><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">@interface</span> <span class="title">JHEventLogger</span> : <span class="title">DDFileLogger</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">@end</span></span><br></pre></td></tr></table></figure></p>
+<p>JHEventLogger.m<br><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">- (<span class="keyword">void</span>)logMessage:(DDLogMessage *)logMessage &#123;</span><br><span class="line">    [<span class="keyword">super</span> logMessage:logMessage];</span><br><span class="line">&#125;</span><br><span class="line">- (<span class="keyword">void</span>)willLogMessage</span><br><span class="line">&#123;</span><br><span class="line">    [<span class="keyword">super</span> willLogMessage];</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">- (<span class="keyword">void</span>)didLogMessage</span><br><span class="line">&#123;</span><br><span class="line">    [<span class="keyword">super</span> didLogMessage];</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>也可以直接使用<code>DDFileLogger</code>类。这样做可以在写入日志时获取相关的通知，从而进行其他操作。</p>
+<p><code>JHEventFormatter</code>用来筛选和格式化日志信息:<br>JHEventFormatter.h<br><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">@interface</span> <span class="title">JHEventFormatter</span> : <span class="title">NSObject</span> &lt;<span class="title">DDLogFormatter</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">@end</span></span><br></pre></td></tr></table></figure></p>
+<p>JHEventFormatter.m<br><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">@implementation</span> <span class="title">JHEventFormatter</span></span></span><br><span class="line">- (<span class="built_in">NSString</span> *)formatLogMessage:(DDLogMessage *)logMessage &#123;</span><br><span class="line">    <span class="built_in">NSString</span> *logLevel;</span><br><span class="line">    <span class="keyword">switch</span> (logMessage-&gt;_flag) &#123;</span><br><span class="line">        <span class="keyword">case</span> DDLogFlagError    : logLevel = <span class="string">@"E"</span>; <span class="keyword">break</span>;</span><br><span class="line">        <span class="keyword">case</span> DDLogFlagWarning  : logLevel = <span class="string">@"W"</span>; <span class="keyword">break</span>;</span><br><span class="line">        <span class="keyword">case</span> DDLogFlagInfo     : logLevel = <span class="string">@"I"</span>; <span class="keyword">break</span>;</span><br><span class="line">        <span class="keyword">case</span> DDLogFlagDebug    : logLevel = <span class="string">@"D"</span>; <span class="keyword">break</span>;</span><br><span class="line">        <span class="keyword">default</span>                : logLevel = <span class="string">@"V"</span>; <span class="keyword">break</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (logMessage.context == JHEVENT_CONTEXT) &#123;</span><br><span class="line">        <span class="keyword">return</span> [<span class="built_in">NSString</span> stringWithFormat:<span class="string">@"%@ | %@"</span>, logLevel, logMessage-&gt;_message];</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">nil</span>;</span><br><span class="line">    &#125;</span><br><span class="line"><span class="keyword">@end</span></span><br></pre></td></tr></table></figure></p>
+<p>只有当我们消息是由<code>JHEventVerbose</code>宏打印时才会将日志写入本地。<br>当我们使用时如下：<br><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">@implementation</span> <span class="title">ViewController</span></span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">- (<span class="keyword">void</span>)viewDidLoad &#123;</span><br><span class="line">    [<span class="keyword">super</span> viewDidLoad];</span><br><span class="line">   ddLogLevel = DDLogLevelVerbose;</span><br><span class="line">&#125;</span><br><span class="line">- (<span class="keyword">IBAction</span>)event_1:(<span class="keyword">id</span>)sender &#123;</span><br><span class="line">    DDLogError(<span class="string">@"error log"</span>);</span><br><span class="line">&#125;</span><br><span class="line">- (<span class="keyword">IBAction</span>)event_2:(<span class="keyword">id</span>)sender &#123;</span><br><span class="line">    DDLogVerbose(<span class="string">@"Verbose log"</span>);</span><br><span class="line">&#125;</span><br><span class="line">- (<span class="keyword">IBAction</span>)event_3:(<span class="keyword">id</span>)sender &#123;</span><br><span class="line">    JHEventVerbose(<span class="string">@"JHEventVerbose"</span>);</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">@end</span></span><br></pre></td></tr></table></figure></p>
+<p>我们在.pch文件中定义了<code>DDLog</code>的优先级为<code>DDLogLevelDebug</code>，此时<code>DDLogVerbose</code>和<code>JHEventVerbose</code>都不会有输出，但是在<code>viewDidLoad</code>方法里我们针对这个文件将优先级改成<code>DDLogLevelVerbose</code>后<code>DDLogVerbose</code>与<code>JHEventVerbose</code>都会正常输出，其他文件的优先级还是<code>DDLogLevelDebug</code>。<br>这三个输出都会被<code>DDASLLogger</code>，<code>DDTTYLogger</code>，<code>JHEventLogger</code>接收到，也就是我们会在Xcode控制台与Mac上的控制台看到这三个输出。但是只有<code>JHEventVerbose</code>的输出会保存到本地，因为我们之前在格式化的时候通过<code>context</code>字段将前两个信息已经过滤掉了。</p>
+<p>上面就是<code>CocoaLumberjack</code>的简单介绍与使用，更多的使用方法还是需要参考<a href="https://github.com/CocoaLumberjack/CocoaLumberjack/tree/master/Documentation" target="_blank" rel="noopener">这里</a>的文档。</p>
+<h3 id="plcrashreporter"><a href="#plcrashreporter" class="headerlink" title="plcrashreporter"></a>plcrashreporter</h3><p><strong>说明</strong>:有关<code>plcrashreporter</code>的介绍大多数都是参考的<code>plcrashreporter</code>开发团队提供的文档，如果想看更多或者下载安装<code>plcrashreporter</code>的请移步<a href="https://www.plcrashreporter.org" target="_blank" rel="noopener">这里</a>。</p>
+<p>CrashReporter提供了一个用于iOS和Mac OS X的进程中崩溃报告框架，并为iOS提供了大部分崩溃报告服务，包括HockeyApp，Flurry和Crittercism。<br>特点</p>
+<ul>
+<li>仅支持使用公开API/ABI的崩溃报告。  </li>
+<li>首次在2008年发布，并用于成千上万的应用程序。 PLCrashReporter已经看到了大量的用户测试。     </li>
+<li>提供所有活动线程的调用栈。     </li>
+<li>最精准的可用堆栈展开，使用DWARF和Apple Compact Unwind框架数据       </li>
+<li>不妨碍lldb / gdb中的调试     </li>
+<li>易于集成现有或定制的崩溃报告服务。     </li>
+<li>为崩溃的线程提供完整的寄存器状态。<br><strong>解码崩溃报告</strong><br>崩溃报告作为protobuf编码消息输出，可以使用CrashReporter库或任何Google Protobuf解码器进行解码。</li>
+</ul>
+<p>除了内置库解码支持外，你可以使用附带的plcrashutil二进制文件将崩溃报告转换为苹果标准的iPhone文本格式，这可传递给符号化工具<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">./bin/plcrashutil convert --format=iphone example_report.plcrash | symbolicatecrash</span><br></pre></td></tr></table></figure></p>
+<p>将来的发布版本可能包括可重用的格式化程序，用于直接从手机输出不同的格式<br><strong>构建</strong><br>构建一个可嵌入的framework<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">user@max:~/plcrashreporter-trunk&gt; xcodebuild -configuration Release -target &apos;Disk Image&apos;</span><br></pre></td></tr></table></figure></p>
+<p>这将在build/Release/PLCrashReporter-{version}.dmg中输出一个新的版本，其中包含可嵌入的Mac OS X框架和iOS静态框架。</p>
+<hr>
+<h4 id="PLCrashReporter介绍"><a href="#PLCrashReporter介绍" class="headerlink" title="PLCrashReporter介绍"></a>PLCrashReporter介绍</h4><p>Plausile CrashReporter实现了在iPhone和Mac OS X上进程中的崩溃报告。<br>支持以下功能：</p>
+<ul>
+<li>实现进程内信号处理。    </li>
+<li>不干扰gdb中的调试    </li>
+<li>处理未被捕获的Objective-C异常和致命信号（SIGSEGV，SIGBUS等）。   </li>
+<li>提供所有活动线程（调用栈，寄存器drump）的完整线程状态。    </li>
+<li>如果您的应用程序崩溃，将会写入崩溃报告。 当应用程序下一次运行时，您可以检查挂起的崩溃报告，并将报告提交到您自己的HTTP服务器，发送电子邮件，甚至在本地内部报告。</li>
+</ul>
+<h4 id="崩溃报告格式"><a href="#崩溃报告格式" class="headerlink" title="崩溃报告格式"></a>崩溃报告格式</h4><p>崩溃日志使用<a href="https://github.com/google/protobuf" target="_blank" rel="noopener">google protobuf</a>解码，也可以使用<a href="https://www.plcrashreporter.org/documentation/api/v1.2/interface_p_l_crash_report.html" target="_blank" rel="noopener">PLCrashReport</a>API进行解码。除此之外附带的plcrashutil可以处理将二进制崩溃报告转换为符号兼容的iPhone文本格式。</p>
+<h4 id="PLCrashReporter类列表与功能简述"><a href="#PLCrashReporter类列表与功能简述" class="headerlink" title="PLCrashReporter类列表与功能简述"></a>PLCrashReporter类列表与功能简述</h4><table>
+<thead>
+<tr>
+<th>class</th>
+<th style="text-align:center">brief</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>PLCrashHostInfoVersion</td>
+<td style="text-align:center">major.minor.revision版本号</td>
+</tr>
+<tr>
+<td>PLCrashProcessInfo</td>
+<td style="text-align:center">提供访问有关目标进程的基本信息的方法</td>
+</tr>
+<tr>
+<td>PLCrashReport</td>
+<td style="text-align:center">提供PLCrashReporter框架生成的崩溃日志的解码</td>
+</tr>
+<tr>
+<td>PLCrashReportApplicationInfo</td>
+<td style="text-align:center">崩溃日志应用程序数据</td>
+</tr>
+<tr>
+<td>PLCrashReportBinaryImageInfo</td>
+<td style="text-align:center">崩溃日志二进制图像信息</td>
+</tr>
+<tr>
+<td>PLCrashReporter</td>
+<td style="text-align:center">崩溃记录</td>
+</tr>
+<tr>
+<td>PLCrashReporterCallbacks</td>
+<td style="text-align:center">支持PLCrashReporter回调，允许主机应用程序在发生崩溃之后在程序终止之前执行其他任务的回调</td>
+</tr>
+<tr>
+<td>PLCrashReporterConfig</td>
+<td style="text-align:center">崩溃记录配置</td>
+</tr>
+<tr>
+<td>PLCrashReportExceptionInfo</td>
+<td style="text-align:center">如果由于未被捕获的Objective-C异常触发崩溃，将会提供异常名称和原因</td>
+</tr>
+<tr>
+<td>PLCrashReportFileHeader</td>
+<td style="text-align:center">崩溃日志文件头格式</td>
+</tr>
+<tr>
+<td><code>&lt;PLCrashReportFormatter&gt;</code></td>
+<td style="text-align:center">崩溃报告格式接受PLCrashReport实例化，根据实现指定的协议进行格式化（如实现文本输出支持），并返回结果</td>
+</tr>
+<tr>
+<td>PLCrashReportMachExceptionInfo</td>
+<td style="text-align:center">提供访问异常类型和代码</td>
+</tr>
+<tr>
+<td>PLCrashReportMachineInfo</td>
+<td style="text-align:center">崩溃日志主机架构信息</td>
+</tr>
+<tr>
+<td>PLCrashReportProcessInfo</td>
+<td style="text-align:center">崩溃日志进程数据</td>
+</tr>
+<tr>
+<td>PLCrashReportProcessorInfo</td>
+<td style="text-align:center">崩溃日志进程记录</td>
+</tr>
+<tr>
+<td>PLCrashReportRegisterInfo</td>
+<td style="text-align:center">崩溃日志通用寄存器信息</td>
+</tr>
+<tr>
+<td>PLCrashReportSignalInfo</td>
+<td style="text-align:center">提供对signal名称和siganl代码的访问</td>
+</tr>
+<tr>
+<td>PLCrashReportStackFrameInfo</td>
+<td style="text-align:center">崩溃日志堆栈信息</td>
+</tr>
+<tr>
+<td>PLCrashReportSymbolInfo</td>
+<td style="text-align:center">崩溃日志符号信息</td>
+</tr>
+<tr>
+<td>PLCrashReportSystemInfo</td>
+<td style="text-align:center">崩溃日志系统数据</td>
+</tr>
+<tr>
+<td>PLCrashReportTextFormatter</td>
+<td style="text-align:center">将PLCrashReport数据格式化为可读的文本</td>
+</tr>
+<tr>
+<td>PLCrashReportThreadInfo</td>
+<td style="text-align:center">崩溃日志每个线程状态信息</td>
+</tr>
+</tbody>
+</table>
+<p>更多详细介绍请<a href="https://www.plcrashreporter.org/documentation/api/v1.2/annotated.html" target="_blank" rel="noopener">参考</a></p>
+<h4 id="iPhone使用实例"><a href="#iPhone使用实例" class="headerlink" title="iPhone使用实例"></a>iPhone使用实例</h4><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line"> - (<span class="keyword">void</span>) handleCrashReport &#123;</span><br><span class="line">     PLCrashReporter *crashReporter = [PLCrashReporter sharedReporter];</span><br><span class="line">     <span class="built_in">NSData</span> *crashData;</span><br><span class="line">     <span class="built_in">NSError</span> *error;</span><br><span class="line">     </span><br><span class="line">     <span class="comment">// Try loading the crash report</span></span><br><span class="line">     crashData = [crashReporter loadPendingCrashReportDataAndReturnError: &amp;error];</span><br><span class="line">     <span class="keyword">if</span> (crashData == <span class="literal">nil</span>) &#123;</span><br><span class="line">         <span class="built_in">NSLog</span>(<span class="string">@"Could not load crash report: %@"</span>, error);</span><br><span class="line">         <span class="keyword">goto</span> finish;</span><br><span class="line">     &#125;</span><br><span class="line">     </span><br><span class="line">     <span class="comment">// We could send the report from here, but we'll just print out</span></span><br><span class="line">     <span class="comment">// some debugging info instead</span></span><br><span class="line">     PLCrashReport *report = [[[PLCrashReport alloc] initWithData: crashData error: &amp;error] autorelease];</span><br><span class="line">     <span class="keyword">if</span> (report == <span class="literal">nil</span>) &#123;</span><br><span class="line">         <span class="built_in">NSLog</span>(<span class="string">@"Could not parse crash report"</span>);</span><br><span class="line">         <span class="keyword">goto</span> finish;</span><br><span class="line">     &#125;</span><br><span class="line">     </span><br><span class="line">     <span class="built_in">NSLog</span>(<span class="string">@"Crashed on %@"</span>, report.systemInfo.timestamp);</span><br><span class="line">     <span class="built_in">NSLog</span>(<span class="string">@"Crashed with signal %@ (code %@, address=0x%"</span> PRIx64 <span class="string">")"</span>, report.signalInfo.name,</span><br><span class="line">           report.signalInfo.code, report.signalInfo.address);</span><br><span class="line">     </span><br><span class="line">     <span class="comment">// Purge the report</span></span><br><span class="line"> finish:</span><br><span class="line">     [crashReporter purgePendingCrashReport];</span><br><span class="line">     <span class="keyword">return</span>;</span><br><span class="line"> &#125;</span><br><span class="line"></span><br><span class="line"> - (<span class="keyword">void</span>) applicationDidFinishLaunching: (<span class="built_in">UIApplication</span> *) application &#123;</span><br><span class="line">     PLCrashReporter *crashReporter = [PLCrashReporter sharedReporter];</span><br><span class="line">     <span class="built_in">NSError</span> *error;</span><br><span class="line">     <span class="comment">// Check if we previously crashed</span></span><br><span class="line">     <span class="keyword">if</span> ([crashReporter hasPendingCrashReport])</span><br><span class="line">         [<span class="keyword">self</span> handleCrashReport];   </span><br><span class="line">     <span class="comment">// Enable the Crash Reporter</span></span><br><span class="line">     <span class="keyword">if</span> (![crashReporter enableCrashReporterAndReturnError: &amp;error])</span><br><span class="line">         <span class="built_in">NSLog</span>(<span class="string">@"Warning: Could not enable crash reporter: %@"</span>, error);         </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><strong>注意：在Xcode调试模式下是捕获不到异常的，包括真机调试和模拟器调试，此时需要断开调试模式后制造异常，捕获后通过Xcode再次运行应用就可以查看保存在本地的异常记录了</strong></p>
+<p>上面的写法是<code>PLCrashReporter</code>文档中给出的实例代码，通过<code>hasPendingCrashReport</code>方法来判断是否存在奔溃信息，如果存在就会调用<code>handleCrashReport</code>方法来处理。处理结束后会调用<code>purgePendingCrashReport</code>方法来清除之前保存的奔溃报告。如果我们想要把奔溃信息上传到服务器那么就会以下问题：<br>如果在上传的过程过程中又出现了新的崩溃信息，那么旧的信息就会被新的奔溃信息所覆盖丢失，这样做只能本地保存一份崩溃日志。如果旧的奔溃日志成功上传到服务器还好，如果因为网络原因没有上传成功，那么此时再出现新的崩溃，老的数据就会丢失。<br>所以使用的时候还应该对上面的代码进行一下修改：</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">@implementation</span> <span class="title">AppDelegate</span></span></span><br><span class="line"><span class="keyword">static</span> <span class="keyword">void</span> save_crash_report (PLCrashReporter *reporter) &#123;</span><br><span class="line">    </span><br><span class="line">    <span class="built_in">NSFileManager</span> *fm = [<span class="built_in">NSFileManager</span> defaultManager];</span><br><span class="line">    <span class="built_in">NSError</span> *error;</span><br><span class="line">    </span><br><span class="line">    <span class="built_in">NSArray</span> *paths = <span class="built_in">NSSearchPathForDirectoriesInDomains</span>(<span class="built_in">NSDocumentDirectory</span>, <span class="built_in">NSUserDomainMask</span>, <span class="literal">YES</span>);</span><br><span class="line">    <span class="built_in">NSString</span> *documentsDirectory = [paths objectAtIndex:<span class="number">0</span>];</span><br><span class="line">    <span class="keyword">if</span> (![fm createDirectoryAtPath: documentsDirectory withIntermediateDirectories: <span class="literal">YES</span> attributes:<span class="literal">nil</span> error: &amp;error]) &#123;</span><br><span class="line">        <span class="built_in">NSLog</span>(<span class="string">@"Could not create documents directory: %@"</span>, error);</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    </span><br><span class="line">    <span class="built_in">NSData</span> *data = [reporter loadPendingCrashReportDataAndReturnError: &amp;error];</span><br><span class="line">    <span class="keyword">if</span> (data == <span class="literal">nil</span>) &#123;</span><br><span class="line">        <span class="built_in">NSLog</span>(<span class="string">@"Failed to load crash report data: %@"</span>, error);</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="built_in">NSString</span> *outputPath = [documentsDirectory stringByAppendingPathComponent: [<span class="built_in">NSString</span> stringWithFormat:<span class="string">@"demo_%f.plcrash"</span>,[<span class="built_in">NSDate</span> date].timeIntervalSince1970]];</span><br><span class="line">    <span class="keyword">if</span> (![data writeToFile: outputPath atomically: <span class="literal">YES</span>]) &#123;</span><br><span class="line">        <span class="built_in">NSLog</span>(<span class="string">@"Failed to write crash report"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span>&#123;</span><br><span class="line">        <span class="built_in">NSLog</span>(<span class="string">@"Saved crash report to: %@"</span>, outputPath);</span><br><span class="line">        [reporter purgePendingCrashReport];</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">static</span> <span class="keyword">void</span> post_crash_callback (siginfo_t *info, ucontext_t *uap, <span class="keyword">void</span> *context) &#123;</span><br><span class="line">    <span class="comment">// this is not async-safe, but this is a test implementation</span></span><br><span class="line">    <span class="built_in">NSLog</span>(<span class="string">@"post crash callback: signo=%d, uap=%p, context=%p"</span>, info-&gt;si_signo, uap, context);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">- (<span class="built_in">BOOL</span>)application:(<span class="built_in">UIApplication</span> *)application didFinishLaunchingWithOptions:(<span class="built_in">NSDictionary</span> *)launchOptions &#123;</span><br><span class="line">    </span><br><span class="line">    PLCrashReporter *crashReport = [PLCrashReporter sharedReporter];</span><br><span class="line">    <span class="built_in">NSError</span> *error;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">if</span> ([crashReport hasPendingCrashReport]) &#123;</span><br><span class="line">        [<span class="keyword">self</span> handleCrashReport];</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (![crashReport enableCrashReporterAndReturnError:&amp;error]) &#123;</span><br><span class="line">        <span class="built_in">NSLog</span>(<span class="string">@"Warning: Could not enable crash reporter: %@"</span>, error);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">YES</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">-(<span class="keyword">void</span>)handleCrashReport</span><br><span class="line">&#123;</span><br><span class="line">    PLCrashReporter *crashReporter = [PLCrashReporter sharedReporter];</span><br><span class="line">    save_crash_report(crashReporter);</span><br><span class="line">    PLCrashReporterCallbacks cb = &#123;</span><br><span class="line">        .version = <span class="number">0</span>,</span><br><span class="line">        .context = (<span class="keyword">void</span> *) <span class="number">0xABABABAB</span>,</span><br><span class="line">        .handleSignal = post_crash_callback</span><br><span class="line">    &#125;;</span><br><span class="line">    [crashReporter setCrashCallbacks: &amp;cb];</span><br><span class="line">    </span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">@end</span></span><br></pre></td></tr></table></figure>
+<p>上面的代码每次有崩溃日志时都会将日志再备份一次到本地，以防日志丢失，备份后将日志上传到服务器，上传成功后将备份的日志删除掉。如果失败下次启动时也可以检查备份目录有多少上传失败的文件，然后根据情况重新上传。上面的代码还添加了崩溃发生时的回调，具体可以参照上面列表中介绍类的信息<code>PLCrashReporterCallbacks：支持PLCrashReporter回调，允许主机应用程序在发生崩溃之后在程序终止之前执行其他任务的回调</code>。</p>
+<h4 id="崩溃日志解析"><a href="#崩溃日志解析" class="headerlink" title="崩溃日志解析"></a>崩溃日志解析</h4><p>上面提到了崩溃日志解析有几种方式，这里介绍使用附带的<code>plcrashutil</code>工具进行解析。现在最新的<code>PLCrashReporter</code>发布版本是<a href="https://www.plcrashreporter.org/download" target="_blank" rel="noopener">1.2</a>。下载这个版本在<code>Tools</code>文件夹里会看见<code>plcrashutil</code>的可执行文件。<br>我们制造几次崩溃后会在上面代码保存的目录下发现如下文件:<br>tupian<br>将其中一个崩溃文件与<code>plcrashutil</code>可执行文件放在一个目录下。并且在shell中cd到这个目录后执行如下命令：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">./plcrashutil convert --format=iphone demo_1494240181.851469.plcrash &gt; app.crash</span><br></pre></td></tr></table></figure></p>
+<p>这条命令会将<code>plcrash</code>文件转换成苹果标准崩溃格式。<br>配置环境变量执行：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">export</span> DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer</span><br></pre></td></tr></table></figure></p>
+<p>找到<code>Xcode</code>自带的符号化工具<code>symbolicatecrash</code><br>在<code>Xcode 8.3</code>中的位置如下<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">/Applications/Xcode.app/Contents/SharedFrameworks/DVTFoundation.framework/Versions/A/Resources/symbolicatecrash</span><br></pre></td></tr></table></figure></p>
+<p>获取应用的符号化文件<code>yourappname.app.dSYM</code><br>将<code>symbolicatecrash</code>和<code>yourappname.app.dSYM</code>放到与<code>plcrashutil</code>相同目录下：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">./symbolicatecrash app.crash yourappname.app.dSYM &gt; app.log</span><br></pre></td></tr></table></figure></p>
+<p>此时生成的<code>app.log</code>文件即是符号化解析后的文件。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/iOS/" rel="tag"># iOS</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/10/01/iOS项目组件化解耦/" rel="next" title="iOS项目组件化解耦">
+                <i class="fa fa-chevron-left"></i> iOS项目组件化解耦
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/07/28/iOS崩溃日志解析脚本/" rel="prev" title="iOS崩溃日志解析脚本">
+                iOS崩溃日志解析脚本 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      <div class="ds-thread" data-thread-key="2017/05/08/浅谈iOS日志收集系统/"
+           data-title="浅谈iOS日志收集系统" data-url="http://ggghub.com/2017/05/08/浅谈iOS日志收集系统/">
+      </div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">LiSiYuan</p>
+              <p class="site-description motion-element" itemprop="description">Hi! I'm GGGHub, Welcome here！</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">29</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                
+                  <span class="site-state-item-count">8</span>
+                  <span class="site-state-item-name">categories</span>
+                
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                
+                  <span class="site-state-item-count">19</span>
+                  <span class="site-state-item-name">tags</span>
+                
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/ggghub" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-globe"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://www.developboot.com" target="_blank" title="developboot">
+                      
+                        <i class="fa fa-fw fa-globe"></i>developboot</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://blog.csdn.net/ggghub" target="_blank" title="CSDN">
+                      
+                        <i class="fa fa-fw fa-globe"></i>CSDN</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#日志分类"><span class="nav-number">1.</span> <span class="nav-text">日志分类</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#日志收集框架"><span class="nav-number">2.</span> <span class="nav-text">日志收集框架</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#CocoaLumberjack"><span class="nav-number">2.1.</span> <span class="nav-text">CocoaLumberjack</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#配置CocoaLumberjack框架"><span class="nav-number">2.1.1.</span> <span class="nav-text">配置CocoaLumberjack框架</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#CocoaLumberjack架构"><span class="nav-number">2.1.2.</span> <span class="nav-text">CocoaLumberjack架构</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#自定义日志消息"><span class="nav-number">2.1.3.</span> <span class="nav-text">自定义日志消息</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#日志消息结构"><span class="nav-number">2.1.3.1.</span> <span class="nav-text">日志消息结构</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#自定义Logger"><span class="nav-number">2.1.4.</span> <span class="nav-text">自定义Logger</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#自定义格式化消息-Formatters"><span class="nav-number">2.1.5.</span> <span class="nav-text">自定义格式化消息(Formatters)</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#使用"><span class="nav-number">2.1.5.1.</span> <span class="nav-text">使用</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#日志文件管理"><span class="nav-number">2.1.6.</span> <span class="nav-text">日志文件管理</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#使用-1"><span class="nav-number">2.1.6.1.</span> <span class="nav-text">使用</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#简单实现"><span class="nav-number">2.1.7.</span> <span class="nav-text">简单实现</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#plcrashreporter"><span class="nav-number">2.2.</span> <span class="nav-text">plcrashreporter</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#PLCrashReporter介绍"><span class="nav-number">2.2.1.</span> <span class="nav-text">PLCrashReporter介绍</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#崩溃报告格式"><span class="nav-number">2.2.2.</span> <span class="nav-text">崩溃报告格式</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#PLCrashReporter类列表与功能简述"><span class="nav-number">2.2.3.</span> <span class="nav-text">PLCrashReporter类列表与功能简述</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#iPhone使用实例"><span class="nav-number">2.2.4.</span> <span class="nav-text">iPhone使用实例</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#崩溃日志解析"><span class="nav-number">2.2.5.</span> <span class="nav-text">崩溃日志解析</span></a></li></ol></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">LiSiYuan</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Muse</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"ggghub"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+    
+    <script src="/lib/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/js/src/hook-duoshuo.js"></script>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
