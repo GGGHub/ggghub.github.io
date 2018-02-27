@@ -1,0 +1,776 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="en">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Hexo, NexT" />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="最近在github上看到了LRNotificationObserver这个项目，看了一下实现方式，作者通过ARC机制实例化注册对象子类与关联对象的方法来管理注册对象的生命周期。从而省去了系统通知移除的过程，本篇介绍该项目实现过程。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="NSNotification系统通知优化">
+<meta property="og:url" content="http://ggghub.com/2016/07/11/NSNotification系统通知优化/index.html">
+<meta property="og:site_name" content="GGGHub&#39;s Blog">
+<meta property="og:description" content="最近在github上看到了LRNotificationObserver这个项目，看了一下实现方式，作者通过ARC机制实例化注册对象子类与关联对象的方法来管理注册对象的生命周期。从而省去了系统通知移除的过程，本篇介绍该项目实现过程。">
+<meta property="og:locale" content="en">
+<meta property="og:updated_time" content="2016-07-14T16:16:35.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="NSNotification系统通知优化">
+<meta name="twitter:description" content="最近在github上看到了LRNotificationObserver这个项目，看了一下实现方式，作者通过ARC机制实例化注册对象子类与关联对象的方法来管理注册对象的生命周期。从而省去了系统通知移除的过程，本篇介绍该项目实现过程。">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://ggghub.com/2016/07/11/NSNotification系统通知优化/"/>
+
+
+
+
+
+  <title>NSNotification系统通知优化 | GGGHub's Blog</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="en">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">GGGHub's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">Coding Obsession</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            Archives
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://ggghub.com/2016/07/11/NSNotification系统通知优化/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="LiSiYuan">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="GGGHub's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">NSNotification系统通知优化</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2016-07-11T17:55:00+08:00">
+                2016-07-11
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/ios/" itemprop="url" rel="index">
+                    <span itemprop="name">ios</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2016/07/11/NSNotification系统通知优化/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/07/11/NSNotification系统通知优化/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>最近在github上看到了<a href="https://github.com/luisrecuenco/LRNotificationObserver" target="_blank" rel="noopener">LRNotificationObserver</a>这个项目，看了一下实现方式，作者通过ARC机制实例化注册对象子类与关联对象的方法来管理注册对象的生命周期。从而省去了系统通知移除的过程，本篇介绍该项目实现过程。<a id="more"></a></p>
+<h2 id="NSNotificationCenter-通知存在的问题"><a href="#NSNotificationCenter-通知存在的问题" class="headerlink" title="NSNotificationCenter 通知存在的问题"></a>NSNotificationCenter 通知存在的问题</h2><p>注册<br><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">[[<span class="built_in">NSNotificationCenter</span> defaultCenter] addObserver:anObserver</span><br><span class="line">                                         selector:<span class="keyword">@selector</span>(handleNotification:)</span><br><span class="line">                                             name:aNotificationName</span><br><span class="line">                                           object:anObjectThatFiresTheNotification];</span><br></pre></td></tr></table></figure></p>
+<p>移除<br><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">[[<span class="built_in">NSNotificationCenter</span> defaultCenter] removeObserver:anObserver</span><br><span class="line">                                                name:aNotificationName</span><br><span class="line">                                              object:anObjectThatFiresTheNotification];</span><br></pre></td></tr></table></figure></p>
+<p>这是正常使用通知的情形，这样使用存在两个问题</p>
+<ul>
+<li>每次使用都需要手动移除观察者。</li>
+<li>如果在主线程注册观察者然后在线程B中发送通知，如果通知事件是更新UI那么就会出现问题因为此时是在线程B操作而不是主线程。</li>
+</ul>
+<h2 id="LRNotificationObserver"><a href="#LRNotificationObserver" class="headerlink" title="LRNotificationObserver"></a>LRNotificationObserver</h2><p><code>LRNotificationObserver</code>对象的内部持有<code>NSNotificationCenter</code>对象实际上是对<code>NSNotificationCenter</code>基础功能进一步的封装。</p>
+<h3 id="LRNotificationObserver自动管理观察者"><a href="#LRNotificationObserver自动管理观察者" class="headerlink" title="LRNotificationObserver自动管理观察者"></a>LRNotificationObserver自动管理观察者</h3><p><code>LRNotificationObserver</code>有两种方法初始化</p>
+<ul>
+<li>实例化注册对象<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">@property</span> (<span class="keyword">nonatomic</span>, <span class="keyword">strong</span>) LRNotificationObserver *backgroundObserver;</span><br><span class="line"></span><br><span class="line"><span class="keyword">self</span>.backgroundObserver = [LRNotificationObserver observerForName:<span class="built_in">UIApplicationDidEnterBackgroundNotification</span></span><br><span class="line">                                                            block:^(<span class="built_in">NSNotification</span> *note) &#123;</span><br><span class="line">                                                                <span class="comment">// Do appropriate background task</span></span><br><span class="line">                                                            &#125;];</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<p>这种方法需要声明一个<code>LRNotificationObserver</code>对象作为属性，根据ARC内存管理当对象销毁时对象的属性也会一起销毁<br>这种情况下作者把销毁的方法写在了<code>LRNotificationObserver</code>对象的<code>dealloc</code>方法中。</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">- (<span class="keyword">void</span>)dealloc</span><br><span class="line">&#123;</span><br><span class="line">    [<span class="keyword">self</span> stopObserving];</span><br><span class="line">&#125;</span><br><span class="line">- (<span class="keyword">void</span>)stopObserving</span><br><span class="line">&#123;</span><br><span class="line">    [_notificationCenter removeObserver:<span class="keyword">self</span> name:_name object:_object];</span><br><span class="line">    [<span class="keyword">self</span> clear];</span><br><span class="line">&#125;</span><br><span class="line">- (<span class="keyword">void</span>)clear</span><br><span class="line">&#123;</span><br><span class="line">    _block = <span class="literal">nil</span>;</span><br><span class="line">    _targetAction = <span class="literal">nil</span>;</span><br><span class="line">    _operationQueue = <span class="literal">nil</span>;</span><br><span class="line">    _dispatchQueue = <span class="literal">nil</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>使用类方法不用实例化对象<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">[LRNotificationObserver observeName:<span class="built_in">UIApplicationDidReceiveMemoryWarningNotification</span></span><br><span class="line">                              owner:<span class="keyword">self</span></span><br><span class="line">                              block:^(<span class="built_in">NSNotification</span> *note) &#123;</span><br><span class="line">                                  <span class="comment">// Purge unnecessary cache</span></span><br><span class="line">                              &#125;];</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<p>虽然不用实例化<code>LRNotificationObserver</code>但是要传入<code>owner</code>参数，<code>owner</code>相当于一个钩子，让其与<code>LRNotificationObserver</code>对象进行关联。</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">+ (<span class="keyword">void</span>)addObserver:(LRNotificationObserver *)observer asPropertyOfOwner:(<span class="keyword">id</span>)owner</span><br><span class="line">&#123;</span><br><span class="line">    objc_setAssociatedObject(owner, (__bridge <span class="keyword">void</span> *)observer, observer, OBJC_ASSOCIATION_RETAIN_NONATOMIC);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>通过运行时关联对象的方法将<code>LRNotificationObserver</code>对象与<code>owner</code>对象关联，当<code>owner</code>销毁时关联断开，<code>LRNotificationObserver</code>对象不被任何对象持有销毁。执行<code>dealloc</code>方法</p>
+<hr>
+<h3 id="线程安全"><a href="#线程安全" class="headerlink" title="线程安全"></a>线程安全</h3><p><code>LRNotificationObserver</code>可以指定通知方法执行队列</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">[LRNotificationObserver observeName:<span class="string">@"someNotificationThatShouldUpdateTheUI"</span></span><br><span class="line">                             object:anObject</span><br><span class="line">                              owner:anOwner</span><br><span class="line">                     dispatch_queue:dispatch_get_main_queue()</span><br><span class="line">                             target:viewController</span><br><span class="line">                           selector:<span class="keyword">@selector</span>(methodToBeExecutedOnMainThread:)];</span><br></pre></td></tr></table></figure>
+<p>当收到通知后线程会自动切换到<code>dispatch_queue</code>置顶队列所在的线程中。</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line">- (<span class="keyword">void</span>)executeNotificationFiredBlock:(dispatch_block_t)block</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">if</span> (<span class="keyword">self</span>.operationQueue)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">if</span> ([<span class="built_in">NSThread</span> isMainThread] &amp;&amp; <span class="keyword">self</span>.operationQueue == [<span class="built_in">NSOperationQueue</span> mainQueue])</span><br><span class="line">        &#123;</span><br><span class="line">            block();</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">else</span></span><br><span class="line">        &#123;</span><br><span class="line">            [<span class="keyword">self</span>.operationQueue addOperationWithBlock:block];</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span> <span class="keyword">if</span> (<span class="keyword">self</span>.dispatchQueue)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">if</span> ([<span class="built_in">NSThread</span> isMainThread] &amp;&amp; <span class="keyword">self</span>.dispatchQueue == dispatch_get_main_queue())</span><br><span class="line">        &#123;</span><br><span class="line">            block();</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">else</span></span><br><span class="line">        &#123;</span><br><span class="line">            <span class="built_in">dispatch_async</span>(<span class="keyword">self</span>.dispatchQueue, block);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">    &#123;</span><br><span class="line">        block();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>作者通过是否指定<code>dispatch_queue</code>与<code>operationQueue</code>来判断是否切换队列，如果没有指定那么默认操作将在发送通知的线程中执行。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/06/13/基于Core Text实现的TXT电子书阅读器/" rel="next" title="基于Core Text实现的TXT电子书阅读器">
+                <i class="fa fa-chevron-left"></i> 基于Core Text实现的TXT电子书阅读器
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016/07/15/iOS开发数据库SQLite的使用/" rel="prev" title="iOS开发数据库SQLite的使用">
+                iOS开发数据库SQLite的使用 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      <div class="ds-thread" data-thread-key="2016/07/11/NSNotification系统通知优化/"
+           data-title="NSNotification系统通知优化" data-url="http://ggghub.com/2016/07/11/NSNotification系统通知优化/">
+      </div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">LiSiYuan</p>
+              <p class="site-description motion-element" itemprop="description">Hi! I'm GGGHub, Welcome here！</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">24</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                
+                  <span class="site-state-item-count">7</span>
+                  <span class="site-state-item-name">categories</span>
+                
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                
+                  <span class="site-state-item-count">16</span>
+                  <span class="site-state-item-name">tags</span>
+                
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/ggghub" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-globe"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://www.developboot.com" target="_blank" title="developboot">
+                      
+                        <i class="fa fa-fw fa-globe"></i>developboot</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://blog.csdn.net/ggghub" target="_blank" title="CSDN">
+                      
+                        <i class="fa fa-fw fa-globe"></i>CSDN</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#NSNotificationCenter-通知存在的问题"><span class="nav-number">1.</span> <span class="nav-text">NSNotificationCenter 通知存在的问题</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#LRNotificationObserver"><span class="nav-number">2.</span> <span class="nav-text">LRNotificationObserver</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#LRNotificationObserver自动管理观察者"><span class="nav-number">2.1.</span> <span class="nav-text">LRNotificationObserver自动管理观察者</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#线程安全"><span class="nav-number">2.2.</span> <span class="nav-text">线程安全</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">LiSiYuan</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Muse</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"ggghub"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+    
+    <script src="/lib/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/js/src/hook-duoshuo.js"></script>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

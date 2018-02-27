@@ -1,0 +1,948 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="en">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Hexo, NexT" />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="iOS系统自带Core Data来进行持久化处理，而且Core Data可以使用图形化界面来创建对象，但是Core Data不是关系型数据库，对于Core Data来说比较擅长管理在设备上创建的数据持久化存储用户创建的对象，但是要处理大量的数据时就应该优先选择SQL关系型数据库来存储这些数据。Core Data在后台也是使用SQLite来存储数据的，但是开发人员不能直接访问这些数据，只能通过Cor">
+<meta property="og:type" content="article">
+<meta property="og:title" content="iOS开发数据库SQLite的使用">
+<meta property="og:url" content="http://ggghub.com/2016/07/15/iOS开发数据库SQLite的使用/index.html">
+<meta property="og:site_name" content="GGGHub&#39;s Blog">
+<meta property="og:description" content="iOS系统自带Core Data来进行持久化处理，而且Core Data可以使用图形化界面来创建对象，但是Core Data不是关系型数据库，对于Core Data来说比较擅长管理在设备上创建的数据持久化存储用户创建的对象，但是要处理大量的数据时就应该优先选择SQL关系型数据库来存储这些数据。Core Data在后台也是使用SQLite来存储数据的，但是开发人员不能直接访问这些数据，只能通过Cor">
+<meta property="og:locale" content="en">
+<meta property="og:image" content="http://img.blog.csdn.net/20160714103146994">
+<meta property="og:updated_time" content="2016-07-14T16:33:09.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="iOS开发数据库SQLite的使用">
+<meta name="twitter:description" content="iOS系统自带Core Data来进行持久化处理，而且Core Data可以使用图形化界面来创建对象，但是Core Data不是关系型数据库，对于Core Data来说比较擅长管理在设备上创建的数据持久化存储用户创建的对象，但是要处理大量的数据时就应该优先选择SQL关系型数据库来存储这些数据。Core Data在后台也是使用SQLite来存储数据的，但是开发人员不能直接访问这些数据，只能通过Cor">
+<meta name="twitter:image" content="http://img.blog.csdn.net/20160714103146994">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://ggghub.com/2016/07/15/iOS开发数据库SQLite的使用/"/>
+
+
+
+
+
+  <title>iOS开发数据库SQLite的使用 | GGGHub's Blog</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="en">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">GGGHub's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">Coding Obsession</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            Archives
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://ggghub.com/2016/07/15/iOS开发数据库SQLite的使用/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="LiSiYuan">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="GGGHub's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">iOS开发数据库SQLite的使用</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2016-07-15T00:33:09+08:00">
+                2016-07-15
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/ios/" itemprop="url" rel="index">
+                    <span itemprop="name">ios</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2016/07/15/iOS开发数据库SQLite的使用/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/07/15/iOS开发数据库SQLite的使用/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>iOS系统自带<code>Core Data</code>来进行持久化处理，而且<code>Core Data</code>可以使用图形化界面来创建对象，但是<code>Core Data</code>不是关系型数据库，对于<code>Core Data</code>来说比较擅长管理在设备上创建的数据持久化存储用户创建的对象，但是要处理大量的数据时就应该优先选择<code>SQL</code>关系型数据库来存储这些数据。<br><code>Core Data</code>在后台也是使用SQLite来存储数据的，但是开发人员不能直接访问这些数据，只能通过<code>Core Data</code>提供的API来操作，如果一旦人为的通过<code>SQLite</code>修改这些数据那么使用<code>Core Data</code>再次访问这些数据时就会发生错误。<br><a id="more"></a></p>
+<h2 id="SQLite库"><a href="#SQLite库" class="headerlink" title="SQLite库"></a>SQLite库</h2><p>SQLite是使用<code>C</code>语言写的开源库，实现了一个自包含的<code>SQL关系型数据库引擎</code>，可以使用<code>SQLite</code>存储操作大量的数据，作为关系型数据库我们可以在一个数据库中建立多张相关联的表来解决大量数据重复的问题。而且<code>SQLite</code>库也针对移动设备上的使用进行了优化。<br>因为<code>SQLite</code>的接口使用<code>C</code>写的，而且<code>Objective-C</code>是<code>C</code>的超集所以可以直接在项目中使用<code>SQLite</code>。</p>
+<h2 id="设计一个数据库"><a href="#设计一个数据库" class="headerlink" title="设计一个数据库"></a>设计一个数据库</h2><p>开始之前首先要想到需要存什么数据，然后怎么设计这个数据库。<br>首先我们设计一个数据库用来存储人员信息如下：</p>
+<table>
+<thead>
+<tr>
+<th>id</th>
+<th>name</th>
+<th>age</th>
+<th>email</th>
+<th>region</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>jhon</td>
+<td>20</td>
+<td>jhon@mail</td>
+<td>beijing</td>
+</tr>
+<tr>
+<td>2</td>
+<td>peter</td>
+<td>20</td>
+<td>peter@mail</td>
+<td>shanghai</td>
+</tr>
+<tr>
+<td>3</td>
+<td>july</td>
+<td>20</td>
+<td>july@mail</td>
+<td>beijing</td>
+</tr>
+<tr>
+<td>4</td>
+<td>elev</td>
+<td>20</td>
+<td>elev@mail</td>
+<td>shenzhen</td>
+</tr>
+<tr>
+<td>5</td>
+<td>ribet</td>
+<td>20</td>
+<td>ribet@mail</td>
+<td>beijing</td>
+</tr>
+</tbody>
+</table>
+<p>上面是所有的人员信息，实际可能比这个多很多。但是我们发现<code>region</code>这一行中有很多的数据重复出现。很多人可能来自同一个地方，为了避免这种情况我们应该再重新创建一张表来单独存储<code>region</code>这列的信息然后在这个表中引用<code>region</code>表中的信息。当然我们还可以在<code>region</code>表中添加更多的信息比如详细地址。现在创建两张表<code>people</code>与<code>region</code>如下所示</p>
+<ul>
+<li>people表</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>id</th>
+<th>name</th>
+<th>age</th>
+<th>email</th>
+<th>region</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>jhon</td>
+<td>20</td>
+<td>jhon@mail</td>
+<td>1</td>
+</tr>
+<tr>
+<td>2</td>
+<td>peter</td>
+<td>20</td>
+<td>peter@mail</td>
+<td>2</td>
+</tr>
+<tr>
+<td>3</td>
+<td>july</td>
+<td>20</td>
+<td>july@mail</td>
+<td>1</td>
+</tr>
+<tr>
+<td>4</td>
+<td>elev</td>
+<td>20</td>
+<td>elev@mail</td>
+<td>3</td>
+</tr>
+<tr>
+<td>5</td>
+<td>ribet</td>
+<td>20</td>
+<td>ribet@mail</td>
+<td>1</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>region表</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>regionid</th>
+<th>regioninfo</th>
+<th>address</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>beijing</td>
+<td>fengtai</td>
+</tr>
+<tr>
+<td>2</td>
+<td>shanghai</td>
+<td>jingan</td>
+</tr>
+<tr>
+<td>3</td>
+<td>shenzhen</td>
+<td>futian</td>
+</tr>
+</tbody>
+</table>
+<h2 id="使用SQLite创建数据库"><a href="#使用SQLite创建数据库" class="headerlink" title="使用SQLite创建数据库"></a>使用SQLite创建数据库</h2><p>为了熟悉<code>SQLite</code>语句，打开<code>shell</code>使用<code>SQLite</code>命令行来创建一个数据库</p>
+<ul>
+<li>打开创建数据库<br>打开<code>shell</code>切换到指定目录输入</li>
+</ul>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sqlite3 database.db</span><br></pre></td></tr></table></figure>
+<p>这行命令是启动<code>sqlite</code>命令行并且创建新的数据库<code>database.db</code>并附加该数据到命令行<br>此时已经进入<code>sqlite</code>命令行通过输入<code>.help</code>可以显示可以使用哪些命令，通过输入<code>.databases</code>来查看当前有哪些数据库附加到当前的命令行工具中。输入<code>.quit</code>或<code>.exit</code>退出当前命令行工具</p>
+<ul>
+<li>创建表</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">create table <span class="string">"main"</span>.<span class="string">"people"</span> (<span class="string">"id"</span> integer primary key autoincrement <span class="keyword">not</span> null, <span class="string">"name"</span> text,<span class="string">"age"</span> integer,<span class="string">"email"</span> text,<span class="string">"region"</span> integer);</span><br></pre></td></tr></table></figure>
+<p>这条命令是创建一个<code>people</code>的表，并且将<code>id</code>字段设为<code>primary key</code>主键将其指定为一个<code>autoincrement</code>自动增长的字段。表示不用提供<code>id</code>的值数据库将自动生成。后面的表示该张表中所含有的字段。</p>
+<p>因为要设计两张表所以还需要创建<code>region</code>表</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">create table <span class="string">"main"</span>.<span class="string">"region"</span> (<span class="string">"regionid"</span> integer primary key autoincrement <span class="keyword">not</span> null, <span class="string">"regioninfo"</span> text,<span class="string">"address"</span> text <span class="keyword">not</span> null);</span><br></pre></td></tr></table></figure>
+<ul>
+<li>添加数据<br>此时已经成功创建了两张表我们要添加数据进去</li>
+</ul>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">insert into "main"."people" ("name","age","email","region") values ('jhon','20','jhon@mail','1');</span><br></pre></td></tr></table></figure>
+<p>这样成功往<code>people</code>表成功的插入了一条数据。这样写效率比较低。每次只能插入一条数据不要担心<code>SQLite</code>支持将文件直接导入数据库中。可以是普通的文件文件也可以是excel文件。下面我们创建一个<code>people.txt</code>文件格式如下：</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">1</span>   jhon    <span class="number">20</span>  jhon@mail   <span class="number">1</span></span><br><span class="line"><span class="number">2</span>   peter   <span class="number">20</span>  peter@mail  <span class="number">2</span></span><br><span class="line"><span class="number">3</span>   july    <span class="number">20</span>  july@mail   <span class="number">1</span></span><br><span class="line"><span class="number">4</span>   elev    <span class="number">20</span>  elev@mail   <span class="number">3</span></span><br><span class="line"><span class="number">5</span>   ribet   <span class="number">20</span>  ribet@mail  <span class="number">1</span></span><br></pre></td></tr></table></figure>
+<p>注意每个字段之间的空隙是用制表符<code>\t</code>来分割的，也就是创建文件是每个字段用<code>tab</code>键进行分割。字段的顺序必须和表中的顺序相同然后将<code>people.txt</code>文件导入<code>people</code>表中</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">.separator <span class="string">"\t"</span></span><br></pre></td></tr></table></figure>
+<p>根据<code>\t</code>来分割字段，然后接着输入</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">.<span class="keyword">import</span> <span class="string">"people.txt"</span> people</span><br></pre></td></tr></table></figure>
+<p>导入people.txt文件到people表中此时会提示如下错误信息</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">people.txt:<span class="number">1</span>: INSERT failed: UNIQUE constraint failed: people.id</span><br></pre></td></tr></table></figure>
+<p>不用担心这个意思是说已经存在了一个id为1的数据所以这条数据插入失败，是因为我们之前手动了插入了一条数据。可以通过以下指令来查插入的数据</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">select * from people;</span><br></pre></td></tr></table></figure>
+<p>然后用同样的方法创建一个<code>region.txt</code>的文件并将其导入<code>region</code>表中。</p>
+<p><strong>注意</strong><br>使用<code>SQLite</code>命令行可能会出现<code>...&gt;</code>这表示指令输入错误，按<code>ctrl+d</code>即可退出</p>
+<ul>
+<li>查询数据上面已经添加完数据通过<code>select</code>指令可以查询这些数据</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">select * from people;</span><br></pre></td></tr></table></figure>
+<p>查询popple表中的所有数据</p>
+<p>链接表数据</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">select name,regioninfo from people,region where people.region=region.regionid;</span><br></pre></td></tr></table></figure>
+<p>输出结果</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">jhon    beijing</span><br><span class="line">peter   shanghai</span><br><span class="line">july    beijing</span><br><span class="line">elev    shenzhen</span><br><span class="line">ribet   beijing</span><br></pre></td></tr></table></figure>
+<p>从<code>people</code>和<code>region</code>表中查找<code>name</code>与<code>regioninfo</code>字段并且只查询people.region=region.regionid相匹配的结果，如果没有这个条件那么将出现5*3=15条数据</p>
+<p>如果要查找某个地区的人使用<code>where</code>来筛选条件</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">select name,regioninfo from people,region where people.region=region.regionid <span class="keyword">and</span> region.regioninfo=<span class="string">"beijing"</span>;</span><br></pre></td></tr></table></figure>
+<p>输出结果</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">jhon    beijing</span><br><span class="line">july    beijing</span><br><span class="line">ribet   beijing</span><br></pre></td></tr></table></figure>
+<h2 id="iOS中SQLite的使用"><a href="#iOS中SQLite的使用" class="headerlink" title="iOS中SQLite的使用"></a>iOS中SQLite的使用</h2><p>开始之前应该在项目中引用SQLite库。<code>TARGETS-&gt;General-&gt;Linked Frameworks and Libraries</code>如下图所示</p>
+<p><img src="http://img.blog.csdn.net/20160714103146994" alt=""></p>
+<p>将之前创建好的database.db文件导入项目中，并引入<code>sqlite3.h</code>头文件</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#import <span class="meta-string">&lt;sqlite3.h&gt;</span></span></span><br></pre></td></tr></table></figure>
+<p>使用SQLite需要一下几个步骤</p>
+<ul>
+<li>声明类变量<code>sqlite3</code>来保存对数据库的引用</li>
+<li>使用<code>sqlite3_open</code>打开数据库</li>
+<li>创建<code>SQLite</code>语句</li>
+<li>创建<code>SQLite</code>语句对象<code>sqlite3_stmt</code></li>
+<li>准备<code>SQLite</code>语句<code>sqlite3_prepare_v2</code></li>
+<li>开始遍历结果<code>sqlite3_step</code></li>
+</ul>
+<p>初始化打开数据库<br><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">sqlite3 * database;</span><br><span class="line">-(<span class="keyword">void</span>)initDatabase</span><br><span class="line">&#123;</span><br><span class="line">    <span class="built_in">NSString</span> *path = [[<span class="built_in">NSBundle</span> mainBundle] pathForResource:<span class="string">@"database"</span> ofType:<span class="string">@"db"</span>];   </span><br><span class="line">    <span class="keyword">if</span> (sqlite3_open([path UTF8String], &amp;database) == SQLITE_OK) &#123;</span><br><span class="line">        <span class="built_in">NSLog</span>(<span class="string">@"open database"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span>&#123;</span><br><span class="line">        sqlite3_close(database);</span><br><span class="line">        <span class="built_in">NSLog</span>(<span class="string">@"error %s"</span>,sqlite3_errmsg(database));</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>打开数据库如果返回的状态码不是<code>SQLITE_OK</code>那么打开失败关闭数据库并且输出错误信息</p>
+<p>查询数据<br><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">-(<span class="keyword">void</span>)operateDatabase</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">const</span> <span class="keyword">char</span> * sql = <span class="string">"select name,regioninfo from people,region where people.region=region.regionid"</span>;</span><br><span class="line">    sqlite3_stmt *statement;     <span class="comment">//创建sql语句对象</span></span><br><span class="line">    <span class="keyword">int</span> sqlResult = sqlite3_prepare_v2(database, sql, <span class="number">-1</span>, &amp;statement, <span class="literal">NULL</span>);    <span class="comment">//准备sql语句</span></span><br><span class="line">    <span class="keyword">if</span> ( sqlResult== SQLITE_OK) <span class="comment">//是否准备结束</span></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">while</span> (sqlite3_step(statement) == SQLITE_ROW)   <span class="comment">//开始遍历查询结果</span></span><br><span class="line">        &#123;</span><br><span class="line">            <span class="built_in">NSLog</span>(<span class="string">@"name %s, region %s"</span>,sqlite3_column_text(statement, <span class="number">0</span>),sqlite3_column_text(statement, <span class="number">1</span>));</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>输出结果：<br><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">name jhon, region beijing</span><br><span class="line">name peter, region shanghai</span><br><span class="line">name july, region beijing</span><br><span class="line">name elev, region shenzhen</span><br><span class="line">name ribet, region beijing</span><br></pre></td></tr></table></figure></p>
+<p><code>sqlite3_prepare_v2</code>的参数第一个是数据库连接，第二个是sql语句，第三个是这个语句的长度传入-1表示地道第一个null终止符为止，第四个是返回一个语句对象，第五个是返回一个指向该sql语句的第一个字节的指针。<br>当<code>sqlite3_prepare_v2</code>返回状态码<code>SQLITE_OK</code>时开始遍历结果。<br><code>sqlite3_step</code>用来遍历结果如果返回为<code>SQLITE_ROW</code>表示下一行准备结束可以开始查询。所以此处用一个<code>while</code>来便利所以查询的结果<br>遍历的过程中要取到结果通过一下的函数获取遍历结果<br><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">SQLITE_API <span class="keyword">const</span> <span class="keyword">void</span> *SQLITE_STDCALL <span class="title">sqlite3_column_blob</span><span class="params">(sqlite3_stmt*, <span class="keyword">int</span> iCol)</span></span>;</span><br><span class="line"><span class="function">SQLITE_API <span class="keyword">int</span> SQLITE_STDCALL <span class="title">sqlite3_column_bytes</span><span class="params">(sqlite3_stmt*, <span class="keyword">int</span> iCol)</span></span>;</span><br><span class="line"><span class="function">SQLITE_API <span class="keyword">int</span> SQLITE_STDCALL <span class="title">sqlite3_column_bytes16</span><span class="params">(sqlite3_stmt*, <span class="keyword">int</span> iCol)</span></span>;</span><br><span class="line"><span class="function">SQLITE_API <span class="keyword">double</span> SQLITE_STDCALL <span class="title">sqlite3_column_double</span><span class="params">(sqlite3_stmt*, <span class="keyword">int</span> iCol)</span></span>;</span><br><span class="line"><span class="function">SQLITE_API <span class="keyword">int</span> SQLITE_STDCALL <span class="title">sqlite3_column_int</span><span class="params">(sqlite3_stmt*, <span class="keyword">int</span> iCol)</span></span>;</span><br><span class="line"><span class="function">SQLITE_API sqlite3_int64 SQLITE_STDCALL <span class="title">sqlite3_column_int64</span><span class="params">(sqlite3_stmt*, <span class="keyword">int</span> iCol)</span></span>;</span><br><span class="line"><span class="function">SQLITE_API <span class="keyword">const</span> <span class="keyword">unsigned</span> <span class="keyword">char</span> *SQLITE_STDCALL <span class="title">sqlite3_column_text</span><span class="params">(sqlite3_stmt*, <span class="keyword">int</span> iCol)</span></span>;</span><br><span class="line"><span class="function">SQLITE_API <span class="keyword">const</span> <span class="keyword">void</span> *SQLITE_STDCALL <span class="title">sqlite3_column_text16</span><span class="params">(sqlite3_stmt*, <span class="keyword">int</span> iCol)</span></span>;</span><br><span class="line"><span class="function">SQLITE_API <span class="keyword">int</span> SQLITE_STDCALL <span class="title">sqlite3_column_type</span><span class="params">(sqlite3_stmt*, <span class="keyword">int</span> iCol)</span></span>;</span><br><span class="line"><span class="function">SQLITE_API sqlite3_value *SQLITE_STDCALL <span class="title">sqlite3_column_value</span><span class="params">(sqlite3_stmt*, <span class="keyword">int</span> iCol)</span></span>;</span><br></pre></td></tr></table></figure></p>
+<p>上面是所支持的结果类型，第一个参数为sql语句对象，第二个为获取哪一列的信息。</p>
+<p>参数化查询</p>
+<p>上面的情况每次sql语句都写死了，如果想要改变某个条件就需要重新写一条语句，幸好sqlite支持参数化查询，每次只需要更改查询条件就可以而不用更改整条sql语句，如果现在只想查询北京地区的人口信息使用参数化查询如下：<br><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">-(<span class="keyword">void</span>)operateDatabase</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">const</span> <span class="keyword">char</span> * sql = <span class="string">"select name,regioninfo from people,region where people.region=region.regionid and regioninfo=?"</span>;</span><br><span class="line">    sqlite3_stmt *statement;     <span class="comment">//创建sql语句对象</span></span><br><span class="line">    <span class="keyword">int</span> sqlResult = sqlite3_prepare_v2(database, sql, <span class="number">-1</span>, &amp;statement, <span class="literal">NULL</span>);    <span class="comment">//准备sql语句</span></span><br><span class="line">    </span><br><span class="line">    sqlite3_bind_text(statement, <span class="number">1</span>, <span class="string">"beijing"</span>, <span class="number">-1</span>,SQLITE_TRANSIENT);    <span class="comment">//绑定参数</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> ( sqlResult== SQLITE_OK) <span class="comment">//是否准备结束</span></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">while</span> (sqlite3_step(statement) == SQLITE_ROW)   <span class="comment">//开始遍历查询结果</span></span><br><span class="line">        &#123;</span><br><span class="line">            <span class="built_in">NSLog</span>(<span class="string">@"name %s, region %s"</span>,sqlite3_column_text(statement, <span class="number">0</span>),sqlite3_column_text(statement, <span class="number">1</span>));</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>输出结果：<br><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">name jhon, regionbeijing</span><br><span class="line">name july, regionbeijing</span><br><span class="line">name ribet, regionbeijing</span><br><span class="line">``` </span><br><span class="line">可见需要更改的条件sql中用`?`来代替，然后用`sqlite3_bind_text`函数来绑定参数。根据类型不同绑定的函数也不同</span><br><span class="line"></span><br><span class="line">``` c</span><br><span class="line">SQLITE_API <span class="keyword">int</span> SQLITE_STDCALL sqlite3_bind_blob(sqlite3_stmt*, <span class="keyword">int</span>, <span class="keyword">const</span> <span class="keyword">void</span>*, <span class="keyword">int</span> n, <span class="keyword">void</span>(*)(<span class="keyword">void</span>*));</span><br><span class="line">SQLITE_API <span class="keyword">int</span> SQLITE_STDCALL sqlite3_bind_blob64(sqlite3_stmt*, <span class="keyword">int</span>, <span class="keyword">const</span> <span class="keyword">void</span>*, sqlite3_uint64,<span class="keyword">void</span>(*)(<span class="keyword">void</span>*));</span><br><span class="line">SQLITE_API <span class="keyword">int</span> SQLITE_STDCALL sqlite3_bind_double(sqlite3_stmt*, <span class="keyword">int</span>, <span class="keyword">double</span>);</span><br><span class="line">SQLITE_API <span class="keyword">int</span> SQLITE_STDCALL sqlite3_bind_int(sqlite3_stmt*, <span class="keyword">int</span>, <span class="keyword">int</span>);</span><br><span class="line">SQLITE_API <span class="keyword">int</span> SQLITE_STDCALL sqlite3_bind_int64(sqlite3_stmt*, <span class="keyword">int</span>, sqlite3_int64);</span><br><span class="line">SQLITE_API <span class="keyword">int</span> SQLITE_STDCALL sqlite3_bind_null(sqlite3_stmt*, <span class="keyword">int</span>);</span><br><span class="line">SQLITE_API <span class="keyword">int</span> SQLITE_STDCALL sqlite3_bind_text(sqlite3_stmt*,<span class="keyword">int</span>,<span class="keyword">const</span> <span class="keyword">char</span>*,<span class="keyword">int</span>,<span class="keyword">void</span>(*)(<span class="keyword">void</span>*));</span><br><span class="line">SQLITE_API <span class="keyword">int</span> SQLITE_STDCALL sqlite3_bind_text16(sqlite3_stmt*, <span class="keyword">int</span>, <span class="keyword">const</span> <span class="keyword">void</span>*, <span class="keyword">int</span>, <span class="keyword">void</span>(*)(<span class="keyword">void</span>*));</span><br><span class="line">SQLITE_API <span class="keyword">int</span> SQLITE_STDCALL sqlite3_bind_text64(sqlite3_stmt*, <span class="keyword">int</span>, <span class="keyword">const</span> <span class="keyword">char</span>*, sqlite3_uint64,<span class="keyword">void</span>(*)(<span class="keyword">void</span>*), <span class="keyword">unsigned</span> <span class="keyword">char</span> encoding);</span><br><span class="line">SQLITE_API <span class="keyword">int</span> SQLITE_STDCALL sqlite3_bind_value(sqlite3_stmt*, <span class="keyword">int</span>, <span class="keyword">const</span> sqlite3_value*);</span><br><span class="line">SQLITE_API <span class="keyword">int</span> SQLITE_STDCALL sqlite3_bind_zeroblob(sqlite3_stmt*, <span class="keyword">int</span>, <span class="keyword">int</span> n);</span><br></pre></td></tr></table></figure></p>
+<p>上面列出了所有支持绑定类型的函数。</p>
+<p>##结束<br>本篇只是列出了<code>SQLite</code>常用的基础方法，实际开发中数据库可能要比这复杂许多，而且还要考虑数据竞争线程安全的问题。具体还是要自己在开发中实践。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/07/11/NSNotification系统通知优化/" rel="next" title="NSNotification系统通知优化">
+                <i class="fa fa-chevron-left"></i> NSNotification系统通知优化
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016/07/21/KVC与KVO的进阶使用/" rel="prev" title="KVC与KVO的进阶使用">
+                KVC与KVO的进阶使用 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      <div class="ds-thread" data-thread-key="2016/07/15/iOS开发数据库SQLite的使用/"
+           data-title="iOS开发数据库SQLite的使用" data-url="http://ggghub.com/2016/07/15/iOS开发数据库SQLite的使用/">
+      </div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">LiSiYuan</p>
+              <p class="site-description motion-element" itemprop="description">Hi! I'm GGGHub, Welcome here！</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">24</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                
+                  <span class="site-state-item-count">7</span>
+                  <span class="site-state-item-name">categories</span>
+                
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                
+                  <span class="site-state-item-count">16</span>
+                  <span class="site-state-item-name">tags</span>
+                
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/ggghub" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-globe"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://www.developboot.com" target="_blank" title="developboot">
+                      
+                        <i class="fa fa-fw fa-globe"></i>developboot</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://blog.csdn.net/ggghub" target="_blank" title="CSDN">
+                      
+                        <i class="fa fa-fw fa-globe"></i>CSDN</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#SQLite库"><span class="nav-number">1.</span> <span class="nav-text">SQLite库</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#设计一个数据库"><span class="nav-number">2.</span> <span class="nav-text">设计一个数据库</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#使用SQLite创建数据库"><span class="nav-number">3.</span> <span class="nav-text">使用SQLite创建数据库</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#iOS中SQLite的使用"><span class="nav-number">4.</span> <span class="nav-text">iOS中SQLite的使用</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">LiSiYuan</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Muse</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"ggghub"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+    
+    <script src="/lib/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/js/src/hook-duoshuo.js"></script>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

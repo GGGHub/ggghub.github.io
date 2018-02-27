@@ -1,0 +1,1059 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="en">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Hexo, NexT" />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="总结了一下HTTP各种报文首部字段。 HTTP报文类型与结构HTTP报文结构   报文首部     空行(CR+LF)   报文主体">
+<meta property="og:type" content="article">
+<meta property="og:title" content="HTTP全部报文首部字段">
+<meta property="og:url" content="http://ggghub.com/2015/12/15/HTTP全部报文首部字段/index.html">
+<meta property="og:site_name" content="GGGHub&#39;s Blog">
+<meta property="og:description" content="总结了一下HTTP各种报文首部字段。 HTTP报文类型与结构HTTP报文结构   报文首部     空行(CR+LF)   报文主体">
+<meta property="og:locale" content="en">
+<meta property="og:updated_time" content="2016-05-10T06:45:02.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="HTTP全部报文首部字段">
+<meta name="twitter:description" content="总结了一下HTTP各种报文首部字段。 HTTP报文类型与结构HTTP报文结构   报文首部     空行(CR+LF)   报文主体">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://ggghub.com/2015/12/15/HTTP全部报文首部字段/"/>
+
+
+
+
+
+  <title>HTTP全部报文首部字段 | GGGHub's Blog</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="en">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">GGGHub's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">Coding Obsession</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            Archives
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://ggghub.com/2015/12/15/HTTP全部报文首部字段/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="LiSiYuan">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="GGGHub's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">HTTP全部报文首部字段</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2015-12-15T18:12:00+08:00">
+                2015-12-15
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/HTTP/" itemprop="url" rel="index">
+                    <span itemprop="name">HTTP</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2015/12/15/HTTP全部报文首部字段/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2015/12/15/HTTP全部报文首部字段/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>总结了一下HTTP各种报文首部字段。</p>
+<h3 id="HTTP报文类型与结构"><a href="#HTTP报文类型与结构" class="headerlink" title="HTTP报文类型与结构"></a>HTTP报文类型与结构</h3><h4 id="HTTP报文结构"><a href="#HTTP报文结构" class="headerlink" title="HTTP报文结构"></a>HTTP报文结构</h4><table>
+<thead>
+<tr>
+<th style="text-align:left">报文首部</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">空行(CR+LF)</td>
+</tr>
+<tr>
+<td style="text-align:left">报文主体</td>
+</tr>
+</tbody>
+</table>
+<a id="more"></a>
+<h4 id="HTTP报文类型"><a href="#HTTP报文类型" class="headerlink" title="HTTP报文类型"></a>HTTP报文类型</h4><p><code>http</code>有两种类型报文，<code>请求报文</code>和<code>响应报文</code>两种报文的首部结构如下</p>
+<ul>
+<li><strong>HTTP请求报文首部</strong></li>
+</ul>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">请求行</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">请求首部字段</td>
+</tr>
+<tr>
+<td style="text-align:left">通用首部字段</td>
+</tr>
+<tr>
+<td style="text-align:left">实体首部字段</td>
+</tr>
+</tbody>
+</table>
+<p><br></p>
+<ul>
+<li><strong>HTTP响应报文首部</strong></li>
+</ul>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">状态行</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">响应首部字段</td>
+</tr>
+<tr>
+<td style="text-align:left">通用首部字段</td>
+</tr>
+<tr>
+<td style="text-align:left">实体首部字段</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h3 id="HTTP报首部字段"><a href="#HTTP报首部字段" class="headerlink" title="HTTP报首部字段"></a>HTTP报首部字段</h3><p>从上面看<code>HTTP</code>一共有四种类型的首部字段<code>通用首部字段</code>，<code>请求首部字段</code>，<code>响应首部字段</code>，<code>实体首部字段</code>。</p>
+<ul>
+<li>通用首部字段：请求报文和响应报文两方都会使用的首部。</li>
+<li>请求首部字段：从客户端向服务器发送请求报文时使用的首部。</li>
+<li>响应首部字段：从服务器向客户端返回响应报文时使用的首部。</li>
+<li>实体首部字段：针对请求报文和响应报文的实体部分使用的首部。</li>
+</ul>
+<h4 id="HTTP-1-1-首部字段"><a href="#HTTP-1-1-首部字段" class="headerlink" title="HTTP/1.1 首部字段"></a>HTTP/1.1 首部字段</h4><ul>
+<li><strong>通用首部字段</strong></li>
+</ul>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">首部字段名</th>
+<th style="text-align:left">说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">Cache</td>
+<td style="text-align:left">控制缓存的行为</td>
+</tr>
+<tr>
+<td style="text-align:left">Connection</td>
+<td style="text-align:left">逐跳首部、连接的管理</td>
+</tr>
+<tr>
+<td style="text-align:left">Date</td>
+<td style="text-align:left">创建报文的日期时间</td>
+</tr>
+<tr>
+<td style="text-align:left">Pragma</td>
+<td style="text-align:left">报文指令</td>
+</tr>
+<tr>
+<td style="text-align:left">Trailer</td>
+<td style="text-align:left">报文末端的首部一览</td>
+</tr>
+<tr>
+<td style="text-align:left">Transfer-Encoding</td>
+<td style="text-align:left">指定报文主体的传输编码方式</td>
+</tr>
+<tr>
+<td style="text-align:left">Upgrade</td>
+<td style="text-align:left">升级为其他协议</td>
+</tr>
+<tr>
+<td style="text-align:left">Via</td>
+<td style="text-align:left">代理服务器的相关信息</td>
+</tr>
+<tr>
+<td style="text-align:left">Warning</td>
+<td style="text-align:left">错误通知</td>
+</tr>
+</tbody>
+</table>
+<p><br></p>
+<ul>
+<li><strong>请求首部字段</strong></li>
+</ul>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">首部字段名</th>
+<th style="text-align:left">说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">Accept</td>
+<td style="text-align:left">用户代理可处理的媒体类型</td>
+</tr>
+<tr>
+<td style="text-align:left">Accept-Charset</td>
+<td style="text-align:left">优先的字符集</td>
+</tr>
+<tr>
+<td style="text-align:left">Accept-Encoding</td>
+<td style="text-align:left">优先的内容编码</td>
+</tr>
+<tr>
+<td style="text-align:left">Accept-Language</td>
+<td style="text-align:left">优先的语言（自然语言）</td>
+</tr>
+<tr>
+<td style="text-align:left">Authorization</td>
+<td style="text-align:left">Web认证信息</td>
+</tr>
+<tr>
+<td style="text-align:left">Expect</td>
+<td style="text-align:left">期待服务器的特定行为</td>
+</tr>
+<tr>
+<td style="text-align:left">From</td>
+<td style="text-align:left">用户的电子邮箱地址</td>
+</tr>
+<tr>
+<td style="text-align:left">Host</td>
+<td style="text-align:left">请求资源所在服务器</td>
+</tr>
+<tr>
+<td style="text-align:left">if-Match</td>
+<td style="text-align:left">比较实体标记（ETag）</td>
+</tr>
+<tr>
+<td style="text-align:left">if-Modified-Since</td>
+<td style="text-align:left">比较资源的更新时间</td>
+</tr>
+<tr>
+<td style="text-align:left">if-None-Match</td>
+<td style="text-align:left">比较实体标记（与if-Match相反）</td>
+</tr>
+<tr>
+<td style="text-align:left">if-Range</td>
+<td style="text-align:left">资源未更新时发送实体Byte的范围请求</td>
+</tr>
+<tr>
+<td style="text-align:left">if-Unmodified-Since</td>
+<td style="text-align:left">比较资源的更新时间（与if-Modified-Since相反）</td>
+</tr>
+<tr>
+<td style="text-align:left">Max-Forwards</td>
+<td style="text-align:left">最大传输逐跳数</td>
+</tr>
+<tr>
+<td style="text-align:left">Proxy-Authorization</td>
+<td style="text-align:left">代理服务器要求客户端的认证信息</td>
+</tr>
+<tr>
+<td style="text-align:left">Range</td>
+<td style="text-align:left">实体的字节范围请求</td>
+</tr>
+<tr>
+<td style="text-align:left">Referer</td>
+<td style="text-align:left">对请求中URI的原始获取方法</td>
+</tr>
+<tr>
+<td style="text-align:left">TE</td>
+<td style="text-align:left">传输编码的优先级</td>
+</tr>
+<tr>
+<td style="text-align:left">User-Agent</td>
+<td style="text-align:left">HTTP客户端程序的信息</td>
+</tr>
+</tbody>
+</table>
+<p><br></p>
+<ul>
+<li><strong>响应首部字段</strong></li>
+</ul>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">首部字段名</th>
+<th style="text-align:left">说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">Accept-Ranges</td>
+<td style="text-align:left">是否接受字节范围请求</td>
+</tr>
+<tr>
+<td style="text-align:left">Age</td>
+<td style="text-align:left">推算资源创建经过时间</td>
+</tr>
+<tr>
+<td style="text-align:left">ETag</td>
+<td style="text-align:left">资源的匹配信息</td>
+</tr>
+<tr>
+<td style="text-align:left">Location</td>
+<td style="text-align:left">令客户端重定向至指定的URI</td>
+</tr>
+<tr>
+<td style="text-align:left">Proxy-Authenticate</td>
+<td style="text-align:left">代理服务器对客户端的认证信息</td>
+</tr>
+<tr>
+<td style="text-align:left">Reter-After</td>
+<td style="text-align:left">对再次发起请求的时机要求</td>
+</tr>
+<tr>
+<td style="text-align:left">Server</td>
+<td style="text-align:left">HTTP服务器的安装信息</td>
+</tr>
+<tr>
+<td style="text-align:left">Vary</td>
+<td style="text-align:left">代理服务器缓存的管理信息</td>
+</tr>
+<tr>
+<td style="text-align:left">WWW-Authenticate</td>
+<td style="text-align:left">服务器对客户端的认证信息</td>
+</tr>
+</tbody>
+</table>
+<p><br></p>
+<ul>
+<li><strong>实体首部字段</strong></li>
+</ul>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">首部字段名</th>
+<th style="text-align:left">说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">Allow</td>
+<td style="text-align:left">资源可支持的HTTP方法</td>
+</tr>
+<tr>
+<td style="text-align:left">Content-Encoding</td>
+<td style="text-align:left">实体主体的适用的编码方式</td>
+</tr>
+<tr>
+<td style="text-align:left">Content-Language</td>
+<td style="text-align:left">实体主体的自然语言</td>
+</tr>
+<tr>
+<td style="text-align:left">Content-Length</td>
+<td style="text-align:left">实体主体的大小（单位：字节）</td>
+</tr>
+<tr>
+<td style="text-align:left">Content-Location</td>
+<td style="text-align:left">替代对应资源的URI</td>
+</tr>
+<tr>
+<td style="text-align:left">Content-MD5</td>
+<td style="text-align:left">实体主体的报文摘要</td>
+</tr>
+<tr>
+<td style="text-align:left">Content-Range</td>
+<td style="text-align:left">实体主体的位置范围</td>
+</tr>
+<tr>
+<td style="text-align:left">Content-Type</td>
+<td style="text-align:left">实体主体的媒体类型</td>
+</tr>
+<tr>
+<td style="text-align:left">Expires</td>
+<td style="text-align:left">实体主体过期的日期时间</td>
+</tr>
+<tr>
+<td style="text-align:left">Last-Modified</td>
+<td style="text-align:left">资源的最后修改日期时间</td>
+</tr>
+</tbody>
+</table>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2015/12/09/利用RunTime解决由NSTimer导致的内存泄漏/" rel="next" title="利用RunTime解决由NSTimer导致的内存泄漏">
+                <i class="fa fa-chevron-left"></i> 利用RunTime解决由NSTimer导致的内存泄漏
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2015/12/16/Xcode调试工具Instruments指南/" rel="prev" title="Xcode调试工具Instruments指南">
+                Xcode调试工具Instruments指南 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      <div class="ds-thread" data-thread-key="2015/12/15/HTTP全部报文首部字段/"
+           data-title="HTTP全部报文首部字段" data-url="http://ggghub.com/2015/12/15/HTTP全部报文首部字段/">
+      </div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">LiSiYuan</p>
+              <p class="site-description motion-element" itemprop="description">Hi! I'm GGGHub, Welcome here！</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">24</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                
+                  <span class="site-state-item-count">7</span>
+                  <span class="site-state-item-name">categories</span>
+                
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                
+                  <span class="site-state-item-count">16</span>
+                  <span class="site-state-item-name">tags</span>
+                
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/ggghub" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-globe"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://www.developboot.com" target="_blank" title="developboot">
+                      
+                        <i class="fa fa-fw fa-globe"></i>developboot</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://blog.csdn.net/ggghub" target="_blank" title="CSDN">
+                      
+                        <i class="fa fa-fw fa-globe"></i>CSDN</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#HTTP报文类型与结构"><span class="nav-number">1.</span> <span class="nav-text">HTTP报文类型与结构</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#HTTP报文结构"><span class="nav-number">1.1.</span> <span class="nav-text">HTTP报文结构</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#HTTP报文类型"><span class="nav-number">1.2.</span> <span class="nav-text">HTTP报文类型</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#HTTP报首部字段"><span class="nav-number">2.</span> <span class="nav-text">HTTP报首部字段</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#HTTP-1-1-首部字段"><span class="nav-number">2.1.</span> <span class="nav-text">HTTP/1.1 首部字段</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">LiSiYuan</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Muse</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"ggghub"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+    
+    <script src="/lib/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/js/src/hook-duoshuo.js"></script>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

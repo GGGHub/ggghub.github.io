@@ -1,0 +1,822 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="en">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Objective-C," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="概述本篇主要介绍键-值编码KVC，键值观察KVO的进阶使用的一些技巧主要是一下两个方面：  KVC的集合操作符 KVO的手动实现方式">
+<meta name="keywords" content="Objective-C">
+<meta property="og:type" content="article">
+<meta property="og:title" content="KVC与KVO的进阶使用">
+<meta property="og:url" content="http://ggghub.com/2016/07/21/KVC与KVO的进阶使用/index.html">
+<meta property="og:site_name" content="GGGHub&#39;s Blog">
+<meta property="og:description" content="概述本篇主要介绍键-值编码KVC，键值观察KVO的进阶使用的一些技巧主要是一下两个方面：  KVC的集合操作符 KVO的手动实现方式">
+<meta property="og:locale" content="en">
+<meta property="og:image" content="http://img.blog.csdn.net/20160721110326448">
+<meta property="og:updated_time" content="2016-07-25T01:23:45.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="KVC与KVO的进阶使用">
+<meta name="twitter:description" content="概述本篇主要介绍键-值编码KVC，键值观察KVO的进阶使用的一些技巧主要是一下两个方面：  KVC的集合操作符 KVO的手动实现方式">
+<meta name="twitter:image" content="http://img.blog.csdn.net/20160721110326448">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://ggghub.com/2016/07/21/KVC与KVO的进阶使用/"/>
+
+
+
+
+
+  <title>KVC与KVO的进阶使用 | GGGHub's Blog</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="en">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">GGGHub's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">Coding Obsession</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            Archives
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://ggghub.com/2016/07/21/KVC与KVO的进阶使用/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="LiSiYuan">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="GGGHub's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">KVC与KVO的进阶使用</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2016-07-21T11:52:00+08:00">
+                2016-07-21
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/iOS/" itemprop="url" rel="index">
+                    <span itemprop="name">iOS</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2016/07/21/KVC与KVO的进阶使用/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/07/21/KVC与KVO的进阶使用/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>本篇主要介绍键-值编码<code>KVC</code>，键值观察<code>KVO</code>的进阶使用的一些技巧主要是一下两个方面：</p>
+<ul>
+<li>KVC的集合操作符</li>
+<li>KVO的手动实现方式<a id="more"></a>
+</li>
+</ul>
+<h2 id="KVC集合操作符"><a href="#KVC集合操作符" class="headerlink" title="KVC集合操作符"></a>KVC集合操作符</h2><p>关于集合操作符在苹果官方文档搜索<code>Collection Operators</code>的关键字就可以查看相关的文档。建议多看官方文档，本篇介绍也是以官方文档为基础的。</p>
+<p>如果一个对象包含一个数组或者是集合的属性那么使用<code>valueForKeyPath</code>获取相关的属性时可以在键的路径中插入一些函数。这些函数称为集合操作符</p>
+<p>按照分类可以分为三类：</p>
+<ul>
+<li><p>简单的集合操作符</p>
+<ul>
+<li>@avg</li>
+<li>@count</li>
+<li>@max</li>
+<li>@min</li>
+<li>@sum</li>
+</ul>
+</li>
+<li><p>对象操作符</p>
+<ul>
+<li>@distinctUnionOfObjects</li>
+<li>@unionOfObjects</li>
+</ul>
+</li>
+<li><p>数组和集合操作符</p>
+<ul>
+<li>@distinctUnionOfArrays  </li>
+<li>@unionOfArrays</li>
+<li>@distinctUnionOfSets</li>
+</ul>
+</li>
+</ul>
+<p>对于这些操作符使用的格式如下：</p>
+<p><img src="http://img.blog.csdn.net/20160721110326448" alt=""></p>
+<p>现在声明一个自定义的对象如下：</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">@interface</span> <span class="title">TestModel</span> : <span class="title">NSObject</span></span></span><br><span class="line"><span class="keyword">@property</span> (<span class="keyword">nonatomic</span>,<span class="keyword">strong</span>) <span class="built_in">NSString</span> *title;</span><br><span class="line"><span class="keyword">@property</span> (<span class="keyword">nonatomic</span>,<span class="keyword">strong</span>) <span class="built_in">NSString</span> *detail;</span><br><span class="line"><span class="keyword">@property</span> (<span class="keyword">nonatomic</span>,<span class="keyword">strong</span>) <span class="built_in">NSArray</span> *strings;</span><br><span class="line">-(<span class="keyword">instancetype</span>)init;</span><br><span class="line"><span class="keyword">@end</span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">@implementation</span> <span class="title">TestModel</span></span></span><br><span class="line">- (<span class="keyword">instancetype</span>)init</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">self</span> = [<span class="keyword">super</span> init];</span><br><span class="line">    <span class="keyword">if</span> (<span class="keyword">self</span>) &#123;</span><br><span class="line">        _title = <span class="string">@"title"</span>;</span><br><span class="line">        _detail = <span class="string">@"detail"</span>;</span><br><span class="line">        _strings = @[@&#123;</span><br><span class="line">                         <span class="string">@"number"</span>:<span class="string">@"2"</span></span><br><span class="line">                        &#125;,</span><br><span class="line">                     @&#123;</span><br><span class="line">                        <span class="string">@"number"</span>:<span class="string">@"3"</span></span><br><span class="line">                         &#125;,</span><br><span class="line">                     @&#123;</span><br><span class="line">                         <span class="string">@"number"</span>:<span class="string">@"4"</span></span><br><span class="line">                         &#125;,</span><br><span class="line">                     @&#123;</span><br><span class="line">                         <span class="string">@"number"</span>:<span class="string">@"5"</span></span><br><span class="line">                         &#125;,</span><br><span class="line">                     @&#123;</span><br><span class="line">                         <span class="string">@"number"</span>:<span class="string">@"1"</span></span><br><span class="line">                         &#125;,</span><br><span class="line">                     @&#123;</span><br><span class="line">                         <span class="string">@"number"</span>:<span class="string">@"1"</span></span><br><span class="line">                         &#125;];</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">self</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">@end</span></span><br></pre></td></tr></table></figure>
+<hr>
+<p>首先声明一个<code>TestModel</code>类型的属性<br><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">@property</span> (<span class="keyword">nonatomic</span>,<span class="keyword">strong</span>) TestModel *testModel;</span><br></pre></td></tr></table></figure></p>
+<p><strong>@avg</strong>：遍历集合中的元素将它们转换为一个双精度浮点数并返回表示它们的平均数<code>NSNumber</code>类型的对象</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">_testModel = [[TestModel alloc] init];</span><br><span class="line"><span class="keyword">id</span> object = [<span class="keyword">self</span> valueForKeyPath:<span class="string">@"testModel.strings.@avg.number"</span>];</span><br><span class="line"><span class="built_in">NSLog</span>(<span class="string">@"object--%@\nclass--%@"</span>,object,[object <span class="keyword">class</span>]);</span><br></pre></td></tr></table></figure>
+<p>输出：<br><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">object-<span class="number">-2.73333333333333333333333333333333333333</span></span><br><span class="line"><span class="keyword">class</span>--<span class="built_in">NSDecimalNumber</span></span><br></pre></td></tr></table></figure></p>
+<hr>
+<p><strong>@count</strong>：返回集合中对象的数量<br><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"> _testModel = [[TestModel alloc] init];</span><br><span class="line"><span class="keyword">id</span> object = [<span class="keyword">self</span> valueForKeyPath:<span class="string">@"testModel.strings.@count"</span>];</span><br><span class="line"><span class="built_in">NSLog</span>(<span class="string">@"object--%@\nclass--%@"</span>,object,[object <span class="keyword">class</span>]);</span><br></pre></td></tr></table></figure></p>
+<p>输出：<br><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">object-<span class="number">-6</span></span><br><span class="line"><span class="keyword">class</span>--__NSCFNumber</span><br></pre></td></tr></table></figure></p>
+<hr>
+<p><strong>@max与@min</strong>：返回集合中的最大值与最小值<br><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"> _testModel = [[TestModel alloc] init];</span><br><span class="line"><span class="keyword">id</span> object = [<span class="keyword">self</span> valueForKeyPath:<span class="string">@"testModel.strings.@max.number"</span>];</span><br><span class="line"><span class="built_in">NSLog</span>(<span class="string">@"object--%@\nclass--%@"</span>,object,[object <span class="keyword">class</span>]);</span><br><span class="line"> _testModel = [[TestModel alloc] init];</span><br><span class="line"><span class="keyword">id</span> object = [<span class="keyword">self</span> valueForKeyPath:<span class="string">@"testModel.strings.@min.number"</span>];</span><br><span class="line"><span class="built_in">NSLog</span>(<span class="string">@"object--%@\nclass--%@"</span>,object,[object <span class="keyword">class</span>]);</span><br></pre></td></tr></table></figure></p>
+<p>输出：<br><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">object-<span class="number">-5</span></span><br><span class="line"><span class="keyword">class</span>--__NSCFConstantString</span><br><span class="line">object-<span class="number">-1</span></span><br><span class="line"><span class="keyword">class</span>--__NSCFConstantString</span><br></pre></td></tr></table></figure></p>
+<hr>
+<p><strong>@sum</strong>：遍历集合中的每一项将它们转换为一个双精度浮点数并返回表示它们的和<code>NSNumber</code>类型的对象</p>
+<p><strong>@distinctUnionOfObjects</strong>：返回集合中所有的对象如果有相同的对象那么只返回一个。<br><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"> _testModel = [[TestModel alloc] init];</span><br><span class="line"><span class="keyword">id</span> object = [<span class="keyword">self</span> valueForKeyPath:<span class="string">@"testModel.strings.@distinctUnionOfObjects.number"</span>];</span><br><span class="line"><span class="built_in">NSLog</span>(<span class="string">@"object--%@\nclass--%@"</span>,object,[object <span class="keyword">class</span>]);</span><br></pre></td></tr></table></figure></p>
+<p>输出：<br><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">object--(</span><br><span class="line">    <span class="number">3</span>,</span><br><span class="line">    <span class="number">5</span>,</span><br><span class="line">    <span class="number">1</span>,</span><br><span class="line">    <span class="number">4</span>,</span><br><span class="line">    <span class="string">"2.4"</span></span><br><span class="line">)</span><br><span class="line"><span class="keyword">class</span>--__NSArrayI</span><br></pre></td></tr></table></figure></p>
+<p>数组中属性<code>number</code>为1的值有两个此时只返回一个。</p>
+<hr>
+<p><strong>@unionOfObjects</strong>：与@distinctUnionOfObjects相反，返回所有的对象包括重复的对象。</p>
+<hr>
+<p><strong>@distinctUnionOfArrays、@unionOfArrays、@distinctUnionOfSets</strong>与上述使用方法大致相同只不过操作对象由数组里的对象变成数组里的集合。</p>
+<hr>
+<h2 id="KVO的手动实现方式"><a href="#KVO的手动实现方式" class="headerlink" title="KVO的手动实现方式"></a>KVO的手动实现方式</h2><p>如果我们使用KVO时不想更改某个属性时立刻回调，比如更改一个属性后想要执行某个操作，这个操作执行后才希望通过收到通知那么此时就需要手动实现KVO监听。</p>
+<p>我们手动实现KVO首先要禁用系统自带的KVO监听，禁用的方法非常简单在想要监听的对象实现<code>automaticallyNotifiesObserversForKey</code>并返回<code>NO</code>即可。对于上面的自定义模型在其内部实现以下方法来达到当<code>title</code>属性发生变化时不会收到通知：</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">+ (<span class="built_in">BOOL</span>)automaticallyNotifiesObserversForKey:(<span class="built_in">NSString</span> *)key</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">if</span> ([key isEqualToString:<span class="string">@"title"</span>]) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">NO</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">        <span class="keyword">return</span>  <span class="literal">YES</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>手动实现KVO也是通过调用<code>willChangeValueForKey</code>与<code>didChangeValueForKey</code>这两个基类方法实现的。</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">  _testModel = [[TestModel alloc] init];</span><br><span class="line"> [_testModel addObserver:<span class="keyword">self</span> forKeyPath:<span class="string">@"title"</span> options:<span class="built_in">NSKeyValueObservingOptionNew</span>|<span class="built_in">NSKeyValueObservingOptionOld</span> context:<span class="literal">NULL</span>];</span><br><span class="line"> </span><br><span class="line">_testModel.title = <span class="string">@"chapter"</span>;</span><br></pre></td></tr></table></figure>
+<p>上面的写法因为禁用了<code>title</code>属性的自动监听功能所以当<code>title</code>发生变化时系统不会监听到。</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"> _testModel = [[TestModel alloc] init];</span><br><span class="line">[_testModel addObserver:<span class="keyword">self</span> forKeyPath:<span class="string">@"title"</span> options:<span class="built_in">NSKeyValueObservingOptionNew</span>|<span class="built_in">NSKeyValueObservingOptionOld</span> context:<span class="literal">NULL</span>];</span><br><span class="line"></span><br><span class="line">[_testModel willChangeValueForKey:<span class="string">@"title"</span>];</span><br><span class="line">_testModel.title = <span class="string">@"chapter"</span>;</span><br><span class="line"><span class="comment">// do something</span></span><br><span class="line">[_testModel didChangeValueForKey:<span class="string">@"title"</span>];</span><br></pre></td></tr></table></figure>
+<p>调用<code>didChangeValueForKey</code>时系统才会监听到<code>title</code>已经发生变化</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Objective-C/" rel="tag"># Objective-C</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/07/15/iOS开发数据库SQLite的使用/" rel="next" title="iOS开发数据库SQLite的使用">
+                <i class="fa fa-chevron-left"></i> iOS开发数据库SQLite的使用
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016/07/22/Core Data系列文章（一）Core Data基础/" rel="prev" title="Core Data系列文章（一）Core Data基础">
+                Core Data系列文章（一）Core Data基础 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      <div class="ds-thread" data-thread-key="2016/07/21/KVC与KVO的进阶使用/"
+           data-title="KVC与KVO的进阶使用" data-url="http://ggghub.com/2016/07/21/KVC与KVO的进阶使用/">
+      </div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">LiSiYuan</p>
+              <p class="site-description motion-element" itemprop="description">Hi! I'm GGGHub, Welcome here！</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">24</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                
+                  <span class="site-state-item-count">7</span>
+                  <span class="site-state-item-name">categories</span>
+                
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                
+                  <span class="site-state-item-count">16</span>
+                  <span class="site-state-item-name">tags</span>
+                
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/ggghub" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-globe"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://www.developboot.com" target="_blank" title="developboot">
+                      
+                        <i class="fa fa-fw fa-globe"></i>developboot</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://blog.csdn.net/ggghub" target="_blank" title="CSDN">
+                      
+                        <i class="fa fa-fw fa-globe"></i>CSDN</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#概述"><span class="nav-number">1.</span> <span class="nav-text">概述</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#KVC集合操作符"><span class="nav-number">2.</span> <span class="nav-text">KVC集合操作符</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#KVO的手动实现方式"><span class="nav-number">3.</span> <span class="nav-text">KVO的手动实现方式</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">LiSiYuan</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Muse</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"ggghub"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+    
+    <script src="/lib/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/js/src/hook-duoshuo.js"></script>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

@@ -1,0 +1,768 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="en">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="CoreText," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="本篇文章的项目地址基于Core Text实现的TXT电子书阅读器。最近花了一点时间学习了iOS的底层文字处理的框架Core Text。在网上也参考很多资料，具体的资料在文章最后列了出来，有兴趣的可参考一下。本篇主要介绍实现TXT电子书阅读器设计用到的Core Text相关的用法与实现。">
+<meta name="keywords" content="CoreText">
+<meta property="og:type" content="article">
+<meta property="og:title" content="基于Core Text实现的TXT电子书阅读器">
+<meta property="og:url" content="http://ggghub.com/2016/06/13/基于Core Text实现的TXT电子书阅读器/index.html">
+<meta property="og:site_name" content="GGGHub&#39;s Blog">
+<meta property="og:description" content="本篇文章的项目地址基于Core Text实现的TXT电子书阅读器。最近花了一点时间学习了iOS的底层文字处理的框架Core Text。在网上也参考很多资料，具体的资料在文章最后列了出来，有兴趣的可参考一下。本篇主要介绍实现TXT电子书阅读器设计用到的Core Text相关的用法与实现。">
+<meta property="og:locale" content="en">
+<meta property="og:image" content="https://developer.apple.com/library/ios/documentation/StringsTextFonts/Conceptual/CoreText_Programming/Art/core_text_arch_2x.png">
+<meta property="og:updated_time" content="2016-06-13T07:55:41.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="基于Core Text实现的TXT电子书阅读器">
+<meta name="twitter:description" content="本篇文章的项目地址基于Core Text实现的TXT电子书阅读器。最近花了一点时间学习了iOS的底层文字处理的框架Core Text。在网上也参考很多资料，具体的资料在文章最后列了出来，有兴趣的可参考一下。本篇主要介绍实现TXT电子书阅读器设计用到的Core Text相关的用法与实现。">
+<meta name="twitter:image" content="https://developer.apple.com/library/ios/documentation/StringsTextFonts/Conceptual/CoreText_Programming/Art/core_text_arch_2x.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://ggghub.com/2016/06/13/基于Core Text实现的TXT电子书阅读器/"/>
+
+
+
+
+
+  <title>基于Core Text实现的TXT电子书阅读器 | GGGHub's Blog</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="en">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">GGGHub's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">Coding Obsession</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            Archives
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://ggghub.com/2016/06/13/基于Core Text实现的TXT电子书阅读器/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="LiSiYuan">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="GGGHub's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">基于Core Text实现的TXT电子书阅读器</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2016-06-13T15:55:41+08:00">
+                2016-06-13
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/iOS/" itemprop="url" rel="index">
+                    <span itemprop="name">iOS</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2016/06/13/基于Core Text实现的TXT电子书阅读器/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/06/13/基于Core Text实现的TXT电子书阅读器/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>本篇文章的项目地址<a href="https://github.com/GGGHub/Reader" target="_blank" rel="noopener">基于Core Text实现的TXT电子书阅读器</a>。<br>最近花了一点时间学习了<code>iOS</code>的底层文字处理的框架<code>Core Text</code>。在网上也参考很多资料，具体的资料在文章最后列了出来，有兴趣的可参考一下。<br>本篇主要介绍实现<code>TXT</code>电子书阅读器设计用到的<code>Core Text</code>相关的用法与实现。<br><a id="more"></a></p>
+<h2 id="关于Core-Text"><a href="#关于Core-Text" class="headerlink" title="关于Core Text"></a>关于Core Text</h2><p><code>Core Text</code>是<code>iOS</code>底层的文字处理框架，只提供一套<code>C</code>函数接口，使用<code>Core Text</code>对象时要注意手动管理内存以避免发生内存泄漏。之前写了一篇<a href="http://blog.csdn.net/ggghub/article/details/50114853" target="_blank" rel="noopener">iOS富文本（二）初识Text Kit</a>是介绍<code>iOS</code>的另一个文字处理框架<code>Text Kit</code>，<code>Text Kit</code>是封装<code>Core Text</code>函数提供一套<code>Objective-C</code>的接口，使用起来也比较友好。高度的封装意味着可定制性差，灵活性低。所以如果需要实现更多的功能最好还是用<code>Core Text</code>。</p>
+<p><strong>关于文字的相关知识参考文章最后列出的资料，因为涉及到字体大小的计算。例如在算字体高度时应该是baseline+ascent+descent的总和，了解这些知识对理解<code>Core Text</code>相关函数很有帮助</strong></p>
+<h3 id="Core-Text运行时的层次"><a href="#Core-Text运行时的层次" class="headerlink" title="Core Text运行时的层次"></a>Core Text运行时的层次</h3><p><img src="https://developer.apple.com/library/ios/documentation/StringsTextFonts/Conceptual/CoreText_Programming/Art/core_text_arch_2x.png" alt=""></p>
+<p>介绍一下这个层级。framesetter对象(CTFramesetterRef)最为顶层接收一个属性化字符串(attributedString)作为输入，一个framesetter对象生成一个或多个文本中的帧(CTFrameRef)每一个CTFrame都代表一个段落。<br>要生成帧(CTFrameRef)时，framesetter调用一个typesetter对象(CTTypesetterRef)，它放置文本在frame中，framesetter设置段落样式给typesetter对象，包括属性对齐方式，制表位，行间距，缩进和换行模式，typesetter对象用这些属性转换每个字符成字形，然后在每行中填充这些字型，再用这些行填满整个绘制区间。<br>每个CTFrame对象包含段落线(CTLine)对象。每个(CTLine)对象代表段落中的每一行，一个CTFrame可以包含一个或者多个CTLine对象。CTLine由typesetter对象操作期间被创建。<br>每个CTLine是包含字形管理(CTRun)对象的数组，一个CTRun对象是一组共享相同属性，方向的连续字形。</p>
+<h2 id="基于Core-Text实现的电子书阅读器"><a href="#基于Core-Text实现的电子书阅读器" class="headerlink" title="基于Core Text实现的电子书阅读器"></a>基于Core Text实现的电子书阅读器</h2><p>根据配置文件得到文字显示的属性。<br><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">+(<span class="built_in">NSDictionary</span> *)parserAttribute:(LSYReadConfig *)config</span><br><span class="line">&#123;</span><br><span class="line">    <span class="built_in">NSMutableDictionary</span> *dict = [<span class="built_in">NSMutableDictionary</span> dictionary];</span><br><span class="line">    dict[<span class="built_in">NSForegroundColorAttributeName</span>] = config.fontColor;</span><br><span class="line">    dict[<span class="built_in">NSFontAttributeName</span>] = [<span class="built_in">UIFont</span> systemFontOfSize:config.fontSize];</span><br><span class="line">    <span class="built_in">NSMutableParagraphStyle</span> *paragraphStyle = [[<span class="built_in">NSMutableParagraphStyle</span> alloc] init];</span><br><span class="line">    paragraphStyle.lineSpacing = config.lineSpace;</span><br><span class="line">    paragraphStyle.alignment = <span class="built_in">NSTextAlignmentJustified</span>;</span><br><span class="line">    dict[<span class="built_in">NSParagraphStyleAttributeName</span>] = paragraphStyle;</span><br><span class="line">    <span class="keyword">return</span> [dict <span class="keyword">copy</span>];</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>根据属性生成属性化字符串，然后属性化字符串作为输入得到<code>CTFrame</code>对象<br><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">+(<span class="built_in">CTFrameRef</span>)parserContent:(<span class="built_in">NSString</span> *)content config:(LSYReadConfig *)parser bouds:(<span class="built_in">CGRect</span>)bounds</span><br><span class="line">&#123;</span><br><span class="line">    <span class="built_in">NSMutableAttributedString</span> *attributedString = [[<span class="built_in">NSMutableAttributedString</span> alloc] initWithString:content];</span><br><span class="line">    <span class="built_in">NSDictionary</span> *attribute = [<span class="keyword">self</span> parserAttribute:parser];</span><br><span class="line">    [attributedString setAttributes:attribute range:<span class="built_in">NSMakeRange</span>(<span class="number">0</span>, content.length)];</span><br><span class="line">    <span class="built_in">CTFramesetterRef</span> setterRef = <span class="built_in">CTFramesetterCreateWithAttributedString</span>((__bridge <span class="built_in">CFAttributedStringRef</span>)attributedString);</span><br><span class="line">    <span class="built_in">CGPathRef</span> pathRef = <span class="built_in">CGPathCreateWithRect</span>(bounds, <span class="literal">NULL</span>);</span><br><span class="line">    <span class="built_in">CTFrameRef</span> frameRef = <span class="built_in">CTFramesetterCreateFrame</span>(setterRef, <span class="built_in">CFRangeMake</span>(<span class="number">0</span>, <span class="number">0</span>), pathRef, <span class="literal">NULL</span>);</span><br><span class="line">    <span class="built_in">CFRelease</span>(setterRef);</span><br><span class="line">    <span class="built_in">CFRelease</span>(pathRef);</span><br><span class="line">    <span class="keyword">return</span> frameRef;</span><br><span class="line">    </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>生成的CTFrame在要View的<code>drawRect</code>方法中调用<code>CTFrameDraw</code>就可以进行绘制。</p>
+<p>因为我们不仅要绘制出文字还要和文字进行交互所以仅仅这两个函数是不够的。<br>还需要以下函数<br><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//根据触摸点获取当前文字的索引</span></span><br><span class="line">+(<span class="built_in">CFIndex</span>)parserIndexWithPoint:(<span class="built_in">CGPoint</span>)point frameRef:(<span class="built_in">CTFrameRef</span>)frameRef</span><br><span class="line">&#123;</span><br><span class="line">    <span class="built_in">CFIndex</span> index = <span class="number">-1</span>;</span><br><span class="line">    <span class="built_in">CGPathRef</span> pathRef = <span class="built_in">CTFrameGetPath</span>(frameRef);   <span class="comment">//获取绘制的路径</span></span><br><span class="line">    <span class="built_in">CGRect</span> bounds = <span class="built_in">CGPathGetBoundingBox</span>(pathRef);  <span class="comment">//获取绘制的区间</span></span><br><span class="line">    <span class="built_in">NSArray</span> *lines = (__bridge <span class="built_in">NSArray</span> *)<span class="built_in">CTFrameGetLines</span>(frameRef); <span class="comment">//获取绘制区间内所有的行数</span></span><br><span class="line">    <span class="keyword">if</span> (!lines) &#123;</span><br><span class="line">        <span class="keyword">return</span> index;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">NSInteger</span> lineCount = [lines count];</span><br><span class="line">    <span class="built_in">CGPoint</span> *origins = malloc(lineCount * <span class="keyword">sizeof</span>(<span class="built_in">CGPoint</span>)); <span class="comment">//给每行的起始点开辟内存</span></span><br><span class="line">    <span class="keyword">if</span> (lineCount) &#123;</span><br><span class="line">        <span class="built_in">CTFrameGetLineOrigins</span>(frameRef, <span class="built_in">CFRangeMake</span>(<span class="number">0</span>, <span class="number">0</span>), origins);  <span class="comment">//获取每行的坐标</span></span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i&lt;lineCount; i++) &#123;</span><br><span class="line">            <span class="built_in">CGPoint</span> baselineOrigin = origins[i];</span><br><span class="line">            <span class="built_in">CTLineRef</span> line = (__bridge <span class="built_in">CTLineRef</span>)[lines objectAtIndex:i];</span><br><span class="line">            <span class="built_in">CGFloat</span> ascent,descent,linegap; <span class="comment">//声明字体的上行高度和下行高度和行距</span></span><br><span class="line">            <span class="built_in">CGFloat</span> lineWidth = <span class="built_in">CTLineGetTypographicBounds</span>(line, &amp;ascent, &amp;descent, &amp;linegap);  <span class="comment">//获取每行的宽度</span></span><br><span class="line">            <span class="built_in">CGRect</span> lineFrame = <span class="built_in">CGRectMake</span>(baselineOrigin.x, <span class="built_in">CGRectGetHeight</span>(bounds)-baselineOrigin.y-ascent, lineWidth, ascent+descent+linegap+[LSYReadConfig shareInstance].lineSpace);    <span class="comment">//没有转换坐标系左下角为坐标原点 字体高度为上行高度加下行高度</span></span><br><span class="line">            <span class="keyword">if</span> (<span class="built_in">CGRectContainsPoint</span>(lineFrame,point))&#123;</span><br><span class="line">                index = <span class="built_in">CTLineGetStringIndexForPosition</span>(line, point); <span class="comment">//得到当前文字的索引</span></span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    free(origins);  释放内存</span><br><span class="line">    <span class="keyword">return</span> index;</span><br><span class="line">    </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>长按文字会默认选中两个文字这样就要计算选中的区间<br><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line">+(<span class="built_in">CGRect</span>)parserRectWithPoint:(<span class="built_in">CGPoint</span>)point frameRef:(<span class="built_in">CTFrameRef</span>)frameRef</span><br><span class="line">&#123;</span><br><span class="line">    <span class="built_in">CFIndex</span> index = <span class="number">-1</span>;</span><br><span class="line">    <span class="built_in">CGPathRef</span> pathRef = <span class="built_in">CTFrameGetPath</span>(frameRef);</span><br><span class="line">    <span class="built_in">CGRect</span> bounds = <span class="built_in">CGPathGetBoundingBox</span>(pathRef);</span><br><span class="line">    <span class="built_in">CGRect</span> rect = <span class="built_in">CGRectZero</span>;</span><br><span class="line">    <span class="built_in">NSArray</span> *lines = (__bridge <span class="built_in">NSArray</span> *)<span class="built_in">CTFrameGetLines</span>(frameRef);</span><br><span class="line">    <span class="keyword">if</span> (!lines) &#123;</span><br><span class="line">        <span class="keyword">return</span> rect;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">NSInteger</span> lineCount = [lines count];</span><br><span class="line">    <span class="built_in">CGPoint</span> *origins = malloc(lineCount * <span class="keyword">sizeof</span>(<span class="built_in">CGPoint</span>)); <span class="comment">//给每行的起始点开辟内存</span></span><br><span class="line">    <span class="keyword">if</span> (lineCount) &#123;</span><br><span class="line">        <span class="built_in">CTFrameGetLineOrigins</span>(frameRef, <span class="built_in">CFRangeMake</span>(<span class="number">0</span>, <span class="number">0</span>), origins);</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i&lt;lineCount; i++) &#123;</span><br><span class="line">            <span class="built_in">CGPoint</span> baselineOrigin = origins[i];</span><br><span class="line">            <span class="built_in">CTLineRef</span> line = (__bridge <span class="built_in">CTLineRef</span>)[lines objectAtIndex:i];</span><br><span class="line">            <span class="built_in">CGFloat</span> ascent,descent,linegap; <span class="comment">//声明字体的上行高度和下行高度和行距</span></span><br><span class="line">            <span class="built_in">CGFloat</span> lineWidth = <span class="built_in">CTLineGetTypographicBounds</span>(line, &amp;ascent, &amp;descent, &amp;linegap);</span><br><span class="line">            <span class="built_in">CGRect</span> lineFrame = <span class="built_in">CGRectMake</span>(baselineOrigin.x, <span class="built_in">CGRectGetHeight</span>(bounds)-baselineOrigin.y-ascent, lineWidth, ascent+descent+linegap+[LSYReadConfig shareInstance].lineSpace);    <span class="comment">//没有转换坐标系左下角为坐标原点 字体高度为上行高度加下行高度加行间距 注：[LSYReadConfig shareInstance].lineSpace为配置文件中设置的行间距</span></span><br><span class="line">            <span class="keyword">if</span> (<span class="built_in">CGRectContainsPoint</span>(lineFrame,point))&#123;</span><br><span class="line">                <span class="built_in">CFRange</span> stringRange = <span class="built_in">CTLineGetStringRange</span>(line);</span><br><span class="line">                index = <span class="built_in">CTLineGetStringIndexForPosition</span>(line, point);</span><br><span class="line">                <span class="built_in">CGFloat</span> xStart = <span class="built_in">CTLineGetOffsetForStringIndex</span>(line, index, <span class="literal">NULL</span>);  <span class="comment">//获取当前索引在当前行的偏移量</span></span><br><span class="line">                <span class="built_in">CGFloat</span> xEnd;</span><br><span class="line">                <span class="comment">//默认选中两个单位</span></span><br><span class="line">                <span class="keyword">if</span> (index &gt; stringRange.location+stringRange.length<span class="number">-2</span>) &#123;</span><br><span class="line">                    xEnd = xStart;</span><br><span class="line">                    xStart = <span class="built_in">CTLineGetOffsetForStringIndex</span>(line,index<span class="number">-2</span>,<span class="literal">NULL</span>);</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">else</span>&#123;</span><br><span class="line">                    xEnd = <span class="built_in">CTLineGetOffsetForStringIndex</span>(line,index+<span class="number">2</span>,<span class="literal">NULL</span>);</span><br><span class="line">                &#125;</span><br><span class="line">                rect = <span class="built_in">CGRectMake</span>(origins[i].x+xStart,baselineOrigin.y-descent,fabs(xStart-xEnd), ascent+descent);</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    free(origins);</span><br><span class="line">    <span class="keyword">return</span> rect;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>上面就是实现这个项目使用的大部分关于<code>Core Text</code>代码，实际项目实现起来远比这要复杂的多。具体实现请参考这个项目<a href="https://github.com/GGGHub/Reader" target="_blank" rel="noopener">基于Core Text实现的TXT电子书阅读器</a></p>
+<h2 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h2><p><a href="http://geeklu.com/2013/03/core-text/" target="_blank" rel="noopener">Core Text 入门</a><br><a href="http://blog.devtang.com/2015/06/27/using-coretext-1/" target="_blank" rel="noopener">基于 CoreText 的排版引擎：基础</a><br><a href="https://www.raywenderlich.com/4147/core-text-tutorial-for-ios-making-a-magazine-app" target="_blank" rel="noopener">Core Text Tutorial for iOS: Making a Magazine App</a><br><a href="https://github.com/jverkoey/nimbus/blob/master/src/attributedlabel/src/NIAttributedLabel.m" target="_blank" rel="noopener">NIAttributedLabel.m</a><br><a href="https://github.com/TigerWf/WFCoretext" target="_blank" rel="noopener">WFCoretext</a></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/CoreText/" rel="tag"># CoreText</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/05/18/JavaScript编写Web脚本最佳实现/" rel="next" title="JavaScript编写Web脚本最佳实现">
+                <i class="fa fa-chevron-left"></i> JavaScript编写Web脚本最佳实现
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016/07/11/NSNotification系统通知优化/" rel="prev" title="NSNotification系统通知优化">
+                NSNotification系统通知优化 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      <div class="ds-thread" data-thread-key="2016/06/13/基于Core Text实现的TXT电子书阅读器/"
+           data-title="基于Core Text实现的TXT电子书阅读器" data-url="http://ggghub.com/2016/06/13/基于Core Text实现的TXT电子书阅读器/">
+      </div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">LiSiYuan</p>
+              <p class="site-description motion-element" itemprop="description">Hi! I'm GGGHub, Welcome here！</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">24</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                
+                  <span class="site-state-item-count">7</span>
+                  <span class="site-state-item-name">categories</span>
+                
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                
+                  <span class="site-state-item-count">16</span>
+                  <span class="site-state-item-name">tags</span>
+                
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/ggghub" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-globe"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://www.developboot.com" target="_blank" title="developboot">
+                      
+                        <i class="fa fa-fw fa-globe"></i>developboot</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://blog.csdn.net/ggghub" target="_blank" title="CSDN">
+                      
+                        <i class="fa fa-fw fa-globe"></i>CSDN</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#关于Core-Text"><span class="nav-number">1.</span> <span class="nav-text">关于Core Text</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Core-Text运行时的层次"><span class="nav-number">1.1.</span> <span class="nav-text">Core Text运行时的层次</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#基于Core-Text实现的电子书阅读器"><span class="nav-number">2.</span> <span class="nav-text">基于Core Text实现的电子书阅读器</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考资料"><span class="nav-number">3.</span> <span class="nav-text">参考资料</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">LiSiYuan</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Muse</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"ggghub"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+    
+    <script src="/lib/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/js/src/hook-duoshuo.js"></script>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
