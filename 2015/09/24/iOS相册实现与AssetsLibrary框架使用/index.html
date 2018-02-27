@@ -1,0 +1,785 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="en">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="多媒体,相册," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="概述 在iOS中如果想要获取手机相册里面的图片或者视频的话就要用到系统自带的AssetsLibrary框架，AssetsLibrary.framework中包含以下文件12345#import &amp;lt;AssetsLibrary/ALAsset.h&amp;gt;#import &amp;lt;AssetsLibrary/ALAssetsFilter.h&amp;gt;#import &amp;lt;AssetsLibrary/">
+<meta name="keywords" content="多媒体,相册">
+<meta property="og:type" content="article">
+<meta property="og:title" content="iOS相册实现与AssetsLibrary框架使用">
+<meta property="og:url" content="http://ggghub.com/2015/09/24/iOS相册实现与AssetsLibrary框架使用/index.html">
+<meta property="og:site_name" content="GGGHub&#39;s Blog">
+<meta property="og:description" content="概述 在iOS中如果想要获取手机相册里面的图片或者视频的话就要用到系统自带的AssetsLibrary框架，AssetsLibrary.framework中包含以下文件12345#import &amp;lt;AssetsLibrary/ALAsset.h&amp;gt;#import &amp;lt;AssetsLibrary/ALAssetsFilter.h&amp;gt;#import &amp;lt;AssetsLibrary/">
+<meta property="og:locale" content="en">
+<meta property="og:image" content="http://img.blog.csdn.net/20150924162256820">
+<meta property="og:image" content="http://img.blog.csdn.net/20150928091207822">
+<meta property="og:updated_time" content="2016-05-11T08:30:56.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="iOS相册实现与AssetsLibrary框架使用">
+<meta name="twitter:description" content="概述 在iOS中如果想要获取手机相册里面的图片或者视频的话就要用到系统自带的AssetsLibrary框架，AssetsLibrary.framework中包含以下文件12345#import &amp;lt;AssetsLibrary/ALAsset.h&amp;gt;#import &amp;lt;AssetsLibrary/ALAssetsFilter.h&amp;gt;#import &amp;lt;AssetsLibrary/">
+<meta name="twitter:image" content="http://img.blog.csdn.net/20150924162256820">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://ggghub.com/2015/09/24/iOS相册实现与AssetsLibrary框架使用/"/>
+
+
+
+
+
+  <title>iOS相册实现与AssetsLibrary框架使用 | GGGHub's Blog</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="en">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">GGGHub's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">Coding Obsession</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            Archives
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://ggghub.com/2015/09/24/iOS相册实现与AssetsLibrary框架使用/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="LiSiYuan">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="GGGHub's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">iOS相册实现与AssetsLibrary框架使用</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2015-09-24T15:05:00+08:00">
+                2015-09-24
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/iOS/" itemprop="url" rel="index">
+                    <span itemprop="name">iOS</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2015/09/24/iOS相册实现与AssetsLibrary框架使用/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2015/09/24/iOS相册实现与AssetsLibrary框架使用/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><hr>
+<p>在iOS中如果想要获取手机相册里面的图片或者视频的话就要用到系统自带的<code>AssetsLibrary</code>框架，<code>AssetsLibrary.framework</code>中包含以下文件<br><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#import <span class="meta-string">&lt;AssetsLibrary/ALAsset.h&gt;</span></span></span><br><span class="line"><span class="meta">#import <span class="meta-string">&lt;AssetsLibrary/ALAssetsFilter.h&gt;</span></span></span><br><span class="line"><span class="meta">#import <span class="meta-string">&lt;AssetsLibrary/ALAssetsGroup.h&gt;</span></span></span><br><span class="line"><span class="meta">#import <span class="meta-string">&lt;AssetsLibrary/ALAssetsLibrary.h&gt;</span></span></span><br><span class="line"><span class="meta">#import <span class="meta-string">&lt;AssetsLibrary/ALAssetRepresentation.h&gt;</span></span></span><br></pre></td></tr></table></figure></p>
+<a id="more"></a>
+<ul>
+<li><p>ALAsset.h<br>  从本地相册获取的图片或者视频的对象都是<code>ALAsset</code>类型的对象。</p>
+</li>
+<li><p>ALAssetsFilter<br>  顾名思义是对本地所有资源的过滤筛选，可以选择只获取照片，只获取视频，或者获取所有的资源。</p>
+</li>
+<li><p>ALAssetsGroup<br> 本地相册分组对象，本地有多少个相薄就会有几个<code>ALAssetsGroup</code>类型的对象。 </p>
+</li>
+<li><p>ALAssetsLibrary<br> 本地资源库对象</p>
+</li>
+<li><p>ALAssetRepresentation<br>  <code>ALAssetRepresentation</code>对象来获取视频或者图片的url，文件名，二进制数据，封面缩略图等</p>
+</li>
+</ul>
+<hr>
+<h2 id="AssetsLibrary使用"><a href="#AssetsLibrary使用" class="headerlink" title="AssetsLibrary使用"></a>AssetsLibrary使用</h2><hr>
+<p>使用前导入<code>AssetsLibrary.framework</code><br><img src="http://img.blog.csdn.net/20150924162256820" alt=""><br><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#import <span class="meta-string">&lt;AssetsLibrary/AssetsLibrary.h&gt;</span></span></span><br></pre></td></tr></table></figure></p>
+<hr>
+<h3 id="获取本地所有相薄"><a href="#获取本地所有相薄" class="headerlink" title="获取本地所有相薄"></a>获取本地所有相薄</h3><p>初始化<code>ALAssetsLibrary</code>对象并使用下面的方法来获取本地所有相薄<br><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">- (<span class="keyword">void</span>)enumerateGroupsWithTypes:(ALAssetsGroupType)types usingBlock:(ALAssetsLibraryGroupsEnumerationResultsBlock)enumerationBlock failureBlock:(ALAssetsLibraryAccessFailureBlock)failureBlock</span><br></pre></td></tr></table></figure></p>
+<p><code>types</code> 相薄分组类型<br><code>ALAssetsGroupType</code>苹果官方文档定义如下<br><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">   <span class="keyword">enum</span> &#123;</span><br><span class="line">    ALAssetsGroupLibrary     <span class="built_in">NS_ENUM_DEPRECATED_IOS</span>(<span class="number">4</span>_0, <span class="number">9</span>_0) = (<span class="number">1</span> &lt;&lt; <span class="number">0</span>),</span><br><span class="line">    <span class="comment">// The Library group that includes all assets.</span></span><br><span class="line">    ALAssetsGroupAlbum       <span class="built_in">NS_ENUM_DEPRECATED_IOS</span>(<span class="number">4</span>_0, <span class="number">9</span>_0) = (<span class="number">1</span> &lt;&lt; <span class="number">1</span>),</span><br><span class="line">    <span class="comment">// All the albums synced from iTunes or created on the device.</span></span><br><span class="line">    ALAssetsGroupEvent       <span class="built_in">NS_ENUM_DEPRECATED_IOS</span>(<span class="number">4</span>_0, <span class="number">9</span>_0) = (<span class="number">1</span> &lt;&lt; <span class="number">2</span>),</span><br><span class="line">    <span class="comment">// All the events synced from iTunes.</span></span><br><span class="line">    ALAssetsGroupFaces       <span class="built_in">NS_ENUM_DEPRECATED_IOS</span>(<span class="number">4</span>_0, <span class="number">9</span>_0) = (<span class="number">1</span> &lt;&lt; <span class="number">3</span>),</span><br><span class="line">    <span class="comment">// All the faces albums synced from iTunes.</span></span><br><span class="line">    ALAssetsGroupSavedPhotos <span class="built_in">NS_ENUM_DEPRECATED_IOS</span>(<span class="number">4</span>_0, <span class="number">9</span>_0) = (<span class="number">1</span> &lt;&lt; <span class="number">4</span>),</span><br><span class="line">    <span class="comment">// The Saved Photos album.</span></span><br><span class="line"><span class="meta">#if __IPHONE_5_0 <span class="meta-string">&lt;= __IPHONE_OS_VERSION_MAX_ALLOWED</span></span></span><br><span class="line"><span class="meta"><span class="meta-string">    ALAssetsGroupPhotoStream NS_ENUM_DEPRECATED_IOS(5_0, 9_0) = (1 &lt;&lt; 5),</span></span></span><br><span class="line"><span class="meta"><span class="meta-string">    // The PhotoStream album.</span></span></span><br><span class="line"><span class="meta"><span class="meta-string">#endif</span></span></span><br><span class="line"><span class="meta"><span class="meta-string">    ALAssetsGroupAll         NS_ENUM_DEPRECATED_IOS(4_0, 9_0) = 0xFFFFFFFF,</span></span></span><br><span class="line"><span class="meta"><span class="meta-string">    // The same as ORing together all the available group types,</span></span></span><br><span class="line"><span class="meta"><span class="meta-string">&#125;;</span></span></span><br></pre></td></tr></table></figure></p>
+<p><code>enumerationBlock</code> 对本地相薄进行遍历并返回遍历结果<br><code>ALAssetsLibraryGroupsEnumerationResultsBlock</code>定义如下<br><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br></pre></td><td class="code"><pre><span class="line">ALAssetsLibraryGroupsEnumerationResultsBlock resultBlock = ^(ALAssetsGroup *group,<span class="built_in">BOOL</span> *stop) &#123;&#125;;</span><br><span class="line">``` </span><br><span class="line">`failureBlock` 遍历失败</span><br><span class="line">`ALAssetsLibraryAccessFailureBlock`定义如下 </span><br><span class="line">```objc</span><br><span class="line">ALAssetsLibraryAccessFailureBlock failureBlock = ^(<span class="built_in">NSError</span> *error) &#123;&#125;;</span><br><span class="line">``` </span><br><span class="line">**代码示例**</span><br><span class="line"></span><br><span class="line">```objc</span><br><span class="line"><span class="keyword">typedef</span> <span class="keyword">void</span> (^albumGroupsBlock)(<span class="built_in">NSMutableArray</span> *groups);</span><br><span class="line">-(<span class="keyword">void</span>)setupAlbumGroups:(albumGroupsBlock)albumGroups   <span class="comment">//获取所有相薄成功后回调</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="built_in">NSMutableArray</span> *groups = @[].mutableCopy;  <span class="comment">//所有相薄数组</span></span><br><span class="line">    ALAssetsFilter* assstsFilter = [ALAssetsFilter allAssets]; <span class="comment">//筛选器获取所有资源</span></span><br><span class="line">    ALAssetsLibraryGroupsEnumerationResultsBlock resultBlock = ^(ALAssetsGroup *group, <span class="built_in">BOOL</span> *stop)&#123;           <span class="comment">//每次遍历成功后回调</span></span><br><span class="line">        <span class="keyword">if</span> (group) &#123;</span><br><span class="line">            [group setAssetsFilter:assstsFilter];</span><br><span class="line">            <span class="built_in">NSInteger</span> groupType = [[group valueForProperty:ALAssetsGroupPropertyType] integerValue];</span><br><span class="line">            <span class="keyword">if</span> (groupType == ALAssetsGroupSavedPhotos) &#123;</span><br><span class="line">                [groups insertObject:group atIndex:<span class="number">0</span>];  <span class="comment">//默认相机胶卷放入数组第一位</span></span><br><span class="line">                </span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">else</span>   </span><br><span class="line">            &#123;</span><br><span class="line">                <span class="keyword">if</span> (group.numberOfAssets&gt;<span class="number">0</span>) &#123;</span><br><span class="line">                    [groups addObject:group];</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">           </span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">else</span>  <span class="comment">//当返回的group为nil表示已经遍历结束</span></span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">if</span> (albumGroups) &#123;</span><br><span class="line">                albumGroups([groups <span class="keyword">copy</span>]);</span><br><span class="line">            &#125;</span><br><span class="line">            </span><br><span class="line">        &#125;</span><br><span class="line">    &#125;;</span><br><span class="line">    ALAssetsLibraryAccessFailureBlock failureBlock = ^(<span class="built_in">NSError</span> *error) &#123;</span><br><span class="line">        <span class="keyword">if</span> (albumGroups) &#123;   <span class="comment">//遍历失败回调</span></span><br><span class="line">            albumGroups([groups <span class="keyword">copy</span>]);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;;</span><br><span class="line">    ;</span><br><span class="line">    [[[ALAssetsLibrary alloc] init] enumerateGroupsWithTypes:ALAssetsGroupAll usingBlock:resultBlock failureBlock:failureBlock];   <span class="comment">//开始遍历</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<hr>
+<h3 id="获取本地每个相薄中的资源"><a href="#获取本地每个相薄中的资源" class="headerlink" title="获取本地每个相薄中的资源"></a>获取本地每个相薄中的资源</h3><p>初始化<code>ALAssetsGroup</code>对象并使用下面的方法来获取相薄中的资源<br><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">- (<span class="keyword">void</span>)enumerateAssetsWithOptions:(<span class="built_in">NSEnumerationOptions</span>)options usingBlock:(ALAssetsGroupEnumerationResultsBlock)enumerationBlock</span><br></pre></td></tr></table></figure></p>
+<p><code>options</code>遍历相薄中资源的顺序<br><code>NSEnumerationOptions</code>定义如下<br><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="built_in">NS_OPTIONS</span>(<span class="built_in">NSUInteger</span>, <span class="built_in">NSEnumerationOptions</span>) &#123;</span><br><span class="line">    <span class="built_in">NSEnumerationConcurrent</span> = (<span class="number">1</span>UL &lt;&lt; <span class="number">0</span>),  <span class="comment">// 并发读取相册中的资源，顺序不确定</span></span><br><span class="line">    <span class="built_in">NSEnumerationReverse</span> = (<span class="number">1</span>UL &lt;&lt; <span class="number">1</span>),    <span class="comment">//倒序读取相册中的资源</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></p>
+<p><code>enumerationBlock</code>对相薄里资源进行遍历并返回遍历结果<br><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line">ALAssetsGroupEnumerationResultsBlock resultBlock = ^(ALAsset *asset, <span class="built_in">NSUInteger</span> index, <span class="built_in">BOOL</span> *stop) &#123;&#125;;</span><br><span class="line">``` </span><br><span class="line">**代码示例**</span><br><span class="line">```objc</span><br><span class="line"><span class="keyword">typedef</span> <span class="keyword">void</span> (^albumAssetsBlock)(<span class="built_in">NSMutableArray</span> *assets);</span><br><span class="line">-(<span class="keyword">void</span>)setupAlbumAssets:(ALAssetsGroup *)group withAssets:(albumAssetsBlock)albumAssets</span><br><span class="line">&#123;</span><br><span class="line">    <span class="built_in">NSMutableArray</span> *assets = @[].mutableCopy;  <span class="comment">//相薄中所有资源数组</span></span><br><span class="line">    ALAssetsFilter* assstsFilter = [ALAssetsFilter allAssets]; <span class="comment">//筛选器获取所有资源</span></span><br><span class="line">    [group setAssetsFilter:assstsFilter];   <span class="comment">//相册内资源总数</span></span><br><span class="line">    <span class="built_in">NSInteger</span> assetCount = [group numberOfAssets];   <span class="comment">//相薄中资源总数</span></span><br><span class="line">    ALAssetsGroupEnumerationResultsBlock resultBlock = ^(ALAsset *asset, <span class="built_in">NSUInteger</span> index, <span class="built_in">BOOL</span> *stop) &#123;  <span class="comment">//资源为ALAsset类型对象</span></span><br><span class="line">        <span class="keyword">if</span> (asset) &#123;</span><br><span class="line">            [assets addObject:asset];</span><br><span class="line">            <span class="built_in">NSString</span> *assetType = [asset valueForProperty:ALAssetPropertyType];</span><br><span class="line">            <span class="keyword">if</span> ([assetType isEqualToString:ALAssetTypePhoto]) &#123;</span><br><span class="line">                <span class="comment">//资源类型为图片</span></span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">else</span> <span class="keyword">if</span> ([assetType isEqualToString:ALAssetTypeVideo]) &#123;</span><br><span class="line">                <span class="comment">//资源类型为视频</span></span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">else</span> <span class="keyword">if</span> (assets.count &gt;= assetCount)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">if</span> (albumAssets) &#123;</span><br><span class="line">                albumAssets([assets <span class="keyword">copy</span>]);</span><br><span class="line">            &#125;</span><br><span class="line">            </span><br><span class="line">        &#125;;</span><br><span class="line">    &#125;;</span><br><span class="line">    [group enumerateAssetsWithOptions:<span class="built_in">NSEnumerationReverse</span> usingBlock:resultBlock];</span><br><span class="line">    <span class="comment">//开始遍历相薄中资源</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<hr>
+<h3 id="实现效果"><a href="#实现效果" class="headerlink" title="实现效果"></a>实现效果</h3><p><img src="http://img.blog.csdn.net/20150928091207822" alt="" title="实现效果预览"></p>
+<hr>
+<p><strong>示例代码</strong><br><a href="https://github.com/GGGHub/AlbumPicker" target="_blank" rel="noopener">https://github.com/GGGHub/AlbumPicker</a></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/多媒体/" rel="tag"># 多媒体</a>
+          
+            <a href="/tags/相册/" rel="tag"># 相册</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2015/10/19/iOS9中UIStackView的使用/" rel="prev" title="iOS9中UIStackView的使用">
+                iOS9中UIStackView的使用 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      <div class="ds-thread" data-thread-key="2015/09/24/iOS相册实现与AssetsLibrary框架使用/"
+           data-title="iOS相册实现与AssetsLibrary框架使用" data-url="http://ggghub.com/2015/09/24/iOS相册实现与AssetsLibrary框架使用/">
+      </div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">LiSiYuan</p>
+              <p class="site-description motion-element" itemprop="description">Hi! I'm GGGHub, Welcome here！</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">15</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                
+                  <span class="site-state-item-count">6</span>
+                  <span class="site-state-item-name">categories</span>
+                
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                
+                  <span class="site-state-item-count">12</span>
+                  <span class="site-state-item-name">tags</span>
+                
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/ggghub" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-globe"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://www.developboot.com" target="_blank" title="developboot">
+                      
+                        <i class="fa fa-fw fa-globe"></i>developboot</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://blog.csdn.net/ggghub" target="_blank" title="CSDN">
+                      
+                        <i class="fa fa-fw fa-globe"></i>CSDN</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#概述"><span class="nav-number">1.</span> <span class="nav-text">概述</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#AssetsLibrary使用"><span class="nav-number">2.</span> <span class="nav-text">AssetsLibrary使用</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#获取本地所有相薄"><span class="nav-number">2.1.</span> <span class="nav-text">获取本地所有相薄</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#获取本地每个相薄中的资源"><span class="nav-number">2.2.</span> <span class="nav-text">获取本地每个相薄中的资源</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#实现效果"><span class="nav-number">2.3.</span> <span class="nav-text">实现效果</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">LiSiYuan</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Muse</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"ggghub"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+    
+    <script src="/lib/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/js/src/hook-duoshuo.js"></script>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

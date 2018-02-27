@@ -1,0 +1,784 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="en">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Hexo, NexT" />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="概述使用HTTP协议进行通信时，由于传输的是明文所以很容易遭到窃听，就算是加密过的信息也容易在传输中遭受到篡改，因此需要在HTTP协议基础上添加加密处理，认证处理等，有了这些处理机制的HTTP成为HTTPS。HTTPS是在应用层和传输层之间加入了SSL(Secure Socket Layer)安全套接层和TLS(Transport Layer Security)安全传输层协议。 正常情况下HTTP">
+<meta property="og:type" content="article">
+<meta property="og:title" content="HTTPS通信机制">
+<meta property="og:url" content="http://ggghub.com/2016/02/20/HTTPS通信机制/index.html">
+<meta property="og:site_name" content="GGGHub&#39;s Blog">
+<meta property="og:description" content="概述使用HTTP协议进行通信时，由于传输的是明文所以很容易遭到窃听，就算是加密过的信息也容易在传输中遭受到篡改，因此需要在HTTP协议基础上添加加密处理，认证处理等，有了这些处理机制的HTTP成为HTTPS。HTTPS是在应用层和传输层之间加入了SSL(Secure Socket Layer)安全套接层和TLS(Transport Layer Security)安全传输层协议。 正常情况下HTTP">
+<meta property="og:locale" content="en">
+<meta property="og:image" content="http://img.blog.csdn.net/20160220215927184">
+<meta property="og:updated_time" content="2016-05-10T07:25:06.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="HTTPS通信机制">
+<meta name="twitter:description" content="概述使用HTTP协议进行通信时，由于传输的是明文所以很容易遭到窃听，就算是加密过的信息也容易在传输中遭受到篡改，因此需要在HTTP协议基础上添加加密处理，认证处理等，有了这些处理机制的HTTP成为HTTPS。HTTPS是在应用层和传输层之间加入了SSL(Secure Socket Layer)安全套接层和TLS(Transport Layer Security)安全传输层协议。 正常情况下HTTP">
+<meta name="twitter:image" content="http://img.blog.csdn.net/20160220215927184">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://ggghub.com/2016/02/20/HTTPS通信机制/"/>
+
+
+
+
+
+  <title>HTTPS通信机制 | GGGHub's Blog</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="en">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">GGGHub's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">Coding Obsession</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            Archives
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://ggghub.com/2016/02/20/HTTPS通信机制/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="LiSiYuan">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="GGGHub's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">HTTPS通信机制</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2016-02-20T22:13:00+08:00">
+                2016-02-20
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/HTTP/" itemprop="url" rel="index">
+                    <span itemprop="name">HTTP</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2016/02/20/HTTPS通信机制/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/02/20/HTTPS通信机制/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h1><p>使用<code>HTTP</code>协议进行通信时，由于传输的是明文所以很容易遭到窃听，就算是加密过的信息也容易在传输中遭受到篡改，因此需要在<code>HTTP</code>协议基础上添加加密处理，认证处理等，有了这些处理机制的<code>HTTP</code>成为<code>HTTPS</code>。<br><code>HTTPS</code>是在应用层和传输层之间加入了SSL(Secure Socket Layer)安全套接层和TLS(Transport Layer Security)安全传输层协议。</p>
+<h2 id="正常情况下HTTP直接与TCP通信，而HTTPS是先与SSL通信后再与TCP进行通讯。"><a href="#正常情况下HTTP直接与TCP通信，而HTTPS是先与SSL通信后再与TCP进行通讯。" class="headerlink" title="正常情况下HTTP直接与TCP通信，而HTTPS是先与SSL通信后再与TCP进行通讯。"></a>正常情况下<code>HTTP</code>直接与<code>TCP</code>通信，而<code>HTTPS</code>是先与SSL通信后再与<code>TCP</code>进行通讯。</h2><a id="more"></a>
+<h1 id="HTTPS加密机制"><a href="#HTTPS加密机制" class="headerlink" title="HTTPS加密机制"></a>HTTPS加密机制</h1><p>要了解<code>HTTPS</code>的加密方式首先需要只要什么是共享密钥加密（对称密钥加密）和公开密钥加密（非对称密钥加密）。</p>
+<ul>
+<li><p>共享密钥加密：发送方传输给接收方一段加密的信息，那么接收方就要用密钥来解密这段信息，加密与解密的密钥是一样的，这样的加密方法为共享密钥加密，对于共享密钥加密，如果获取密钥的话那么任何人都可以解密这段信息。</p>
+</li>
+<li><p>公开密钥加密：公开密钥解决了共享密钥的问题，传输的信息用同一个公开的密钥进行加密，但是接收方解密的时候用私有的密钥进行解密，公开密钥加密又称作非对称密钥加密，当截取者获取公开密钥时也无法对信息进行解密，必须用私有密钥才可以解密。</p>
+</li>
+</ul>
+<p><strong>HTTPS采用混合加密机制</strong><br>HTTPS使用公开密钥加密的方式来传输用于共享密钥加密的密钥，然后双方都存在这个密钥后用共享密钥加密的方式进行信息传输。<br>然而这样做也会出现一些问题，当服务端与客户端在公开密钥加密的方式下进行通信时，怎样确保这个公开的密钥就是服务器传过来的，也有可能是在传输的过程中被替换掉了，由于存在这样的原因，所以需要使用由权威的数字证书认定机构颁发的公开密钥证书。</p>
+<p>这样HTTPS传输的过程大概是这个样子：</p>
+<p><img src="http://img.blog.csdn.net/20160220215927184" alt=""></p>
+<hr>
+<h1 id="HTTPS安全通信流程"><a href="#HTTPS安全通信流程" class="headerlink" title="HTTPS安全通信流程"></a>HTTPS安全通信流程</h1><ul>
+<li><p>客户端发送请求报文开始SSL通信，报文中包含客户端支持的SSL版本，加密组件列表。</p>
+</li>
+<li><p>服务器可进行SSL通信时会发送响应报文。</p>
+</li>
+<li><p>之后服务器发送Certificate报文，报文中包含公开密钥证书。</p>
+</li>
+<li><p>最后服务器发送报文通知客户端最初的SSL握手结束</p>
+</li>
+<li><p>SSL第一次握手结束后，客户端会用服务器的公开密钥加密一段随机密码串传输给服务器。</p>
+</li>
+<li><p>接着客户端会继承发送报文提示服务器，在此报文以后的通信将使用之前发送过去的随机密码串进行加密处理。</p>
+</li>
+<li><p>最后客户端发送结束报文。</p>
+</li>
+<li><p>服务器同样发送报文提示客户端，在此报文以后的通信将使用客户端之前发送过来的随机密码串进行加密处理。</p>
+</li>
+<li><p>服务器发送结束报文。</p>
+</li>
+<li><p>服务器和客户端的结束报文交换完后，SSL连接建立完成，开始HTTP请求。</p>
+</li>
+</ul>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2015/12/29/Instruments－查看收集到的数据/" rel="next" title="Instruments－查看收集到的数据">
+                <i class="fa fa-chevron-left"></i> Instruments－查看收集到的数据
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016/03/01/iOS XMPP Framework 中文概述/" rel="prev" title="iOS XMPPFramework 中文概述">
+                iOS XMPPFramework 中文概述 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      <div class="ds-thread" data-thread-key="2016/02/20/HTTPS通信机制/"
+           data-title="HTTPS通信机制" data-url="http://ggghub.com/2016/02/20/HTTPS通信机制/">
+      </div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">LiSiYuan</p>
+              <p class="site-description motion-element" itemprop="description">Hi! I'm GGGHub, Welcome here！</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">15</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                
+                  <span class="site-state-item-count">6</span>
+                  <span class="site-state-item-name">categories</span>
+                
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                
+                  <span class="site-state-item-count">12</span>
+                  <span class="site-state-item-name">tags</span>
+                
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/ggghub" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-globe"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://www.developboot.com" target="_blank" title="developboot">
+                      
+                        <i class="fa fa-fw fa-globe"></i>developboot</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://blog.csdn.net/ggghub" target="_blank" title="CSDN">
+                      
+                        <i class="fa fa-fw fa-globe"></i>CSDN</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#概述"><span class="nav-number">1.</span> <span class="nav-text">概述</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#正常情况下HTTP直接与TCP通信，而HTTPS是先与SSL通信后再与TCP进行通讯。"><span class="nav-number">1.1.</span> <span class="nav-text">正常情况下HTTP直接与TCP通信，而HTTPS是先与SSL通信后再与TCP进行通讯。</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#HTTPS加密机制"><span class="nav-number">2.</span> <span class="nav-text">HTTPS加密机制</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#HTTPS安全通信流程"><span class="nav-number">3.</span> <span class="nav-text">HTTPS安全通信流程</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">LiSiYuan</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Muse</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"ggghub"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+    
+    <script src="/lib/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/js/src/hook-duoshuo.js"></script>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

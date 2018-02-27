@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="en">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="富文本," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="在上一篇中介绍了Text Kit的三种基本组件的关系并且简单的实现了怎么使用这三种基本组件，本片将深入的去使用这三种基本组件。">
+<meta name="keywords" content="富文本">
+<meta property="og:type" content="article">
+<meta property="og:title" content="iOS富文本（三）深入使用Text Kit">
+<meta property="og:url" content="http://ggghub.com/2015/12/02/iOS富文本（三）深入使用Text Kit/index.html">
+<meta property="og:site_name" content="GGGHub&#39;s Blog">
+<meta property="og:description" content="在上一篇中介绍了Text Kit的三种基本组件的关系并且简单的实现了怎么使用这三种基本组件，本片将深入的去使用这三种基本组件。">
+<meta property="og:locale" content="en">
+<meta property="og:image" content="http://img.blog.csdn.net/20151203162620498">
+<meta property="og:image" content="http://img.blog.csdn.net/20151204145248139">
+<meta property="og:image" content="http://img.blog.csdn.net/20151204145800215">
+<meta property="og:updated_time" content="2016-05-11T07:41:48.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="iOS富文本（三）深入使用Text Kit">
+<meta name="twitter:description" content="在上一篇中介绍了Text Kit的三种基本组件的关系并且简单的实现了怎么使用这三种基本组件，本片将深入的去使用这三种基本组件。">
+<meta name="twitter:image" content="http://img.blog.csdn.net/20151203162620498">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://ggghub.com/2015/12/02/iOS富文本（三）深入使用Text Kit/"/>
+
+
+
+
+
+  <title>iOS富文本（三）深入使用Text Kit | GGGHub's Blog</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="en">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">GGGHub's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">Coding Obsession</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            Archives
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://ggghub.com/2015/12/02/iOS富文本（三）深入使用Text Kit/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="LiSiYuan">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="GGGHub's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">iOS富文本（三）深入使用Text Kit</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2015-12-02T23:23:00+08:00">
+                2015-12-02
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/iOS/" itemprop="url" rel="index">
+                    <span itemprop="name">iOS</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2015/12/02/iOS富文本（三）深入使用Text Kit/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2015/12/02/iOS富文本（三）深入使用Text Kit/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="在上一篇中介绍了Text-Kit的三种基本组件的关系并且简单的实现了怎么使用这三种基本组件，本片将深入的去使用这三种基本组件。"><a href="#在上一篇中介绍了Text-Kit的三种基本组件的关系并且简单的实现了怎么使用这三种基本组件，本片将深入的去使用这三种基本组件。" class="headerlink" title="在上一篇中介绍了Text Kit的三种基本组件的关系并且简单的实现了怎么使用这三种基本组件，本片将深入的去使用这三种基本组件。"></a>在<a href="http://blog.csdn.net/ggghub/article/details/50114853" target="_blank" rel="noopener">上一篇</a>中介绍了<code>Text Kit</code>的三种基本组件的关系并且简单的实现了怎么使用这三种基本组件，本片将深入的去使用这三种基本组件。</h2><a id="more"></a>
+<h2 id="NSTextStorage"><a href="#NSTextStorage" class="headerlink" title="NSTextStorage"></a>NSTextStorage</h2><p><code>NSTextStorage</code>是<code>NSMutableAttributedString</code>的子类，根据<code>苹果官方文档</code>描述是<code>semiconcrete</code>子类，因为<code>NSTextStorage</code>没有实现<code>NSMutableAttributedString</code>中的方法，所以说<code>NSTextStorage</code>应该是<code>NSMutableAttributedString</code>的类簇。<br>所要我们深入使用<code>NSTextStorage</code>不仅要继承<code>NSTextStorage</code>类还要实现<code>NSMutableAttributedString</code>的下面方法<br><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">- (<span class="built_in">NSString</span> *)string</span><br><span class="line">- (<span class="keyword">void</span>)replaceCharactersInRange:(<span class="built_in">NSRange</span>)range    withString:(<span class="built_in">NSString</span> *)str</span><br><span class="line">- (<span class="built_in">NSDictionary</span> *)attributesAtIndex:(<span class="built_in">NSUInteger</span>)location effectiveRange:(<span class="built_in">NSRangePointer</span>)range</span><br><span class="line">- (<span class="keyword">void</span>)setAttributes:(<span class="built_in">NSDictionary</span> *)attrs range:(<span class="built_in">NSRange</span>)range</span><br></pre></td></tr></table></figure></p>
+<p>因为这些方法实际上<code>NSTextStorage</code>并没有实现然而我们断然不知道<code>NSMutableAttributedString</code>是如何实现这些方法，所以我们继承<code>NSTextStorage</code>并实现这些方法最简单的莫过于在<code>NSTextStorage</code>类中实例化一个<code>NSMutableAttributedString</code>对象然后调用<code>NSMutableAttributedString</code>对象的这些方法来实现<code>NSTextStorage</code>类中的这些方法<br><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">@interface</span> <span class="title">LSYTextStorage</span> : <span class="title">NSTextStorage</span></span></span><br><span class="line"><span class="keyword">@property</span> (<span class="keyword">nonatomic</span>,<span class="keyword">strong</span>) <span class="built_in">NSMutableAttributedString</span> *attributedString;</span><br><span class="line"><span class="keyword">@end</span></span><br></pre></td></tr></table></figure></p>
+<p>继承<code>NSTextStorage</code>后都会实现下面的代码，如果要做一些特殊的处理知道在下面的代码里添加就可以了<br><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#import <span class="meta-string">"LSYTextStorage.h"</span></span></span><br><span class="line"><span class="class"><span class="keyword">@interface</span> <span class="title">LSYTextStorage</span> ()</span></span><br><span class="line"><span class="keyword">@property</span> (<span class="keyword">nonatomic</span>,<span class="keyword">strong</span>) <span class="built_in">NSMutableAttributedString</span> *attributedString;</span><br><span class="line"><span class="keyword">@end</span></span><br><span class="line"><span class="class"><span class="keyword">@implementation</span> <span class="title">LSYTextStorage</span></span></span><br><span class="line">- (<span class="keyword">instancetype</span>)init</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">self</span> = [<span class="keyword">super</span> init];</span><br><span class="line">    <span class="keyword">if</span> (<span class="keyword">self</span>) &#123;</span><br><span class="line">        _attributedString = [[<span class="built_in">NSMutableAttributedString</span> alloc] init];</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">self</span>;</span><br><span class="line">&#125;</span><br><span class="line">-(<span class="built_in">NSString</span> *)string&#123;</span><br><span class="line">    <span class="keyword">return</span> [_attributedString string];</span><br><span class="line">&#125;</span><br><span class="line">- (<span class="built_in">NSDictionary</span> *)attributesAtIndex:(<span class="built_in">NSUInteger</span>)location effectiveRange:(<span class="keyword">nullable</span> <span class="built_in">NSRangePointer</span>)range</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">return</span> [_attributedString attributesAtIndex:location effectiveRange:range];</span><br><span class="line">&#125;</span><br><span class="line">-(<span class="keyword">void</span>)replaceCharactersInRange:(<span class="built_in">NSRange</span>)range withString:(<span class="built_in">NSString</span> *)str</span><br><span class="line">&#123;</span><br><span class="line">    [<span class="keyword">self</span> beginEditing];</span><br><span class="line">    [_attributedString replaceCharactersInRange:range withString:str];</span><br><span class="line">    [<span class="keyword">self</span> edited:<span class="built_in">NSTextStorageEditedAttributes</span>|<span class="built_in">NSTextStorageEditedCharacters</span> range:range changeInLength:str.length-range.length];</span><br><span class="line">    [<span class="keyword">self</span> endEditing];</span><br><span class="line">&#125;</span><br><span class="line">-(<span class="keyword">void</span>)setAttributes:(<span class="built_in">NSDictionary</span>&lt;<span class="built_in">NSString</span> *,<span class="keyword">id</span>&gt; *)attrs range:(<span class="built_in">NSRange</span>)range</span><br><span class="line">&#123;</span><br><span class="line">    [<span class="keyword">self</span> beginEditing];</span><br><span class="line">    [_attributedString setAttributes:attrs range:range];</span><br><span class="line">    [<span class="keyword">self</span> edited:<span class="built_in">NSTextStorageEditedAttributes</span> range:range changeInLength:<span class="number">0</span>];</span><br><span class="line">    [<span class="keyword">self</span> endEditing];</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">@end</span></span><br></pre></td></tr></table></figure></p>
+<p>上面实现的方法里代码都加上了<code>beginEditing</code>，<code>edited:range:changeInLength:</code>，<code>endEditing</code>的方法，这样做主要是通知它的 Layout Manager 发生了变化来计时调整布局<br>根据上面提供的模版添加特殊处理的代码<br><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#import <span class="meta-string">"LSYTextStorage.h"</span></span></span><br><span class="line"><span class="class"><span class="keyword">@interface</span> <span class="title">LSYTextStorage</span> ()</span></span><br><span class="line"><span class="keyword">@property</span> (<span class="keyword">nonatomic</span>,<span class="keyword">strong</span>) <span class="built_in">NSMutableAttributedString</span> *attributedString;</span><br><span class="line"><span class="keyword">@end</span></span><br><span class="line"><span class="class"><span class="keyword">@implementation</span> <span class="title">LSYTextStorage</span></span></span><br><span class="line">- (<span class="keyword">instancetype</span>)init</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">self</span> = [<span class="keyword">super</span> init];</span><br><span class="line">    <span class="keyword">if</span> (<span class="keyword">self</span>) &#123;</span><br><span class="line">        _attributedString = [[<span class="built_in">NSMutableAttributedString</span> alloc] init];</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">self</span>;</span><br><span class="line">&#125;</span><br><span class="line">-(<span class="built_in">NSString</span> *)string&#123;</span><br><span class="line">    <span class="keyword">return</span> [_attributedString string];</span><br><span class="line">&#125;</span><br><span class="line">- (<span class="built_in">NSDictionary</span> *)attributesAtIndex:(<span class="built_in">NSUInteger</span>)location effectiveRange:(<span class="keyword">nullable</span> <span class="built_in">NSRangePointer</span>)range</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">return</span> [_attributedString attributesAtIndex:location effectiveRange:range];</span><br><span class="line">&#125;</span><br><span class="line">-(<span class="keyword">void</span>)replaceCharactersInRange:(<span class="built_in">NSRange</span>)range withString:(<span class="built_in">NSString</span> *)str</span><br><span class="line">&#123;</span><br><span class="line">    [<span class="keyword">self</span> beginEditing];</span><br><span class="line">    [_attributedString replaceCharactersInRange:range withString:str];</span><br><span class="line">    [<span class="keyword">self</span> edited:<span class="built_in">NSTextStorageEditedAttributes</span>|<span class="built_in">NSTextStorageEditedCharacters</span> range:range changeInLength:str.length-range.length];</span><br><span class="line">    [<span class="keyword">self</span> endEditing];</span><br><span class="line">&#125;</span><br><span class="line">-(<span class="keyword">void</span>)setAttributes:(<span class="built_in">NSDictionary</span>&lt;<span class="built_in">NSString</span> *,<span class="keyword">id</span>&gt; *)attrs range:(<span class="built_in">NSRange</span>)range</span><br><span class="line">&#123;</span><br><span class="line">    [<span class="keyword">self</span> beginEditing];</span><br><span class="line">    [_attributedString setAttributes:attrs range:range];</span><br><span class="line">    [<span class="keyword">self</span> edited:<span class="built_in">NSTextStorageEditedAttributes</span> range:range changeInLength:<span class="number">0</span>];</span><br><span class="line">    [<span class="keyword">self</span> endEditing];</span><br><span class="line">&#125;</span><br><span class="line">-(<span class="keyword">void</span>)processEditing</span><br><span class="line">&#123;</span><br><span class="line">    </span><br><span class="line">    <span class="built_in">NSRange</span> lineRange = <span class="built_in">NSUnionRange</span>(<span class="keyword">self</span>.editedRange, [<span class="keyword">self</span>.string lineRangeForRange:<span class="keyword">self</span>.editedRange]);  <span class="comment">//正在编辑的整个段落范围</span></span><br><span class="line">    [<span class="keyword">self</span>.attributedString.string enumerateSubstringsInRange:lineRange options:<span class="built_in">NSStringEnumerationByWords</span> usingBlock:^(<span class="built_in">NSString</span> * _Nullable substring, <span class="built_in">NSRange</span> substringRange, <span class="built_in">NSRange</span> enclosingRange, <span class="built_in">BOOL</span> * _Nonnull stop) &#123;</span><br><span class="line">        <span class="keyword">if</span> ([substring isEqualToString:<span class="string">@"GGGHub"</span>]) &#123;</span><br><span class="line">            [<span class="keyword">self</span> setAttributes:@&#123;<span class="built_in">NSForegroundColorAttributeName</span>:[<span class="built_in">UIColor</span> redColor]&#125; range:substringRange];  <span class="comment">//当出现GGGHub单词时字体变红</span></span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">else</span>&#123;</span><br><span class="line">            [<span class="keyword">self</span> setAttributes:@&#123;<span class="built_in">NSForegroundColorAttributeName</span>:[<span class="built_in">UIColor</span> blackColor]&#125; range:substringRange]; <span class="comment">//默认字体是黑色</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;];</span><br><span class="line">    [<span class="keyword">super</span> processEditing];</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">@end</span></span><br></pre></td></tr></table></figure></p>
+<p>每次编辑都会调用<code>-(void)processEditing</code>的方法，然后遍历整段修改的文字当出现<code>GGGHub</code>的单词时显示红色字体。</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#import <span class="meta-string">"ViewController.h"</span></span></span><br><span class="line"><span class="meta">#import <span class="meta-string">"LSYTextStorage.h"</span></span></span><br><span class="line"><span class="class"><span class="keyword">@interface</span> <span class="title">ViewController</span> ()</span></span><br><span class="line">&#123;</span><br><span class="line">    LSYTextStorage *textStroage;  <span class="comment">//需要声明为全局变量，否则出了作用域后就释放掉了</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">@property</span> (<span class="keyword">weak</span>, <span class="keyword">nonatomic</span>) <span class="keyword">IBOutlet</span> <span class="built_in">UITextView</span> *textView;</span><br><span class="line"></span><br><span class="line"><span class="keyword">@end</span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">@implementation</span> <span class="title">ViewController</span></span></span><br><span class="line"></span><br><span class="line">- (<span class="keyword">void</span>)viewDidLoad &#123;</span><br><span class="line">    [<span class="keyword">super</span> viewDidLoad];</span><br><span class="line">    <span class="built_in">NSString</span> *str = _textView.text;</span><br><span class="line">    textStroage = [[LSYTextStorage alloc] init];</span><br><span class="line">    [textStroage replaceCharactersInRange:<span class="built_in">NSMakeRange</span>(<span class="number">0</span>, <span class="number">0</span>) withString:str];</span><br><span class="line">    [textStroage addLayoutManager:<span class="keyword">self</span>.textView.layoutManager];</span><br><span class="line">   <span class="comment">//替换textView的textStroage属性</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>只要文本中出现指定的关键字字体就会变红，输入指定的关键字字体也会变红。</p>
+<p><strong>实现效果</strong><br><img src="http://img.blog.csdn.net/20151203162620498" alt=""></p>
+<p>代码在<a href="https://github.com/GGGHub/TextKitDemo/releases" target="_blank" rel="noopener">github</a> <code>NSTextStorage</code> Tag下载</p>
+<hr>
+<h2 id="NSLayoutManager"><a href="#NSLayoutManager" class="headerlink" title="NSLayoutManager"></a>NSLayoutManager</h2><p>布局管理器主要用来绘制字体的。<code>NSTextStorage</code>虽然能够改变字体的样式但是更改不了字体绘制的方式。我们可以继承<code>NSLayoutManager</code>来更改字体绘制。对于某些特定的字段可能不需要显示比如加密文本，或者用图片替换这些字段，或者給这些字段添加一些背景，这时只要重写<code>NSLayoutManager</code>中的某些方法可以很简单的实现。<br>更改字体绘制与字体背景颜色只需要重写下面的两个方法<br><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">- (<span class="keyword">void</span>)drawBackgroundForGlyphRange:(<span class="built_in">NSRange</span>)glyphsToShow atPoint:(<span class="built_in">CGPoint</span>)origin;</span><br><span class="line"><span class="comment">//绘制字形背景</span></span><br><span class="line">- (<span class="keyword">void</span>)drawGlyphsForGlyphRange:(<span class="built_in">NSRange</span>)glyphsToShow atPoint:(<span class="built_in">CGPoint</span>)origin;</span><br><span class="line"><span class="comment">//绘制字形</span></span><br></pre></td></tr></table></figure></p>
+<p>下面例子会实现这样的功能，只要文本中有纯数字或者输入纯数字那么这段数字不显示出来，用黑色的遮罩挡住。<br>首先在<code>LSYTextStorage.m</code>文件中更改<code>processEditing</code>函数<br><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">-(<span class="keyword">void</span>)processEditing</span><br><span class="line">&#123;</span><br><span class="line">    </span><br><span class="line">    <span class="built_in">NSRange</span> lineRange = <span class="built_in">NSUnionRange</span>(<span class="keyword">self</span>.editedRange, [<span class="keyword">self</span>.string lineRangeForRange:<span class="keyword">self</span>.editedRange]);</span><br><span class="line">    <span class="built_in">NSString</span> *regexNumber = <span class="string">@"^-?[0-9]\\d*$"</span>;</span><br><span class="line">    <span class="built_in">NSPredicate</span> *predicateNumber = [<span class="built_in">NSPredicate</span> predicateWithFormat:<span class="string">@"SELF MATCHES %@"</span>,regexNumber];</span><br><span class="line">    <span class="comment">//正则表达式，判断是否为纯数字</span></span><br><span class="line">    [<span class="keyword">self</span>.attributedString.string enumerateSubstringsInRange:lineRange options:<span class="built_in">NSStringEnumerationByWords</span> usingBlock:^(<span class="built_in">NSString</span> * _Nullable substring, <span class="built_in">NSRange</span> substringRange, <span class="built_in">NSRange</span> enclosingRange, <span class="built_in">BOOL</span> * _Nonnull stop) &#123;</span><br><span class="line">        <span class="built_in">NSLog</span>(<span class="string">@"%@"</span>,substring);</span><br><span class="line">        <span class="keyword">if</span> ([substring isEqualToString:<span class="string">@"GGGHub"</span>]) &#123;</span><br><span class="line">            [<span class="keyword">self</span> setAttributes:@&#123;<span class="built_in">NSForegroundColorAttributeName</span>:[<span class="built_in">UIColor</span> redColor]&#125; range:substringRange];</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">/**</span></span><br><span class="line"><span class="comment">         *  如果是纯数字給这段字符串添加LSYSecretAttribute属性为了绘制字形时查找</span></span><br><span class="line"><span class="comment">         */</span></span><br><span class="line">        <span class="keyword">else</span> <span class="keyword">if</span> ([predicateNumber evaluateWithObject:substring])&#123;</span><br><span class="line">            [<span class="keyword">self</span> setAttributes:@&#123;<span class="string">@"LSYSecretAttribute"</span>:<span class="string">@"secretAttribute"</span>&#125; range:substringRange];</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">else</span>&#123;</span><br><span class="line">            [<span class="keyword">self</span> setAttributes:@&#123;<span class="built_in">NSForegroundColorAttributeName</span>:[<span class="built_in">UIColor</span> blackColor]&#125; range:substringRange];</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;];</span><br><span class="line">    [<span class="keyword">super</span> processEditing];</span><br><span class="line">    </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>上面的代码主要为纯数字的字符串添加一个<code>LSYSecretAttribute</code>的属性，当<code>NSLayoutManager</code>开始绘制字形时可以方便找到这段字符串然后在这段字符串的范围绘制黑色遮罩<br>再重写<code>NSLayoutManager</code>的方法前<br><img src="http://img.blog.csdn.net/20151204145248139" alt=""><br>下面重写<code>NSLayoutManager</code>的<code>drawGlyphsForGlyphRange</code>方法<br><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line">-(<span class="keyword">void</span>)drawGlyphsForGlyphRange:(<span class="built_in">NSRange</span>)glyphsToShow atPoint:(<span class="built_in">CGPoint</span>)origin</span><br><span class="line">&#123;</span><br><span class="line">    </span><br><span class="line">    <span class="built_in">NSRange</span> range = [<span class="keyword">self</span> characterRangeForGlyphRange:glyphsToShow</span><br><span class="line">                                     actualGlyphRange:<span class="literal">NULL</span>];</span><br><span class="line">    [<span class="keyword">self</span>.textStorage enumerateAttribute:<span class="string">@"LSYSecretAttribute"</span> inRange:range options:<span class="number">0</span> usingBlock:^(<span class="keyword">id</span>  _Nullable value, <span class="built_in">NSRange</span> range, <span class="built_in">BOOL</span> * _Nonnull stop) &#123;</span><br><span class="line">        <span class="comment">//找到在LSYTextStorage中自定的LSYSecretAttribute属性</span></span><br><span class="line">        <span class="keyword">if</span> ([value isEqualToString:<span class="string">@"secretAttribute"</span>]) &#123;</span><br><span class="line">            <span class="built_in">NSRange</span> glyphRange = [<span class="keyword">self</span> glyphRangeForCharacterRange:range</span><br><span class="line">                                              actualCharacterRange:<span class="literal">NULL</span>];</span><br><span class="line">            <span class="built_in">NSTextContainer</span> *</span><br><span class="line">            container = [<span class="keyword">self</span> textContainerForGlyphAtIndex:glyphRange.location</span><br><span class="line">                                            effectiveRange:<span class="literal">NULL</span>];</span><br><span class="line">            <span class="built_in">CGContextRef</span> context = <span class="built_in">UIGraphicsGetCurrentContext</span>();</span><br><span class="line">            <span class="built_in">CGContextSaveGState</span>(context);   <span class="comment">//保存当前的绘图配置信息</span></span><br><span class="line">            <span class="built_in">CGContextTranslateCTM</span>(context, origin.x, origin.y); <span class="comment">//转换初始坐标系到绘制字形的位置</span></span><br><span class="line">            [[<span class="built_in">UIColor</span> blackColor] setFill];</span><br><span class="line">            <span class="built_in">CGRect</span> rect = [<span class="keyword">self</span> boundingRectForGlyphRange:glyphRange inTextContainer:container];</span><br><span class="line">            [<span class="keyword">self</span> drawSecret:rect]; <span class="comment">//开始绘制</span></span><br><span class="line">             <span class="built_in">CGContextRestoreGState</span>(context); <span class="comment">//恢复绘图配置信息</span></span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">else</span></span><br><span class="line">        &#123;</span><br><span class="line">            [<span class="keyword">super</span> drawGlyphsForGlyphRange:range atPoint:origin];</span><br><span class="line">        &#125;</span><br><span class="line">        </span><br><span class="line">    &#125;];</span><br><span class="line">    </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>实现效果<br><img src="http://img.blog.csdn.net/20151204145800215" alt=""> </p>
+<p>这种遮罩是动态的，只要输入是纯数字那么<code>NSLayoutManager</code>的对象就不会对其进行绘制，而用黑色的遮罩挡住。<br>代码在<a href="https://github.com/GGGHub/TextKitDemo/releases" target="_blank" rel="noopener">github</a> <code>NSLayoutManager</code> Tag下载</p>
+<hr>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/富文本/" rel="tag"># 富文本</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2015/11/30/iOS富文本（二）初识Text Kit/" rel="next" title="iOS富文本（二）初识Text Kit">
+                <i class="fa fa-chevron-left"></i> iOS富文本（二）初识Text Kit
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2015/12/09/利用RunTime解决由NSTimer导致的内存泄漏/" rel="prev" title="利用RunTime解决由NSTimer导致的内存泄漏">
+                利用RunTime解决由NSTimer导致的内存泄漏 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      <div class="ds-thread" data-thread-key="2015/12/02/iOS富文本（三）深入使用Text Kit/"
+           data-title="iOS富文本（三）深入使用Text Kit" data-url="http://ggghub.com/2015/12/02/iOS富文本（三）深入使用Text Kit/">
+      </div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">LiSiYuan</p>
+              <p class="site-description motion-element" itemprop="description">Hi! I'm GGGHub, Welcome here！</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">15</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                
+                  <span class="site-state-item-count">6</span>
+                  <span class="site-state-item-name">categories</span>
+                
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                
+                  <span class="site-state-item-count">12</span>
+                  <span class="site-state-item-name">tags</span>
+                
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/ggghub" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-globe"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://www.developboot.com" target="_blank" title="developboot">
+                      
+                        <i class="fa fa-fw fa-globe"></i>developboot</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://blog.csdn.net/ggghub" target="_blank" title="CSDN">
+                      
+                        <i class="fa fa-fw fa-globe"></i>CSDN</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#在上一篇中介绍了Text-Kit的三种基本组件的关系并且简单的实现了怎么使用这三种基本组件，本片将深入的去使用这三种基本组件。"><span class="nav-number">1.</span> <span class="nav-text">在上一篇中介绍了Text Kit的三种基本组件的关系并且简单的实现了怎么使用这三种基本组件，本片将深入的去使用这三种基本组件。</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#NSTextStorage"><span class="nav-number">2.</span> <span class="nav-text">NSTextStorage</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#NSLayoutManager"><span class="nav-number">3.</span> <span class="nav-text">NSLayoutManager</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">LiSiYuan</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Muse</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"ggghub"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+    
+    <script src="/lib/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/js/src/hook-duoshuo.js"></script>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

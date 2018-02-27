@@ -1,0 +1,870 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="en">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="翻译," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="本篇文章翻译XMPP Framework中的Overview of the XMPP Framework部分">
+<meta name="keywords" content="翻译">
+<meta property="og:type" content="article">
+<meta property="og:title" content="iOS XMPPFramework 中文概述">
+<meta property="og:url" content="http://ggghub.com/2016/03/01/iOS XMPP Framework 中文概述/index.html">
+<meta property="og:site_name" content="GGGHub&#39;s Blog">
+<meta property="og:description" content="本篇文章翻译XMPP Framework中的Overview of the XMPP Framework部分">
+<meta property="og:locale" content="en">
+<meta property="og:updated_time" content="2016-05-11T07:38:41.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="iOS XMPPFramework 中文概述">
+<meta name="twitter:description" content="本篇文章翻译XMPP Framework中的Overview of the XMPP Framework部分">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://ggghub.com/2016/03/01/iOS XMPP Framework 中文概述/"/>
+
+
+
+
+
+  <title>iOS XMPPFramework 中文概述 | GGGHub's Blog</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="en">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">GGGHub's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">Coding Obsession</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            Archives
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://ggghub.com/2016/03/01/iOS XMPP Framework 中文概述/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="LiSiYuan">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="GGGHub's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">iOS XMPPFramework 中文概述</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2016-03-01T17:02:00+08:00">
+                2016-03-01
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/iOS/" itemprop="url" rel="index">
+                    <span itemprop="name">iOS</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2016/03/01/iOS XMPP Framework 中文概述/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/03/01/iOS XMPP Framework 中文概述/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="本篇文章翻译XMPP-Framework中的Overview-of-the-XMPP-Framework部分"><a href="#本篇文章翻译XMPP-Framework中的Overview-of-the-XMPP-Framework部分" class="headerlink" title="本篇文章翻译XMPP Framework中的Overview of the XMPP Framework部分 "></a>本篇文章翻译<a href="https://github.com/robbiehanson/XMPPFramework" target="_blank" rel="noopener">XMPP Framework</a>中的<a href="https://github.com/robbiehanson/XMPPFramework/wiki/IntroToFramework" target="_blank" rel="noopener">Overview of the XMPP Framework</a>部分 </h2><a id="more"></a>
+<h2 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h2><p>The framework is divided into 2 parts:</p>
+<ol>
+<li>xmpp核心部分</li>
+<li>xmpp扩展（roster，XEP&#39;s，可选的支持工具等）</li>
+</ol>
+<p>xmpp核心部分实现了xmpp规范（<a href="http://xmpp.org/rfcs/rfc3920.html" target="_blank" rel="noopener">RFC 3920</a>）</p>
+<pre><code>&gt;请不要把聊天与xmpp混淆，xmpp全称是&quot;可扩展消息与存在协议&quot;，它是一种可以用于多种用途的通用协议，事实上目前有很多公司使用这个框架例如家庭自动化，在医院传达警报给护士。
+</code></pre><p>可扩展包括例如支持花名册，自动重连与多种xmpp扩展实现(<a href="http://xmpp.org/extensions/" target="_blank" rel="noopener">XEP&#39;s</a>).。</p>
+<h2 id="XMPP核心"><a href="#XMPP核心" class="headerlink" title="XMPP核心"></a>XMPP核心</h2><p>XMPP核心文件在本地命名为”Core”的文件夹中。这些文件包括：</p>
+<ul>
+<li>XMPPStream</li>
+<li>XMPPParser</li>
+<li>XMPPJID</li>
+<li>XMPPElement</li>
+<li>XMPPIQ</li>
+<li>XMPPMessage</li>
+<li>XMPPPresence</li>
+<li>XMPPModule</li>
+<li>XMPPLogging</li>
+<li>XMPPInternal</li>
+</ul>
+<p>这个框架的核心是<code>XMPPStream</code>类，这是你将要交互使用的主要的类，它是所有的扩展与定义代码插入的类，它具有一些使框架灵活，可扩展，易于在上面开发有趣的功能。这些将在稍后的文档中更深入的讨论。</p>
+<p>XMPPParser 是XMPPStream使用的内部类。你也许已经猜出它是做什么的了，你不需要以任何方式形式与这个解析器交互。</p>
+<p>XMPPJID 提供了一个不变的JID (Jabber Identifier)实现，它支持解析JID&#39;s，并以各种形式提取JID的各个部分。它遵守NSCopying协议，一边JID&#39;s可以当做NSDictionary的key。它也遵守NSCoding协议。</p>
+<p>XMPPElement 是3个主要XMPP元素的基类:XMPPIQ, XMPPMessage &amp; XMPPPresence. XMPPElement扩展NSXMLElement类，因此你有全部的NSXML的功能，检查任何xml元素。在这个章节有更多详细的描述<a href="#t2">Elements: IQ, Message, &amp; Presence</a>。</p>
+<p>XMPPModule 提供可选植入扩展的基础类，如果你正在写你自己应用执行的代码。你很可能仅仅创建你自己的类，注册接受代理调用。但是如果你正在实现一个标准的XEP。或者你想你的应用指定扩展是可被植入，那么你要在XMPPModule上创建，Module在后面更详细的被介绍。</p>
+<p>XMPPLogging 提供一个非常快，强大灵活的日志框架，它会在<a href="#xmpp-日志">XMPP Logging</a> 章节中讨论。</p>
+<p>XMPPInternal 仅仅是关于核心和各种高级底层扩展内部的东西。</p>
+<h2 id="元素-IQ-Message-amp-Presence"><a href="#元素-IQ-Message-amp-Presence" class="headerlink" title="元素: IQ, Message, &amp; Presence"></a>元素: IQ, Message, &amp; Presence</h2><p>XMPPElement扩展NSXMLElement类，因此你有全部的NSXML的功能，检查任何xml元素。</p>
+<ul>
+<li>XMPPIQ -&gt; XMPPElement -&gt; NSXMLElement -&gt; NSXMLNode -&gt; NSObject</li>
+<li>XMPPMessage -&gt; XMPPElement -&gt; NSXMLElement -&gt; NSXMLNode -&gt; NSObject</li>
+<li>XMPPPresence -&gt; XMPPElement -&gt; NSXMLElement -&gt; NSXMLNode -&gt; NSObject</li>
+</ul>
+<p>除了NSXML基础功能外，还提供了<a href="http://code.google.com/p/xmppframework/source/browse/Categories/NSXMLElement+XMPP.h" target="_blank" rel="noopener">NSXMLElement+XMPP</a> 类别。这个类别提供各种方便的方法让你的代码更简洁易读。例如：</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[element attributeIntValueForName:<span class="string">@"age"</span>];</span><br></pre></td></tr></table></figure>
+<p>更多的信息请看<a href="https://github.com/robbiehanson/XMPPFramework/wiki/WorkingWithElements" target="_blank" rel="noopener">Working With Elements</a>页面</p>
+<h2 id="XMPPStream配置"><a href="#XMPPStream配置" class="headerlink" title="XMPPStream配置"></a>XMPPStream配置</h2><p>一个xmpp stream配置初始化被分为多个部分：</p>
+<ul>
+<li>配置如何连接到xmpp服务器</li>
+<li>添加代理</li>
+<li>添加 modules</li>
+<li>连接</li>
+<li>认证</li>
+</ul>
+<h3 id="配置连接"><a href="#配置连接" class="headerlink" title="配置连接"></a>配置连接</h3><p>对于大部分人来说，这仅涉及一个步骤 - 设置stream的myJID属性。例如：</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">xmppStream.myJID = [XMPPJID jidWithString:<span class="string">@"user@gmail.com"</span>];</span><br></pre></td></tr></table></figure>
+<p>该xmpp stream 将查找遵循XMPP RFC的剩余信息，这包括正在进行的SRV查找_xmpp-client._tcp.domain。在上面的例子中，使用Gmail，谷歌服务器可能会返回类似&quot;talk.google.com&quot;，然后xmpp stream将会链接到该服务器，如果SRV查找查找失败，那么xmpp stream 将会简单链接到JID&#39;s domain。</p>
+<p>如果你知道你正在连接到不具有xmpp SRV记录的xmpp服务器，你可以告诉xmpp stream 通过指定的主机名跳过SRV查找，例如：<br><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">xmppStream.myJID = [XMPPJID jidWithString:<span class="string">@"user@myCompany.com"</span>];</span><br><span class="line">xmppStream.hostName = <span class="string">@"myCompany.com"</span>;</span><br></pre></td></tr></table></figure></p>
+<p>主机名也会派上用场，当你使用一个开发xmpp服务器，可能服务器是在背地网络可用的，或者不具有DNS地址等，例如：</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">xmppStream.myJID = [XMPPJID jidWithString:<span class="string">@"user@dev1.myCompany.com"</span>];</span><br><span class="line">xmppStream.hostName = <span class="string">@"192.168.2.27"</span>;</span><br></pre></td></tr></table></figure>
+<p>另一个可选的属性是主机端口，默认情况下，并按照xmpp规范。几乎所有的服务器上的端口都在5222运行，如果你的服务器在不同的端口上运行，那可以设置主机端口的属性。</p>
+<h3 id="添加代理"><a href="#添加代理" class="headerlink" title="添加代理"></a>添加代理</h3><p>XMPPStream有一些旨在使框架灵活，可扩展，易于在上面开发有趣的功能。其中之一使用MulticastDelegate。</p>
+<p>什么是MulticastDelegate？</p>
+<p>xmpp framework需要支持扩展的数量不受限制，这包括对这个框架的官方扩展，以及任何数量的扩展或你想要插入这个框架的自定义代码。因此传统的代理模式是行不通的，xmpp 模块和扩展需要分开到自己单独的类，但每个类都需要接受代理方法。而标准NSNotification架构将无法胜任，一些代理要求返回变量。（加上它真的很烦人要从userInfo字典的通知中提取参数）。</p>
+<p>因此一个MulticastDelegate允许你使用一个标准的代理模式插入框架中，但它允许多个类接受想用的代理通知。这样做的好处是，你不必把所有的xmpp处理代码在一个类中。你可以认为你合适的方法分开处理在不同的类中。</p>
+<p>你可以任何时间添加/删除XMPPStream的代理对象：</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">[xmppStream addDelegate:<span class="keyword">self</span> delegateQueue:dispatch_get_main_queue()];</span><br><span class="line">...</span><br><span class="line">[xmppStream removeDelegate:<span class="keyword">self</span>];</span><br></pre></td></tr></table></figure>
+<p>更多关于MulticastDelegate的讨论可以在<a href="https://github.com/robbiehanson/XMPPFramework/wiki/MulticastDelegate" target="_blank" rel="noopener">这里</a>找到。线程和队列更详细的讨论可以在<a href="https://github.com/robbiehanson/XMPPFramework/wiki/Threading" target="_blank" rel="noopener">这里</a>找到。</p>
+<h3 id="添加-Modules"><a href="#添加-Modules" class="headerlink" title="添加 Modules"></a>添加 Modules</h3><p>这有一些关于这个框架的扩展，当然，你可以如你所愿写尽可能多的扩展。我们不会检查所有可用的扩展，但我们会列出几个在这里示例。</p>
+<ul>
+<li>XMPPReconnect - 自动重新连接，如果你意外断开。</li>
+<li>XMPPRoster - 提供标准的xmpp花名册支持</li>
+<li>XMPPRoom - 提供多人聊天支持.</li>
+<li>XMPPPubSub - 发布订阅</li>
+</ul>
+<p>作为例子，我们将会插入XMPPReconnect模块在我们的stream：</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">xmppReconnect = [ [XMPPReconnect alloc] init];</span><br><span class="line"></span><br><span class="line"><span class="comment">// Optional configuration of xmppReconnect could go here.</span></span><br><span class="line"><span class="comment">// The defaults are fine for our purposes.</span></span><br><span class="line"></span><br><span class="line">[xmppReconnect activate:xmppStream];</span><br><span class="line"></span><br><span class="line"><span class="comment">// You can also optionally add delegates to the module.</span></span><br><span class="line"></span><br><span class="line">[xmppReconnect addDelegate:<span class="keyword">self</span> delegateQueue:dispatch_get_main_queue()];</span><br><span class="line"></span><br><span class="line"><span class="comment">// And that's all that is needed.</span></span><br><span class="line"><span class="comment">// The module will receive any delegate methods it needs automatically</span></span><br><span class="line"><span class="comment">// from the xmpp stream, and will continue to do its thing unless you deactivate it.</span></span><br></pre></td></tr></table></figure>
+<h3 id="连接"><a href="#连接" class="headerlink" title="连接"></a>连接</h3><p>当你准备好，你可以开始连接进程：</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">NSError</span> *error = <span class="literal">nil</span>;</span><br><span class="line"><span class="keyword">if</span> (![xmppStream connect:&amp;error])</span><br><span class="line">&#123;</span><br><span class="line">    <span class="built_in">NSLog</span>(<span class="string">@"Oops, I probably forgot something: %@"</span>, error);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>如果你忘记设置必需的属性，例如myJID，那么connect方法会返回NO，错误消息会通知你的问题。</p>
+<p>在连接过程中，客户端和服务器经过一个xmpp握手。在此期间，服务器通知各种它支持以及需要的各种协议给客户端。有些服务器可能需要连接通过SSL/TLS。如果是这样的情况下，xmpp stream将自动保护连接，如果你正在连接服务器以不正确X509证书，你可能需要实现xmppStream:willSecureWithSettings: 代理方法来改变默认的安全设置。</p>
+<h3 id="认证"><a href="#认证" class="headerlink" title="认证"></a>认证</h3><p>所有的连接握手结束后xmppStreamDidConnect: 代理方法被调用。这通常是大多数客户端应启动验证过程：</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">- (<span class="keyword">void</span>)xmppStreamDidConnect:(XMPPStream *)sender</span><br><span class="line">&#123;</span><br><span class="line">    [xmppStream authenticateWithPassword:password error:<span class="literal">NULL</span>];</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="XMPP-日志"><a href="#XMPP-日志" class="headerlink" title="XMPP 日志"></a>XMPP 日志</h2><p>这有几个目标对于整个XMPP架构日志：</p>
+<ul>
+<li><p><strong>它必须支持多种日志级别.</strong> <br><br>不是所有的日志消息具有相同的优先级。有些是有关错误的，而其他都只是信息。日志分级帮助开发者保证他们的日志信息完整的，能够打开和关闭他们没有任何困难。</p>
+</li>
+<li><p><strong>它必须在每个文件基础上可配置</strong> <br><br>一个全局日志级别不会接受当这个框架包含了这么多文件。加上调试的问题往往开发者只希望看到几个文件的日志语句。</p>
+</li>
+<li><p><strong>它必须可配置于终端用户</strong> <br><br>xmpp framework 需要对日志语句完全控制，用户有很多不同的需求。一些想要日志声明到一个文件中，一些可能想要日志声明到数据库里。或者可能他们需要针对日志声明在不同的地方，取决于日志声明来源于app中还是xmpp framework。</p>
+</li>
+</ul>
+<p>我从事客户端多年来的工作，我看到第三方框架一遍又一遍发生同样的问题。第三方库自带散落着的NSLog语句，最终需要用户通过库注释掉NSLog语句，或者将它们转换为一些原始的自定义宏的版本。</p>
+<p>xmpp framework 采用了专业的日志框架<a href="https://github.com/robbiehanson/CocoaLumberjack" target="_blank" rel="noopener">CocoaLumberjack</a>。这个日志框架实际上比的NSLog更快，做同样的事情时也是如此。此外，它还支持大量不同的配置，并允许终端用户甚至可以添加自己的自定义日志记录，筛选和格式化。</p>
+<p>下面是你需要知道的XMPPFramework有关日志的设置：</p>
+<p>对于在框架内部大多数文件顶部你会发现如下：</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Log levels: off, error, warn, info, verbose</span></span><br><span class="line"><span class="keyword">static</span> <span class="keyword">const</span> <span class="keyword">int</span> xmppLogLevel = XMPP_LOG_LEVEL_WARN;</span><br></pre></td></tr></table></figure>
+<p>如你所见有4个日志级别(加上 XMPP_LOG_LEVEL_NONE):</p>
+<ul>
+<li>Error</li>
+<li>Warning</li>
+<li>Info</li>
+<li>Verbose</li>
+</ul>
+<p>您可以更改任何文件的日志级别，要它输出更多的信息。</p>
+<p>除了这一点，可启用一个跟踪标记。当启用跟踪，它输出正在调用的方法。</p>
+<p>请注意，跟踪是从日志等级分开的。例如，一个可以设置日志级别设置为警告，并启用跟踪像这样：<br><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Log levels: off, error, warn, info, verbose</span></span><br><span class="line"><span class="keyword">static</span> <span class="keyword">const</span> <span class="keyword">int</span> xmppLogLevel = XMPP_LOG_LEVEL_WARN | XMPP_LOG_FLAG_TRACE;</span><br></pre></td></tr></table></figure></p>
+<p>就代码而言意味着：<br><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">XMPPLogTrace(); <span class="comment">// Enabled - Will spit out "&lt;FileName&gt;: &lt;MethodName&gt;"</span></span><br><span class="line">XMPPLogError(<span class="string">@"I will get logged"</span>);</span><br><span class="line">XMPPLogWarn(<span class="string">@"I will get logged"</span>);</span><br><span class="line">XMPPLogInfo(<span class="string">@"I will NOT get logged"</span>);</span><br><span class="line">XMPPLogVerbose(<span class="string">@"I will NOT get logged"</span>);</span><br></pre></td></tr></table></figure></p>
+<p>除此之外，XMPPStream有一个选项使你能够看到正在发送的原始XML sent/received。你可以把它放在XMPPStream.m像这样：</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Log levels: off, error, warn, info, verbose</span></span><br><span class="line"><span class="keyword">static</span> <span class="keyword">const</span> <span class="keyword">int</span> xmppLogLevel = XMPP_LOG_LEVEL_INFO | XMPP_LOG_FLAG_SEND_RECV;</span><br></pre></td></tr></table></figure>
+<p>当你启动应用程序，您需要配置lumberjack框架。对于初学者来说，你可以这样简单的设置在你的AppDelegate：<br><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#import <span class="meta-string">"DDLog.h"</span></span></span><br><span class="line"><span class="meta">#import <span class="meta-string">"DDTTYLogger.h"</span></span></span><br><span class="line"></span><br><span class="line">- (<span class="keyword">void</span>)applicationDidFinishLaunching:(<span class="built_in">NSNotification</span> *)aNotification</span><br><span class="line">&#123;</span><br><span class="line">    [DDLog addLogger:[DDTTYLogger sharedInstance] withLogLevel:XMPP_LOG_FLAG_SEND_RECV];</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// All your other code...</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>更多关于Lumberjack信息参考<a href="https://github.com/robbiehanson/CocoaLumberjack" target="_blank" rel="noopener">这里</a>。<br>For more information about Lumberjack take a look at its <a href="https://github.com/robbiehanson/CocoaLumberjack" target="_blank" rel="noopener">project page</a>. </p>
+<h2 id="更多信息"><a href="#更多信息" class="headerlink" title="更多信息"></a>更多信息</h2><p>想要立刻开始？</p>
+<ul>
+<li><a href="https://github.com/robbiehanson/XMPPFramework/wiki/GettingStarted_iOS" target="_blank" rel="noopener">Get started using XMPPFramework on iOS</a></li>
+<li><a href="https://github.com/robbiehanson/XMPPFramework/wiki/GettingStarted_Mac" target="_blank" rel="noopener">Get started using XMPPFramework on Mac OS X</a>   </li>
+</ul>
+<p>扩展你的知识！</p>
+<ul>
+<li><p><a href="https://github.com/robbiehanson/XMPPFramework/wiki/WorkingWithElements" target="_blank" rel="noopener">Learn about working with xml/xmpp elements</a></p>
+</li>
+<li><p><a href="https://github.com/robbiehanson/XMPPFramework/wiki/Threading" target="_blank" rel="noopener">Learn about XMPPFramework&#39;s threading architecture</a></p>
+</li>
+</ul>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/翻译/" rel="tag"># 翻译</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/02/20/HTTPS通信机制/" rel="next" title="HTTPS通信机制">
+                <i class="fa fa-chevron-left"></i> HTTPS通信机制
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016/03/03/iOS9 class dump header/" rel="prev" title="iOS9 class dump header">
+                iOS9 class dump header <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      <div class="ds-thread" data-thread-key="2016/03/01/iOS XMPP Framework 中文概述/"
+           data-title="iOS XMPPFramework 中文概述" data-url="http://ggghub.com/2016/03/01/iOS XMPP Framework 中文概述/">
+      </div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">LiSiYuan</p>
+              <p class="site-description motion-element" itemprop="description">Hi! I'm GGGHub, Welcome here！</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">15</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                
+                  <span class="site-state-item-count">6</span>
+                  <span class="site-state-item-name">categories</span>
+                
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                
+                  <span class="site-state-item-count">12</span>
+                  <span class="site-state-item-name">tags</span>
+                
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/ggghub" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-globe"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://www.developboot.com" target="_blank" title="developboot">
+                      
+                        <i class="fa fa-fw fa-globe"></i>developboot</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://blog.csdn.net/ggghub" target="_blank" title="CSDN">
+                      
+                        <i class="fa fa-fw fa-globe"></i>CSDN</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#本篇文章翻译XMPP-Framework中的Overview-of-the-XMPP-Framework部分"><span class="nav-number">1.</span> <span class="nav-text">本篇文章翻译XMPP Framework中的Overview of the XMPP Framework部分 </span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#介绍"><span class="nav-number">2.</span> <span class="nav-text">介绍</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#XMPP核心"><span class="nav-number">3.</span> <span class="nav-text">XMPP核心</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#元素-IQ-Message-amp-Presence"><span class="nav-number">4.</span> <span class="nav-text">元素: IQ, Message, &amp; Presence</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#XMPPStream配置"><span class="nav-number">5.</span> <span class="nav-text">XMPPStream配置</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#配置连接"><span class="nav-number">5.1.</span> <span class="nav-text">配置连接</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#添加代理"><span class="nav-number">5.2.</span> <span class="nav-text">添加代理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#添加-Modules"><span class="nav-number">5.3.</span> <span class="nav-text">添加 Modules</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#连接"><span class="nav-number">5.4.</span> <span class="nav-text">连接</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#认证"><span class="nav-number">5.5.</span> <span class="nav-text">认证</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#XMPP-日志"><span class="nav-number">6.</span> <span class="nav-text">XMPP 日志</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#更多信息"><span class="nav-number">7.</span> <span class="nav-text">更多信息</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">LiSiYuan</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Muse</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"ggghub"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+    
+    <script src="/lib/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/js/src/hook-duoshuo.js"></script>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

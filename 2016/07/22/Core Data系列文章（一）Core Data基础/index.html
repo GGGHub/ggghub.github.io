@@ -1,0 +1,793 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="en">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Core Data," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="在iOS开发数据库SQLite的使用介绍了iOS中使用SQLite对数据进行持久化存储，实际上是对数据库直接进行操作，而苹果专门有一套API来间接的对数据进行持久化存储，而且主要针对用户创建的对象 — Core Data。 Core Data有很多强大的功能，使用图形化界面来创建对象。可以使用NSPredicate对数据进行筛选，使用NSSortDescriptor对数据进行排序。还可以通过获取属">
+<meta name="keywords" content="Core Data">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Core Data系列文章（一）Core Data基础">
+<meta property="og:url" content="http://ggghub.com/2016/07/22/Core Data系列文章（一）Core Data基础/index.html">
+<meta property="og:site_name" content="GGGHub&#39;s Blog">
+<meta property="og:description" content="在iOS开发数据库SQLite的使用介绍了iOS中使用SQLite对数据进行持久化存储，实际上是对数据库直接进行操作，而苹果专门有一套API来间接的对数据进行持久化存储，而且主要针对用户创建的对象 — Core Data。 Core Data有很多强大的功能，使用图形化界面来创建对象。可以使用NSPredicate对数据进行筛选，使用NSSortDescriptor对数据进行排序。还可以通过获取属">
+<meta property="og:locale" content="en">
+<meta property="og:image" content="http://img.blog.csdn.net/20160722111022213">
+<meta property="og:image" content="http://img.blog.csdn.net/20160722115157193">
+<meta property="og:image" content="http://img.blog.csdn.net/20160722115440056">
+<meta property="og:image" content="http://img.blog.csdn.net/20160722155009163">
+<meta property="og:updated_time" content="2016-07-25T01:28:58.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Core Data系列文章（一）Core Data基础">
+<meta name="twitter:description" content="在iOS开发数据库SQLite的使用介绍了iOS中使用SQLite对数据进行持久化存储，实际上是对数据库直接进行操作，而苹果专门有一套API来间接的对数据进行持久化存储，而且主要针对用户创建的对象 — Core Data。 Core Data有很多强大的功能，使用图形化界面来创建对象。可以使用NSPredicate对数据进行筛选，使用NSSortDescriptor对数据进行排序。还可以通过获取属">
+<meta name="twitter:image" content="http://img.blog.csdn.net/20160722111022213">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://ggghub.com/2016/07/22/Core Data系列文章（一）Core Data基础/"/>
+
+
+
+
+
+  <title>Core Data系列文章（一）Core Data基础 | GGGHub's Blog</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="en">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">GGGHub's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">Coding Obsession</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            Archives
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://ggghub.com/2016/07/22/Core Data系列文章（一）Core Data基础/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="LiSiYuan">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="GGGHub's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Core Data系列文章（一）Core Data基础</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2016-07-22T17:07:00+08:00">
+                2016-07-22
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/iOS/" itemprop="url" rel="index">
+                    <span itemprop="name">iOS</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2016/07/22/Core Data系列文章（一）Core Data基础/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/07/22/Core Data系列文章（一）Core Data基础/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>在<a href="http://blog.csdn.net/ggghub/article/details/51906974" target="_blank" rel="noopener">iOS开发数据库SQLite的使用</a>介绍了iOS中使用SQLite对数据进行持久化存储，实际上是对数据库直接进行操作，而苹果专门有一套API来间接的对数据进行持久化存储，而且主要针对用户创建的对象 — <code>Core Data</code>。</p>
+<p><code>Core Data</code>有很多强大的功能，使用图形化界面来创建对象。可以使用<code>NSPredicate</code>对数据进行筛选，使用<code>NSSortDescriptor</code>对数据进行排序。还可以通过获取属性与请求模板的设置筛选数据。也可以建立对象与对象之间的关联关系，一对一，一对多，多对多种情况。对于每个对象的属性也可以指定约束和验证的规则。而且苹果还对<code>Core Data</code>的性能做了优化，如添加对查询数据的缓存，关联对象不会立刻访问达到节省内存的目的等。Core Data 还提供了<code>Mapping Model</code>来解决数据库版本升级的问题。</p>
+<p>本篇主要介绍Core Data的架构与Core Data使用的基础配置。<br><a id="more"></a></p>
+<h2 id="Core-Data架构"><a href="#Core-Data架构" class="headerlink" title="Core Data架构"></a>Core Data架构</h2><p>很多人刚刚接触Core Data 时只看一些模板代码与API并不知道Core Data设计架构是什么样的，导致不了解Core Data内部是如何工作以至于学习起来总感觉生涩难懂，了解Core Data的设计架构对学习和理解Core Data是有很大的帮助。首先我们先看看Core Data中的对象以及这些对象间是如何工作的：</p>
+<p><img src="http://img.blog.csdn.net/20160722111022213" alt=""></p>
+<h3 id="数据存储"><a href="#数据存储" class="headerlink" title="数据存储"></a>数据存储</h3><p>数据存储是通过持久存储协调器将用户创建的对象写入磁盘中，或者从磁盘中读取用户创建的对象。存储的文件可以是一个数据库文件，可以是一个二进制文件在初始化持久协调器时可以指定存储的类型。</p>
+<p><strong>注意：</strong> 不要尝试修改存储的文件，如果对使用<code>Core Data</code>存储的文件进行修改，将改变文件结构导致使用<code>Core Data</code>读取文件时出错</p>
+<h3 id="持久化存储协调器"><a href="#持久化存储协调器" class="headerlink" title="持久化存储协调器"></a>持久化存储协调器</h3><p>持久化存储协调器的是<code>NSPersistentStoreCoordinator</code>类的实例，只是扮演托管对象上下文和数据存储之间的中间人角色，当托管对象上下文进行数据请求时通过持久化存储协调器从存储文件的位置获取数据，而托管上下文存储数据是也是通过是持久化存储协调器进行数据存储。</p>
+<p><strong>注意：</strong><code>NSPersistentStoreCoordinator</code>类不是线程安全的类当多个线程需要对数据进行操作时需要给<code>NSPersistentStoreCoordinator</code>类的实例加锁或者在每个线程中重新实例化一个<code>NSPersistentStoreCoordinator</code>类。关于锁的使用请参考我之前写的一篇文章<a href="http://blog.csdn.net/ggghub/article/details/51353793" target="_blank" rel="noopener">Objective-C中的同步线程的锁</a>。</p>
+<h3 id="托管对象模型"><a href="#托管对象模型" class="headerlink" title="托管对象模型"></a>托管对象模型</h3><p>托管对象模型定义了应用中使用的数据模型的结构，托管对象是<code>NSManagedObjectModel</code>类的实例对象，托管对象模型由一组实体组成每一组实体都表示一类数据结构，可以定义每个模型的结构与各个模型之间的关系。持久化存储协调器根据托管对象模型中定义的数据结构与每个实体之间的关系来创建托管对象，并将这些托管对象存到磁盘中。</p>
+<h3 id="托管对象上下文"><a href="#托管对象上下文" class="headerlink" title="托管对象上下文"></a>托管对象上下文</h3><p>托管对象上下文是<code>NSManagedObjectContext</code>类的实例，托管对象上下文主要提供一个访问托管对象的接口，管理所有的托管对象。可以在托管对象上下文中对托管对象进行操作，包括添加对象，删除对象，修改对象，查找对象。一般从磁盘中获取数据时都要创建一个请求，指定托管对象上下文然后设置请求的条件来访问数据。</p>
+<hr>
+<h2 id="Core-Data使用的基础配置"><a href="#Core-Data使用的基础配置" class="headerlink" title="Core Data使用的基础配置"></a>Core Data使用的基础配置</h2><p>下面通过创建一个带有Core Data模板的项目来介绍Core Data使用时各项参数配置。</p>
+<p>新建一个<code>Xcode</code>项目选择<code>Master-Detail Application</code>：</p>
+<p><img src="http://img.blog.csdn.net/20160722115157193" alt=""></p>
+<p>点击<code>Next</code>并勾选<code>Use Core Data</code>：</p>
+<p><img src="http://img.blog.csdn.net/20160722115440056" alt=""></p>
+<p>此时可以先运行查看一下效果，每次添加都会增加一行显示当前时间的信息，当完全退出应用时再次打开这些信息还存在说明了已经对数据持久化存储了。</p>
+<p>在<code>AppDelegate</code>里可以看到<code>Core Data</code>相关对象初始化的过程。首先是托管对象模型<code>NSManagedObjectModel</code>的创建</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">- (<span class="built_in">NSManagedObjectModel</span> *)managedObjectModel &#123;</span><br><span class="line">    <span class="comment">// The managed object model for the application. It is a fatal error for the application not to be able to find and load its model.</span></span><br><span class="line">    <span class="keyword">if</span> (_managedObjectModel != <span class="literal">nil</span>) &#123;</span><br><span class="line">        <span class="keyword">return</span> _managedObjectModel;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">NSURL</span> *modelURL = [[<span class="built_in">NSBundle</span> mainBundle] URLForResource:<span class="string">@"LSYBaseData"</span> withExtension:<span class="string">@"momd"</span>];</span><br><span class="line">    _managedObjectModel = [[<span class="built_in">NSManagedObjectModel</span> alloc] initWithContentsOfURL:modelURL];</span><br><span class="line">    <span class="keyword">return</span> _managedObjectModel;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>在应用的项目文件中包含后缀为<code>.xcdatamodeld</code>的文件这个文件就是托管对象模型，在后台<code>Xcode</code>会将这个文件编译为<code>momd</code>类型的文件，<code>momd</code>文件是部署到设备上的文件。</p>
+<p>然后是持久化存储协调器<code>NSPersistentStoreCoordinator</code>类的实例创建。<br><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">- (<span class="built_in">NSPersistentStoreCoordinator</span> *)persistentStoreCoordinator &#123;</span><br><span class="line">    <span class="comment">// The persistent store coordinator for the application. This implementation creates and returns a coordinator, having added the store for the application to it.</span></span><br><span class="line">    <span class="keyword">if</span> (_persistentStoreCoordinator != <span class="literal">nil</span>) &#123;</span><br><span class="line">        <span class="keyword">return</span> _persistentStoreCoordinator;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// Create the coordinator and store</span></span><br><span class="line">    </span><br><span class="line">    _persistentStoreCoordinator = [[<span class="built_in">NSPersistentStoreCoordinator</span> alloc] initWithManagedObjectModel:[<span class="keyword">self</span> managedObjectModel]];</span><br><span class="line">    <span class="built_in">NSURL</span> *storeURL = [[<span class="keyword">self</span> applicationDocumentsDirectory] URLByAppendingPathComponent:<span class="string">@"LSYBaseData.sqlite"</span>];</span><br><span class="line">    <span class="built_in">NSError</span> *error = <span class="literal">nil</span>;</span><br><span class="line">    <span class="built_in">NSString</span> *failureReason = <span class="string">@"There was an error creating or loading the application's saved data."</span>;</span><br><span class="line">    <span class="keyword">if</span> (![_persistentStoreCoordinator addPersistentStoreWithType:<span class="built_in">NSSQLiteStoreType</span> configuration:<span class="literal">nil</span> URL:storeURL options:<span class="literal">nil</span> error:&amp;error]) &#123;</span><br><span class="line">        <span class="comment">// Report any error we got.</span></span><br><span class="line">        <span class="built_in">NSMutableDictionary</span> *dict = [<span class="built_in">NSMutableDictionary</span> dictionary];</span><br><span class="line">        dict[<span class="built_in">NSLocalizedDescriptionKey</span>] = <span class="string">@"Failed to initialize the application's saved data"</span>;</span><br><span class="line">        dict[<span class="built_in">NSLocalizedFailureReasonErrorKey</span>] = failureReason;</span><br><span class="line">        dict[<span class="built_in">NSUnderlyingErrorKey</span>] = error;</span><br><span class="line">        error = [<span class="built_in">NSError</span> errorWithDomain:<span class="string">@"YOUR_ERROR_DOMAIN"</span> code:<span class="number">9999</span> userInfo:dict];</span><br><span class="line">        <span class="comment">// Replace this with code to handle the error appropriately.</span></span><br><span class="line">        <span class="comment">// abort() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.</span></span><br><span class="line">        <span class="built_in">NSLog</span>(<span class="string">@"Unresolved error %@, %@"</span>, error, [error userInfo]);</span><br><span class="line">        abort();</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">return</span> _persistentStoreCoordinator;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>通过传入一个托管对象模型来初始化<code>NSPersistentStoreCoordinator</code>对象，因为<code>NSPersistentStoreCoordinator</code>对象是托管对象模型、托管对象上下文、数据存储的中间人，后面可以看到创建托管对象上下文也需要用到<code>NSPersistentStoreCoordinator</code>对象。<br>持久化存储协调器指定了存储类型为数据库文件所以通过创建一个<code>.sqlite</code>文件的路径来存储数据。<br>之后的代码是将数据存储添加到协调器。第一个参数<code>NSSQLiteStoreType</code>说明应该是数据库存储，当然也可以指定其他的存储参数。第二个参数<code>configuration</code>，通过传入<code>configuration</code>的名称将不同的托管对象模型存储到不同的数据文件中，默认将托管对象模型中的所有实体对象都存到同一个文件中。第三个参数<code>options</code>通过传入一个字典来添加对数据存储的附加配置，后面添加模型映射时会添加此配置。此时不需要所以传nil。</p>
+<p>最后一段代码是创建一个托管对象的上下文</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">- (<span class="built_in">NSManagedObjectContext</span> *)managedObjectContext &#123;</span><br><span class="line">    <span class="comment">// Returns the managed object context for the application (which is already bound to the persistent store coordinator for the application.)</span></span><br><span class="line">    <span class="keyword">if</span> (_managedObjectContext != <span class="literal">nil</span>) &#123;</span><br><span class="line">        <span class="keyword">return</span> _managedObjectContext;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="built_in">NSPersistentStoreCoordinator</span> *coordinator = [<span class="keyword">self</span> persistentStoreCoordinator];</span><br><span class="line">    <span class="keyword">if</span> (!coordinator) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">nil</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    _managedObjectContext = [[<span class="built_in">NSManagedObjectContext</span> alloc] initWithConcurrencyType:<span class="built_in">NSMainQueueConcurrencyType</span>];</span><br><span class="line">    [_managedObjectContext setPersistentStoreCoordinator:coordinator];</span><br><span class="line">    <span class="keyword">return</span> _managedObjectContext;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>通过一个上面创建的持久化存储协调器来配置一个托管对象上下文。</p>
+<p>现在Core Data 基本对象都已经初始化那么在<code>MasterViewController.m</code>文件中查看<code>Core Data</code>是如果对数据进行操作的。</p>
+<p>首先<code>Core Data</code>想要获取数据必须构建一个请求。然后请求结果的控制器根据构建的请求和托管对象上下文来获取数据。请求结果控制器通过与托管对象上下文绑定，每当上下文数据发生变化时，请求结果控制器都会调用相应的代理方法。</p>
+<p><img src="http://img.blog.csdn.net/20160722155009163" alt=""></p>
+<p>下面查看初始化请求结果控制器的相关代码</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line">- (<span class="built_in">NSFetchedResultsController</span> *)fetchedResultsController</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">if</span> (_fetchedResultsController != <span class="literal">nil</span>) &#123;</span><br><span class="line">        <span class="keyword">return</span> _fetchedResultsController;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="built_in">NSFetchRequest</span> *fetchRequest = [[<span class="built_in">NSFetchRequest</span> alloc] init];  <span class="comment">// 初始化请求</span></span><br><span class="line">    <span class="built_in">NSEntityDescription</span> *entity = [<span class="built_in">NSEntityDescription</span> entityForName:<span class="string">@"Event"</span> inManagedObjectContext:<span class="keyword">self</span>.managedObjectContext];    <span class="comment">//获取实体描述</span></span><br><span class="line">    [fetchRequest setEntity:entity];</span><br><span class="line">    </span><br><span class="line">    [fetchRequest setFetchBatchSize:<span class="number">20</span>];    <span class="comment">//设置获取数量</span></span><br><span class="line">    </span><br><span class="line">    <span class="built_in">NSSortDescriptor</span> *sortDescriptor = [[<span class="built_in">NSSortDescriptor</span> alloc] initWithKey:<span class="string">@"timeStamp"</span> ascending:<span class="literal">NO</span>];</span><br><span class="line"></span><br><span class="line">    [fetchRequest setSortDescriptors:@[sortDescriptor]];    <span class="comment">//设置排序条件可以多个条件</span></span><br><span class="line">    </span><br><span class="line">    <span class="built_in">NSFetchedResultsController</span> *aFetchedResultsController = [[<span class="built_in">NSFetchedResultsController</span> alloc] initWithFetchRequest:fetchRequest managedObjectContext:<span class="keyword">self</span>.managedObjectContext sectionNameKeyPath:<span class="literal">nil</span> cacheName:<span class="string">@"Master"</span>];   <span class="comment">// 初始化请求结果控制器</span></span><br><span class="line">    aFetchedResultsController.delegate = <span class="keyword">self</span>;          <span class="comment">// 设置代理</span></span><br><span class="line">    <span class="keyword">self</span>.fetchedResultsController = aFetchedResultsController;</span><br><span class="line">    </span><br><span class="line">    <span class="built_in">NSError</span> *error = <span class="literal">nil</span>;</span><br><span class="line">    <span class="keyword">if</span> (![<span class="keyword">self</span>.fetchedResultsController performFetch:&amp;error]) &#123;</span><br><span class="line">         <span class="comment">// Replace this implementation with code to handle the error appropriately.</span></span><br><span class="line">         <span class="comment">// abort() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development. </span></span><br><span class="line">        <span class="built_in">NSLog</span>(<span class="string">@"Unresolved error %@, %@"</span>, error, [error userInfo]);</span><br><span class="line">        abort();</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">return</span> _fetchedResultsController;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>下面是获取请求结果的相关代理方法：<br><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">- (<span class="keyword">void</span>)controllerWillChangeContent:(<span class="built_in">NSFetchedResultsController</span> *)controller;</span><br><span class="line"></span><br><span class="line">- (<span class="keyword">void</span>)controllerDidChangeContent:(<span class="built_in">NSFetchedResultsController</span> *)controller;</span><br><span class="line"></span><br><span class="line">- (<span class="keyword">void</span>)controller:(<span class="built_in">NSFetchedResultsController</span> *)controller didChangeObject:(<span class="keyword">id</span>)anObject atIndexPath:(<span class="keyword">nullable</span> <span class="built_in">NSIndexPath</span> *)indexPath forChangeType:(<span class="built_in">NSFetchedResultsChangeType</span>)type newIndexPath:(<span class="keyword">nullable</span> <span class="built_in">NSIndexPath</span> *)newIndexPath;</span><br><span class="line"></span><br><span class="line">- (<span class="keyword">void</span>)controller:(<span class="built_in">NSFetchedResultsController</span> *)controller didChangeSection:(<span class="keyword">id</span> &lt;<span class="built_in">NSFetchedResultsSectionInfo</span>&gt;)sectionInfo atIndex:(<span class="built_in">NSUInteger</span>)sectionIndex forChangeType:(<span class="built_in">NSFetchedResultsChangeType</span>)type;</span><br><span class="line"></span><br><span class="line">- (<span class="keyword">nullable</span> <span class="built_in">NSString</span> *)controller:(<span class="built_in">NSFetchedResultsController</span> *)controller sectionIndexTitleForSectionName:(<span class="built_in">NSString</span> *)sectionName;</span><br></pre></td></tr></table></figure></p>
+<p>然后是添加数据：</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">- (<span class="keyword">void</span>)insertNewObject:(<span class="keyword">id</span>)sender &#123;</span><br><span class="line">    <span class="built_in">NSManagedObjectContext</span> *context = [<span class="keyword">self</span>.fetchedResultsController managedObjectContext]; <span class="comment">//获取托管对象上下文</span></span><br><span class="line">    <span class="built_in">NSEntityDescription</span> *entity = [[<span class="keyword">self</span>.fetchedResultsController fetchRequest] entity];    <span class="comment">//获取实体名称</span></span><br><span class="line">    <span class="built_in">NSManagedObject</span> *newManagedObject = [<span class="built_in">NSEntityDescription</span> insertNewObjectForEntityForName:[entity name] inManagedObjectContext:context]; <span class="comment">//添加托管对象</span></span><br><span class="line">    </span><br><span class="line">    [newManagedObject setValue:[<span class="built_in">NSDate</span> date] forKey:<span class="string">@"timeStamp"</span>];  <span class="comment">//设置托管对象timeStamp属性值</span></span><br><span class="line">        </span><br><span class="line">    <span class="comment">// Save the context.</span></span><br><span class="line">    <span class="built_in">NSError</span> *error = <span class="literal">nil</span>;</span><br><span class="line">    <span class="keyword">if</span> (![context save:&amp;error])     <span class="comment">//保存数据</span></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="comment">// Replace this implementation with code to handle the error appropriately.</span></span><br><span class="line">        <span class="comment">// abort() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.</span></span><br><span class="line">        <span class="built_in">NSLog</span>(<span class="string">@"Unresolved error %@, %@"</span>, error, [error userInfo]);</span><br><span class="line">        abort();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>托管对象更改属性名是通过KVC方式进行修改，如果一旦属性名写错的话就会导致程序崩溃，后面的文章会通过实例化<code>NSManagedObject</code>的子类提供<code>getter</code>与<code>setter</code>方法来修改属性。</p>
+<p>删除托管对象是通过托管对象上下文对象提供的方法来删除的，具体实现在<code>UITableView</code>的代理中：</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">- (<span class="keyword">void</span>)tableView:(<span class="built_in">UITableView</span> *)tableView commitEditingStyle:(<span class="built_in">UITableViewCellEditingStyle</span>)editingStyle forRowAtIndexPath:(<span class="built_in">NSIndexPath</span> *)indexPath &#123;</span><br><span class="line">    <span class="keyword">if</span> (editingStyle == <span class="built_in">UITableViewCellEditingStyleDelete</span>) &#123;</span><br><span class="line">        <span class="built_in">NSManagedObjectContext</span> *context = [<span class="keyword">self</span>.fetchedResultsController managedObjectContext];</span><br><span class="line">        [context deleteObject:[<span class="keyword">self</span>.fetchedResultsController objectAtIndexPath:indexPath]];</span><br><span class="line">            </span><br><span class="line">        <span class="built_in">NSError</span> *error = <span class="literal">nil</span>;</span><br><span class="line">        <span class="keyword">if</span> (![context save:&amp;error]) &#123;</span><br><span class="line">            <span class="comment">// Replace this implementation with code to handle the error appropriately.</span></span><br><span class="line">            <span class="comment">// abort() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.</span></span><br><span class="line">            <span class="built_in">NSLog</span>(<span class="string">@"Unresolved error %@, %@"</span>, error, [error userInfo]);</span><br><span class="line">            abort();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="结束"><a href="#结束" class="headerlink" title="结束"></a>结束</h2><p>本篇主要介绍了Core Data架构与使用时的基本配置以及对数据的基本操作。后面一系列文章将介绍Core Data众多的进阶使用。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Core-Data/" rel="tag"># Core Data</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/05/18/JavaScript编写Web脚本最佳实现/" rel="next" title="JavaScript编写Web脚本最佳实现">
+                <i class="fa fa-chevron-left"></i> JavaScript编写Web脚本最佳实现
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      <div class="ds-thread" data-thread-key="2016/07/22/Core Data系列文章（一）Core Data基础/"
+           data-title="Core Data系列文章（一）Core Data基础" data-url="http://ggghub.com/2016/07/22/Core Data系列文章（一）Core Data基础/">
+      </div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">LiSiYuan</p>
+              <p class="site-description motion-element" itemprop="description">Hi! I'm GGGHub, Welcome here！</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">15</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                
+                  <span class="site-state-item-count">6</span>
+                  <span class="site-state-item-name">categories</span>
+                
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                
+                  <span class="site-state-item-count">12</span>
+                  <span class="site-state-item-name">tags</span>
+                
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/ggghub" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-globe"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://www.developboot.com" target="_blank" title="developboot">
+                      
+                        <i class="fa fa-fw fa-globe"></i>developboot</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://blog.csdn.net/ggghub" target="_blank" title="CSDN">
+                      
+                        <i class="fa fa-fw fa-globe"></i>CSDN</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Core-Data架构"><span class="nav-number">1.</span> <span class="nav-text">Core Data架构</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#数据存储"><span class="nav-number">1.1.</span> <span class="nav-text">数据存储</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#持久化存储协调器"><span class="nav-number">1.2.</span> <span class="nav-text">持久化存储协调器</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#托管对象模型"><span class="nav-number">1.3.</span> <span class="nav-text">托管对象模型</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#托管对象上下文"><span class="nav-number">1.4.</span> <span class="nav-text">托管对象上下文</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Core-Data使用的基础配置"><span class="nav-number">2.</span> <span class="nav-text">Core Data使用的基础配置</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#结束"><span class="nav-number">3.</span> <span class="nav-text">结束</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">LiSiYuan</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Muse</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"ggghub"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+    
+    <script src="/lib/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/js/src/hook-duoshuo.js"></script>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

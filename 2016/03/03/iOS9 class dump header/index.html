@@ -1,0 +1,761 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="en">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="iOS逆向," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="获取系统私有API，网上有很多资料总结了一下就三种方式：  使用class-dump可以提取系统私有API列表 使用class-dump+DumpFrameworks.pl，这个可以一次性提取所有系统Framework与PrivateFrameworks的API列表 直接使用已经提取好的API列表github地址">
+<meta name="keywords" content="iOS逆向">
+<meta property="og:type" content="article">
+<meta property="og:title" content="iOS9 class dump header">
+<meta property="og:url" content="http://ggghub.com/2016/03/03/iOS9 class dump header/index.html">
+<meta property="og:site_name" content="GGGHub&#39;s Blog">
+<meta property="og:description" content="获取系统私有API，网上有很多资料总结了一下就三种方式：  使用class-dump可以提取系统私有API列表 使用class-dump+DumpFrameworks.pl，这个可以一次性提取所有系统Framework与PrivateFrameworks的API列表 直接使用已经提取好的API列表github地址">
+<meta property="og:locale" content="en">
+<meta property="og:image" content="http://img.blog.csdn.net/20160303104644165">
+<meta property="og:image" content="http://img.blog.csdn.net/20160303105002265">
+<meta property="og:image" content="http://img.blog.csdn.net/20160303105218890">
+<meta property="og:updated_time" content="2016-05-11T07:37:01.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="iOS9 class dump header">
+<meta name="twitter:description" content="获取系统私有API，网上有很多资料总结了一下就三种方式：  使用class-dump可以提取系统私有API列表 使用class-dump+DumpFrameworks.pl，这个可以一次性提取所有系统Framework与PrivateFrameworks的API列表 直接使用已经提取好的API列表github地址">
+<meta name="twitter:image" content="http://img.blog.csdn.net/20160303104644165">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://ggghub.com/2016/03/03/iOS9 class dump header/"/>
+
+
+
+
+
+  <title>iOS9 class dump header | GGGHub's Blog</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="en">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">GGGHub's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">Coding Obsession</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            Archives
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://ggghub.com/2016/03/03/iOS9 class dump header/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="LiSiYuan">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="GGGHub's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">iOS9 class dump header</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2016-03-03T10:59:00+08:00">
+                2016-03-03
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/iOS/" itemprop="url" rel="index">
+                    <span itemprop="name">iOS</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2016/03/03/iOS9 class dump header/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/03/03/iOS9 class dump header/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>获取系统私有API，网上有很多资料总结了一下就三种方式：</p>
+<ul>
+<li>使用<a href="http://stevenygard.com/projects/class-dump/" target="_blank" rel="noopener">class-dump</a>可以提取系统私有API列表</li>
+<li>使用<a href="http://stevenygard.com/projects/class-dump/" target="_blank" rel="noopener">class-dump</a>+DumpFrameworks.pl，这个可以一次性提取所有系统Framework与PrivateFrameworks的API列表</li>
+<li>直接使用已经提取好的API列表<a href="https://github.com/nst/iOS-Runtime-Headers" target="_blank" rel="noopener">github地址</a><a id="more"></a>
+DumpFrameworks.pl代码如下：<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#!/usr/bin/perl</span></span><br><span class="line"><span class="meta">#</span></span><br><span class="line"><span class="meta"># 24 November 2008</span></span><br><span class="line"><span class="meta"># Framework Dumping utility; requires class-dump</span></span><br><span class="line"><span class="meta">#</span></span><br><span class="line"></span><br><span class="line">use strict;</span><br><span class="line"></span><br><span class="line">use Cwd;</span><br><span class="line">use File::Path;</span><br><span class="line"></span><br><span class="line">my $HOME = (getpwuid($&lt;))[7] || $ENV&#123;'HOME'&#125; </span><br><span class="line">  or die <span class="string">"Could not find your home directory!"</span>;</span><br><span class="line"></span><br><span class="line"><span class="meta"># This command must be in your path.</span></span><br><span class="line"><span class="meta"># http://www.codethecode.com/projects/class-dump/</span></span><br><span class="line">my $CLASS_DUMP = 'class-dump'; </span><br><span class="line"></span><br><span class="line"><span class="meta"># Public Frameworks  /xcode4/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS4.3.sdk////Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS4.2.sdk/System/Library</span></span><br><span class="line"><span class="meta"># /Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator4.2.sdk/System/Library/Frameworks  /xcode4/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator5.0.sdk/System/Library</span></span><br><span class="line">dump_frameworks('/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator9.2.sdk/System/Library/Frameworks',</span><br><span class="line">                'Frameworks');</span><br><span class="line"></span><br><span class="line"><span class="meta"># Private Frameworks</span></span><br><span class="line">dump_frameworks('/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator9.2.sdk/System/Library/PrivateFrameworks',</span><br><span class="line">                'PrivateFrameworks');</span><br><span class="line"></span><br><span class="line">sub dump_frameworks</span><br><span class="line">&#123;</span><br><span class="line">  my($dir, $subdir) = @_;</span><br><span class="line"></span><br><span class="line">  opendir(my $dirh, $dir) or die <span class="string">"Could not opendir($dir) - $!"</span>;</span><br><span class="line"></span><br><span class="line">  <span class="meta"># Iterate through each framework found in the directory</span></span><br><span class="line">  foreach my $file (grep &#123; /\.framework$/ &#125; readdir($dirh))</span><br><span class="line">  &#123;</span><br><span class="line">    <span class="meta"># Extract the framework name</span></span><br><span class="line">    (my $fname = $file) =~ s/\.framework$<span class="comment">//;</span></span><br><span class="line">    print <span class="string">"Framework: $fname\n"</span>;</span><br><span class="line"></span><br><span class="line">    my $headers_dir = <span class="string">"$HOME/Headers/$subdir/$fname"</span>;</span><br><span class="line"></span><br><span class="line">    <span class="meta"># Create the folder to store the headers</span></span><br><span class="line">    mkpath($headers_dir);</span><br><span class="line"></span><br><span class="line">    <span class="meta"># Perform the class-dump</span></span><br><span class="line">    my $cwd = cwd();</span><br><span class="line">    chdir($headers_dir) or die <span class="string">"Could not chdir($headers_dir) - $!"</span>;</span><br><span class="line"></span><br><span class="line">    system($CLASS_DUMP, '-H', "$dir/$file");</span><br><span class="line">   </span><br><span class="line">   <span class="keyword">if</span>($? == <span class="number">-1</span>)</span><br><span class="line">    &#123;</span><br><span class="line">      die <span class="string">"Could not execute $CLASS_DUMP - $!\n"</span>;</span><br><span class="line">    &#125;</span><br><span class="line"><span class="meta">#</span></span><br><span class="line"><span class="meta">#    elsif($? &amp; 127)</span></span><br><span class="line"><span class="meta">#    &#123;</span></span><br><span class="line"><span class="meta">#      printf(<span class="meta-string">"$CLASS_DUMP died with signal %d, %s coredump\n"</span>,</span></span><br><span class="line"><span class="meta">#             ($? &amp; 127),  ($? &amp; 128) ? 'with' : 'without');</span></span><br><span class="line"><span class="meta">#      exit;</span></span><br><span class="line"><span class="meta">#    &#125;</span></span><br><span class="line"><span class="meta">#    </span></span><br><span class="line"><span class="meta">#    elsif(my $ret = $? &gt;&gt; 8)</span></span><br><span class="line"><span class="meta">#    &#123;</span></span><br><span class="line"><span class="meta">#      die <span class="meta-string">"The command '$CLASS_DUMP -H $dir/$file' failed, returning $ret\n"</span>;</span></span><br><span class="line"><span class="meta">#    &#125;</span></span><br><span class="line"><span class="meta">#*/    </span></span><br><span class="line">    chdir($cwd) or die <span class="string">"Could not chdir($cwd) - $!"</span>;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<p>注意使用DumpFrameworks.pl时要更改系统库的路径为你自己的路径。</p>
+<hr>
+<p>但是从<a href="http://stevenygard.com/projects/class-dump/" target="_blank" rel="noopener">class-dump</a>官网下载的最新版本<code>class-dump-3.5.dmg</code>却不能获取<code>iOS9</code>以后版本的API列表。报错信息：</p>
+<blockquote>
+<p>Warning: This file does not contain any Objective-C runtime information. </p>
+</blockquote>
+<p>具体原因<code>Google</code>了一下：</p>
+<blockquote>
+<p>class-dump依赖于<strong>DATA段下的几个sect里的数据。<br>iOS9 dyld解包的生成macho不在标准</strong>DATA段，导致某些classdump无法识别</p>
+</blockquote>
+<p><a href="http://bbs.iosre.com/t/class-dump-api/2152/4" target="_blank" rel="noopener">原答案地址</a></p>
+<p>然后我从<a href="https://github.com/nygard/class-dump" target="_blank" rel="noopener">github</a>上获取class-dump开源代码重新编译class-dump的可执行文件，并把这个可执行文件导出重新dump成功获取iOS9以后的系统私有API。具体方法如下：</p>
+<p>1.打开class-dump并在TARGETS选中class-dump可执行文件</p>
+<p><img src="http://img.blog.csdn.net/20160303104644165" alt=""></p>
+<p>2.Xcode-&gt;Perferences-&gt;Locations</p>
+<p><img src="http://img.blog.csdn.net/20160303105002265" alt=""></p>
+<p>3.Advanced-&gt;Custom</p>
+<p><img src="http://img.blog.csdn.net/20160303105218890" alt=""></p>
+<p>不要更改任何路径选择后编译该项目。</p>
+<p>编译成功后在~Library/Developer/Xcode/DerivedData/Build/Products可以找到这个可执行文件然后用这文件获取系统私有API。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/iOS逆向/" rel="tag"># iOS逆向</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/03/01/iOS XMPP Framework 中文概述/" rel="next" title="iOS XMPPFramework 中文概述">
+                <i class="fa fa-chevron-left"></i> iOS XMPPFramework 中文概述
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016/04/26/iOS数字媒体开发浅析/" rel="prev" title="iOS数字媒体开发浅析">
+                iOS数字媒体开发浅析 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      <div class="ds-thread" data-thread-key="2016/03/03/iOS9 class dump header/"
+           data-title="iOS9 class dump header" data-url="http://ggghub.com/2016/03/03/iOS9 class dump header/">
+      </div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+
+      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">LiSiYuan</p>
+              <p class="site-description motion-element" itemprop="description">Hi! I'm GGGHub, Welcome here！</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">15</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                
+                  <span class="site-state-item-count">6</span>
+                  <span class="site-state-item-name">categories</span>
+                
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                
+                  <span class="site-state-item-count">12</span>
+                  <span class="site-state-item-name">tags</span>
+                
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/ggghub" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-globe"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://www.developboot.com" target="_blank" title="developboot">
+                      
+                        <i class="fa fa-fw fa-globe"></i>developboot</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://blog.csdn.net/ggghub" target="_blank" title="CSDN">
+                      
+                        <i class="fa fa-fw fa-globe"></i>CSDN</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">LiSiYuan</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Muse</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"ggghub"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+    
+    <script src="/lib/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/js/src/hook-duoshuo.js"></script>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

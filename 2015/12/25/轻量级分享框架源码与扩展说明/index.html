@@ -1,0 +1,793 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="en">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="说明文档," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="介绍最近花了一点时间写了一个轻量级的分享框架ThinShareSDK，源码放在github上。本篇主要介绍一下整体的设计以及使用者怎么在原有的基础上简单的扩展。">
+<meta name="keywords" content="说明文档">
+<meta property="og:type" content="article">
+<meta property="og:title" content="轻量级分享框架源码与扩展说明">
+<meta property="og:url" content="http://ggghub.com/2015/12/25/轻量级分享框架源码与扩展说明/index.html">
+<meta property="og:site_name" content="GGGHub&#39;s Blog">
+<meta property="og:description" content="介绍最近花了一点时间写了一个轻量级的分享框架ThinShareSDK，源码放在github上。本篇主要介绍一下整体的设计以及使用者怎么在原有的基础上简单的扩展。">
+<meta property="og:locale" content="en">
+<meta property="og:updated_time" content="2016-05-11T07:38:10.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="轻量级分享框架源码与扩展说明">
+<meta name="twitter:description" content="介绍最近花了一点时间写了一个轻量级的分享框架ThinShareSDK，源码放在github上。本篇主要介绍一下整体的设计以及使用者怎么在原有的基础上简单的扩展。">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://ggghub.com/2015/12/25/轻量级分享框架源码与扩展说明/"/>
+
+
+
+
+
+  <title>轻量级分享框架源码与扩展说明 | GGGHub's Blog</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="en">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">GGGHub's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">Coding Obsession</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            Archives
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://ggghub.com/2015/12/25/轻量级分享框架源码与扩展说明/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="LiSiYuan">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="GGGHub's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">轻量级分享框架源码与扩展说明</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2015-12-25T17:46:00+08:00">
+                2015-12-25
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/github/" itemprop="url" rel="index">
+                    <span itemprop="name">github</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2015/12/25/轻量级分享框架源码与扩展说明/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2015/12/25/轻量级分享框架源码与扩展说明/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h2><p>最近花了一点时间写了一个轻量级的分享框架<code>ThinShareSDK</code>，源码放在<a href="https://github.com/GGGHub/ThinShareSDK" target="_blank" rel="noopener">github</a>上。本篇主要介绍一下整体的设计以及使用者怎么在原有的基础上简单的扩展。</p>
+<hr>
+<a id="more"></a>
+<h3 id="接口说明"><a href="#接口说明" class="headerlink" title="接口说明"></a>接口说明</h3><p>分享主要分两个步骤</p>
+<ol>
+<li>构建模型</li>
+<li>生成分享界面并分享<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">id</span> model = [OKWShareSDK webContentTitle:<span class="string">@"分享链接"</span> description:<span class="string">@"测试分享"</span> webpageUrl:<span class="string">@"www.baidu.com"</span> thumbImageData:data];   <span class="comment">//构建Model</span></span><br><span class="line"></span><br><span class="line">[OKWShareSDK defaultShareMenu:<span class="string">@"title"</span> model:model];</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<p>默认一共有7种分享，<code>QQ好友</code>，<code>QQ空间</code>，<code>微信好友</code>，<code>朋友圈</code>，<code>微信收藏</code>，<code>短信</code>，<code>邮件</code>。这些是可选的。<br><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">id</span> model = [OKWShareSDK webContentTitle:<span class="string">@"分享链接"</span> description:<span class="string">@"测试分享"</span> webpageUrl:<span class="string">@"www.baidu.com"</span> thumbImageData:data];   <span class="comment">//构建Model</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">NSArray</span> *typeArray = [OKWShareSDK getShareListType:OKWShareTypeQQ,OKWShareTypeWeChatFav,OKWShareTypeSMS ,<span class="literal">nil</span>];  <span class="comment">//构建分享类型</span></span><br><span class="line"></span><br><span class="line">[OKWShareSDK defaultOptionShareMenu:<span class="string">@"title"</span> model:model types:typeArray];</span><br></pre></td></tr></table></figure></p>
+<p>我会根据构建<code>Model</code>的种类与分享的类型来判断把哪种类型的信息分享到哪里。</p>
+<hr>
+<p>如果想要定制界面而不用默认的界面也分两个步骤</p>
+<ol>
+<li>构建模型</li>
+<li>调用分享接口<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">id</span> model = [OKWShareSDK webContentTitle:<span class="string">@"分享链接"</span> description:<span class="string">@"测试分享"</span> webpageUrl:<span class="string">@"www.baidu.com"</span> thumbImageData:data];   <span class="comment">//构建Model</span></span><br><span class="line"></span><br><span class="line">[OKWShareSDK share:OKWShareTypeWeChatSession model:model];  <span class="comment">//分享到微信好友</span></span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<p>提供分享功能，界面自由定制，然后直接调用提供的方法即可。</p>
+<hr>
+<p>关于分享后回调，在静态库中统一回调给<code>OKWShareDelegate</code>这个类，所有的回调操作统一在这里处理。</p>
+<hr>
+<h3 id="分享基类"><a href="#分享基类" class="headerlink" title="分享基类"></a>分享基类</h3><p>静态库中有一个<code>OKWBaseShare</code>的类，这是分享的基类，所有种类的分享功能类都继承此类，<code>OKWBaseShare</code>提供基础分享接口，分享统一调用<code>OKWBaseShare</code>提供的接口，然后根据多态的特性，由<code>OKWBaseShare</code>决定到底哪一个子类来执行此功能。<br><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">@interface</span> <span class="title">OKWBaseShare</span> : <span class="title">NSObject</span></span></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> *  发送链接消息</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> *  @param content 内容</span></span><br><span class="line"><span class="comment"> *  @param type    分享到哪里</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line">+(<span class="keyword">void</span>)sendLinkMessage:(OKWShareContent *)content messageType:(OKWShareType)type;</span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> *  发送文本消息</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> *  @param content 内容</span></span><br><span class="line"><span class="comment"> *  @param type    分享到哪里</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line">+(<span class="keyword">void</span>)sendTextMessage:(OKWShareContent *)content messageType:(OKWShareType)type;</span><br><span class="line"><span class="keyword">@end</span></span><br></pre></td></tr></table></figure></p>
+<h3 id="分享数据模型"><a href="#分享数据模型" class="headerlink" title="分享数据模型"></a>分享数据模型</h3><p>分享的数据统一由<code>OKWShareContent</code>类管理，构建数据模型时生成的Model就是<code>OKWShareContent</code>类型，<code>OKWShareContent</code>里有一个<code>OKWShareDataType</code>枚举类型成员变量，当构建模型时用<code>OKWShareDataType</code>来区别应该构建哪种类型数据。<br><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="built_in">NS_ENUM</span>(<span class="built_in">NSUInteger</span>,OKWShareDataType) &#123;</span><br><span class="line">    OKWShareWabURL,</span><br><span class="line">    OKWShareText</span><br><span class="line">&#125;;</span><br><span class="line"><span class="class"><span class="keyword">@interface</span> <span class="title">OKWShareContent</span> : <span class="title">NSObject</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">@property</span> (<span class="keyword">nonatomic</span>,<span class="keyword">copy</span>) <span class="built_in">NSString</span> *title; <span class="comment">//标题</span></span><br><span class="line"><span class="keyword">@property</span> (<span class="keyword">nonatomic</span>,<span class="keyword">copy</span>) <span class="built_in">NSString</span> *description;   <span class="comment">//描述信息</span></span><br><span class="line"><span class="keyword">@property</span> (<span class="keyword">nonatomic</span>,<span class="keyword">copy</span>) <span class="built_in">NSString</span> *webpageUrl;    <span class="comment">//wap链接</span></span><br><span class="line"><span class="keyword">@property</span> (<span class="keyword">nonatomic</span>,<span class="keyword">copy</span>) <span class="built_in">NSData</span> *thumbImageData;  <span class="comment">//缩略图数据</span></span><br><span class="line"><span class="keyword">@property</span> (<span class="keyword">nonatomic</span>) <span class="built_in">NSString</span> *text;   <span class="comment">//文本信息</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">@property</span> (<span class="keyword">nonatomic</span>) OKWShareDataType dataType;    <span class="comment">//内容类型</span></span><br><span class="line"><span class="keyword">@end</span></span><br></pre></td></tr></table></figure></p>
+<hr>
+<h2 id="扩展"><a href="#扩展" class="headerlink" title="扩展"></a>扩展</h2><h3 id="扩展分享数据类型"><a href="#扩展分享数据类型" class="headerlink" title="扩展分享数据类型"></a>扩展分享数据类型</h3><p>默认只有分享链接与文本，如果想分享一个图片信息就需要在原有的基础上进行扩展</p>
+<ol>
+<li>在<code>OKWShareSDK</code>中提供一个构建图片数据模型的方法<br>参考<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> *  创建分享web的内容</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> *  @param title         分享的链接</span></span><br><span class="line"><span class="comment"> *  @param description   分享的描述</span></span><br><span class="line"><span class="comment"> *  @param pageUrl       分享的URL</span></span><br><span class="line"><span class="comment"> *  @param thumbImageData 分享的缩略图</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> *  @return 分享的数据模型</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line">+(<span class="keyword">id</span>)webContentTitle:(<span class="built_in">NSString</span> *)title description:(<span class="built_in">NSString</span> *)description webpageUrl:(<span class="built_in">NSString</span> *)pageUrl thumbImageData:(<span class="built_in">NSData</span> *)thumbImageData;</span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> *  创建分享文本内容</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> *  @param content 分享的内容</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> *  @return 分享的数据模型</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line">+(<span class="keyword">id</span>)textContent:(<span class="built_in">NSString</span> *)content;</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<p>2.在<code>OKWBaseShare</code>中提供发送图片信息的接口然后在其子类中实现该方法<br>参考<br><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> *  发送链接消息</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> *  @param content 内容</span></span><br><span class="line"><span class="comment"> *  @param type    分享到哪里</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line">+(<span class="keyword">void</span>)sendLinkMessage:(OKWShareContent *)content messageType:(OKWShareType)type;</span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> *  发送文本消息</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> *  @param content 内容</span></span><br><span class="line"><span class="comment"> *  @param type    分享到哪里</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line">+(<span class="keyword">void</span>)sendTextMessage:(OKWShareContent *)content messageType:(OKWShareType)type;</span><br></pre></td></tr></table></figure></p>
+<p>3.在<code>OKWShareContent</code>添加数据类型的种类，并且在构建数据模型时给<code>dataType</code>进行赋值<br>参考<br><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="built_in">NS_ENUM</span>(<span class="built_in">NSUInteger</span>,OKWShareDataType) &#123;</span><br><span class="line">    OKWShareWabURL,</span><br><span class="line">    OKWShareText</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">+(<span class="keyword">id</span>)webContentTitle:(<span class="built_in">NSString</span> *)title description:(<span class="built_in">NSString</span> *)description webpageUrl:(<span class="built_in">NSString</span> *)pageUrl thumbImageData:(<span class="built_in">NSData</span> *)thumbImageData</span><br><span class="line">&#123;</span><br><span class="line">    OKWShareContent *shareContent = [OKWShareContent new];</span><br><span class="line">    shareContent.title = title;</span><br><span class="line">    shareContent.description = description;</span><br><span class="line">    shareContent.webpageUrl = pageUrl;</span><br><span class="line">    shareContent.thumbImageData = thumbImageData;</span><br><span class="line">    shareContent.dataType = OKWShareWabURL;</span><br><span class="line">    <span class="keyword">return</span> shareContent;</span><br><span class="line">    </span><br><span class="line">&#125;</span><br><span class="line">+(<span class="keyword">id</span>)textContent:(<span class="built_in">NSString</span> *)content</span><br><span class="line">&#123;</span><br><span class="line">    OKWShareContent *shareContent = [OKWShareContent new];</span><br><span class="line">    shareContent.text = content;</span><br><span class="line">    shareContent.dataType = OKWShareText;</span><br><span class="line">    <span class="keyword">return</span> shareContent;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>4.在<code>OKWShareSDK</code>实现文件中实现分享的方法<br>参考<br><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">+(<span class="keyword">void</span>)share:(OKWShareType)type model:(<span class="keyword">id</span>)model</span><br><span class="line">&#123;</span><br><span class="line">    OKWShareContent *shareModel = model;</span><br><span class="line">    <span class="keyword">switch</span> (shareModel.dataType) &#123;</span><br><span class="line">        <span class="keyword">case</span> OKWShareWabURL:</span><br><span class="line">            [OKWShareSDK shareLink:type model:model];</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">        <span class="keyword">case</span> OKWShareText:</span><br><span class="line">            [OKWShareSDK shareLText:type model:model];</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">        <span class="keyword">default</span>:</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">+(<span class="keyword">void</span>)shareLink:(OKWShareType)type model:(<span class="keyword">id</span>)model</span><br><span class="line">&#123;</span><br><span class="line">    [OKWBaseShare sendLinkMessage:model messageType:type];</span><br><span class="line">&#125;</span><br><span class="line">+(<span class="keyword">void</span>)shareLText:(OKWShareType)type model:(<span class="keyword">id</span>)model</span><br><span class="line">&#123;</span><br><span class="line">    [OKWBaseShare sendTextMessage:model messageType:type];</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>5.这样原有的分享就可以根据构建的数据模型的类型来进行图片分享。</p>
+<hr>
+<h3 id="扩展分享种类"><a href="#扩展分享种类" class="headerlink" title="扩展分享种类"></a>扩展分享种类</h3><p>默认有七种分享如果想添加一种分享就要扩展分享种类<br>1.在<code>OKWShareSDK</code>实现文件中有一个<code>NSDictional</code>的类别。在里面添加需要扩展的名称和图片的名称。将图片资源放在<code>OKWShareResource.bundle</code>中。<br>参考<br><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">@implementation</span> <span class="title">NSDictionary</span> (<span class="title">defaultShareData</span>)</span></span><br><span class="line">+(<span class="keyword">id</span>)defaultShareData;</span><br><span class="line">&#123;</span><br><span class="line">    <span class="built_in">NSMutableDictionary</span> *shareData = [<span class="built_in">NSMutableDictionary</span> new];</span><br><span class="line">    </span><br><span class="line">    <span class="built_in">NSDictionary</span> *weChatSession = @&#123;<span class="string">@"image"</span>:<span class="string">@"OKWShareResource.bundle/wechat_friends"</span>,<span class="string">@"title"</span>:<span class="string">@"微信好友"</span>&#125;;</span><br><span class="line">    [shareData addEntriesFromDictionary:@&#123;[<span class="built_in">NSNumber</span> numberWithUnsignedInteger:OKWShareTypeWeChatSession]:weChatSession&#125;];</span><br><span class="line">    </span><br><span class="line">    <span class="built_in">NSDictionary</span> *weChatTimeLine = @&#123;<span class="string">@"image"</span>:<span class="string">@"OKWShareResource.bundle/wechant_timeline"</span>,<span class="string">@"title"</span>:<span class="string">@"朋友圈"</span>&#125;;</span><br><span class="line">    [shareData addEntriesFromDictionary:@&#123;[<span class="built_in">NSNumber</span> numberWithUnsignedInteger:OKWShareTypeWeChatTimeLine]:weChatTimeLine&#125;];</span><br><span class="line">    </span><br><span class="line">    <span class="built_in">NSDictionary</span> *weChatFav = @&#123;<span class="string">@"image"</span>:<span class="string">@"OKWShareResource.bundle/wechat_fav"</span>,<span class="string">@"title"</span>:<span class="string">@"微信收藏"</span>&#125;;</span><br><span class="line">    [shareData addEntriesFromDictionary:@&#123;[<span class="built_in">NSNumber</span> numberWithUnsignedInteger:OKWShareTypeWeChatFav]:weChatFav&#125;];</span><br><span class="line">    </span><br><span class="line">    <span class="built_in">NSDictionary</span> *QQ = @&#123;<span class="string">@"image"</span>:<span class="string">@"OKWShareResource.bundle/qq_friends"</span>,<span class="string">@"title"</span>:<span class="string">@"QQ好友"</span>&#125;;</span><br><span class="line">    [shareData addEntriesFromDictionary:@&#123;[<span class="built_in">NSNumber</span> numberWithUnsignedInteger:OKWShareTypeQQ]:QQ&#125;];</span><br><span class="line">    </span><br><span class="line">    <span class="built_in">NSDictionary</span> *QQSpace = @&#123;<span class="string">@"image"</span>:<span class="string">@"OKWShareResource.bundle/qq_space"</span>,<span class="string">@"title"</span>:<span class="string">@"QQ空间"</span>&#125;;</span><br><span class="line">    [shareData addEntriesFromDictionary:@&#123;[<span class="built_in">NSNumber</span> numberWithUnsignedInteger:OKWShareTypeQQSpace]:QQSpace&#125;];</span><br><span class="line">    </span><br><span class="line">    <span class="built_in">NSDictionary</span> *mail = @&#123;<span class="string">@"image"</span>:<span class="string">@"OKWShareResource.bundle/mail"</span>,<span class="string">@"title"</span>:<span class="string">@"邮件"</span>&#125;;</span><br><span class="line">    [shareData addEntriesFromDictionary:@&#123;[<span class="built_in">NSNumber</span> numberWithUnsignedInteger:OKWShareTypeMail]:mail&#125;];</span><br><span class="line">    </span><br><span class="line">    <span class="built_in">NSDictionary</span> *SMS = @&#123;<span class="string">@"image"</span>:<span class="string">@"OKWShareResource.bundle/message"</span>,<span class="string">@"title"</span>:<span class="string">@"短信"</span>&#125;;</span><br><span class="line">    [shareData addEntriesFromDictionary:@&#123;[<span class="built_in">NSNumber</span> numberWithUnsignedInteger:OKWShareTypeSMS]:SMS&#125;];</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">return</span> shareData;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">@end</span></span><br></pre></td></tr></table></figure></p>
+<p>2.在<code>OKWShareSDK</code>中添加分享种类的枚举值<br>参考<br><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="built_in">NS_ENUM</span>(<span class="built_in">NSUInteger</span>,OKWShareType) &#123;</span><br><span class="line">    OKWShareTypeWeChatSession = <span class="number">1000</span>, <span class="comment">//微信好友</span></span><br><span class="line">    OKWShareTypeWeChatTimeLine, <span class="comment">//微信朋友圈</span></span><br><span class="line">    OKWShareTypeWeChatFav,  <span class="comment">//微信收藏</span></span><br><span class="line">    OKWShareTypeQQ, <span class="comment">//QQ</span></span><br><span class="line">    OKWShareTypeQQSpace, <span class="comment">//QQ空间</span></span><br><span class="line">    OKWShareTypeMail,   <span class="comment">//邮件</span></span><br><span class="line">    OKWShareTypeSMS     <span class="comment">//短信</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></p>
+<p>3.创建要分享功能的类，继承<code>OKWBaseShare</code>，并实现要<code>OKWBaseShare</code>的方法。具体请参考<code>OKWWeChatShare</code>与<code>OKWQQShare</code>类方法的实现。<br>4.在<code>OKWBaseShare</code>实现文件中添加新增分享种类的判断。<br>参考<br><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">+(<span class="keyword">void</span>)sendTextMessage:(OKWShareContent *)content messageType:(OKWShareType)type</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">switch</span> (type) &#123;</span><br><span class="line">        <span class="keyword">case</span> OKWShareTypeWeChatFav:</span><br><span class="line">        <span class="keyword">case</span> OKWShareTypeWeChatTimeLine:</span><br><span class="line">        <span class="keyword">case</span> OKWShareTypeWeChatSession:</span><br><span class="line">            [OKWWeChatShare sendTextMessage:content messageType:type];</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">        <span class="keyword">case</span> OKWShareTypeMail:</span><br><span class="line">        <span class="keyword">case</span> OKWShareTypeSMS:</span><br><span class="line">            [OKWSystemShare sendTextMessage:content messageType:type];</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">        <span class="keyword">case</span> OKWShareTypeQQ:</span><br><span class="line">        <span class="keyword">case</span> OKWShareTypeQQSpace:</span><br><span class="line">            [OKWQQShare sendTextMessage:content messageType:type];</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">        <span class="keyword">default</span>:</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/说明文档/" rel="tag"># 说明文档</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2015/12/16/Xcode调试工具Instruments指南/" rel="next" title="Xcode调试工具Instruments指南">
+                <i class="fa fa-chevron-left"></i> Xcode调试工具Instruments指南
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2015/12/29/Instruments－查看收集到的数据/" rel="prev" title="Instruments－查看收集到的数据">
+                Instruments－查看收集到的数据 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      <div class="ds-thread" data-thread-key="2015/12/25/轻量级分享框架源码与扩展说明/"
+           data-title="轻量级分享框架源码与扩展说明" data-url="http://ggghub.com/2015/12/25/轻量级分享框架源码与扩展说明/">
+      </div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">LiSiYuan</p>
+              <p class="site-description motion-element" itemprop="description">Hi! I'm GGGHub, Welcome here！</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">15</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                
+                  <span class="site-state-item-count">6</span>
+                  <span class="site-state-item-name">categories</span>
+                
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                
+                  <span class="site-state-item-count">12</span>
+                  <span class="site-state-item-name">tags</span>
+                
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/ggghub" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-globe"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://www.developboot.com" target="_blank" title="developboot">
+                      
+                        <i class="fa fa-fw fa-globe"></i>developboot</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://blog.csdn.net/ggghub" target="_blank" title="CSDN">
+                      
+                        <i class="fa fa-fw fa-globe"></i>CSDN</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#介绍"><span class="nav-number">1.</span> <span class="nav-text">介绍</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#接口说明"><span class="nav-number">1.1.</span> <span class="nav-text">接口说明</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#分享基类"><span class="nav-number">1.2.</span> <span class="nav-text">分享基类</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#分享数据模型"><span class="nav-number">1.3.</span> <span class="nav-text">分享数据模型</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#扩展"><span class="nav-number">2.</span> <span class="nav-text">扩展</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#扩展分享数据类型"><span class="nav-number">2.1.</span> <span class="nav-text">扩展分享数据类型</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#扩展分享种类"><span class="nav-number">2.2.</span> <span class="nav-text">扩展分享种类</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">LiSiYuan</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Muse</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"ggghub"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+    
+    <script src="/lib/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/js/src/hook-duoshuo.js"></script>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

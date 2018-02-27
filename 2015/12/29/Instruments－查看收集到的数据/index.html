@@ -1,0 +1,883 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="en">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Hexo, NexT" />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="由于Xcode调试工具Instruments指南篇幅太长，所以本篇blog继续上篇，介绍对Instruments收集到的数据去分析。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Instruments－查看收集到的数据">
+<meta property="og:url" content="http://ggghub.com/2015/12/29/Instruments－查看收集到的数据/index.html">
+<meta property="og:site_name" content="GGGHub&#39;s Blog">
+<meta property="og:description" content="由于Xcode调试工具Instruments指南篇幅太长，所以本篇blog继续上篇，介绍对Instruments收集到的数据去分析。">
+<meta property="og:locale" content="en">
+<meta property="og:image" content="https://developer.apple.com/library/tvos/documentation/DeveloperTools/Conceptual/InstrumentsUserGuide/Art/instruments_trace_document_withdata_2x.png">
+<meta property="og:image" content="https://developer.apple.com/library/tvos/documentation/DeveloperTools/Conceptual/InstrumentsUserGuide/Art/instruments_trace_document_timeline_pane_2x.png">
+<meta property="og:image" content="https://developer.apple.com/library/tvos/documentation/DeveloperTools/Conceptual/InstrumentsUserGuide/Art/instruments_trace_document_timeline_pane_zooming_2x.png">
+<meta property="og:image" content="https://developer.apple.com/library/tvos/documentation/DeveloperTools/Conceptual/InstrumentsUserGuide/Art/instruments_view_menu_snaptracktofit_menuitem_2x.png">
+<meta property="og:image" content="https://developer.apple.com/library/tvos/documentation/DeveloperTools/Conceptual/InstrumentsUserGuide/Art/instruments_view_menu_increasedecksize_menuitem_2x.png">
+<meta property="og:image" content="https://developer.apple.com/library/tvos/documentation/DeveloperTools/Conceptual/InstrumentsUserGuide/Art/instruments_trace_document_timeline_pane_largertrack_2x.png">
+<meta property="og:image" content="https://developer.apple.com/library/tvos/documentation/DeveloperTools/Conceptual/InstrumentsUserGuide/Art/instruments_view_menu_decreasedecksize_menuitem_2x.png">
+<meta property="og:image" content="https://developer.apple.com/library/tvos/documentation/DeveloperTools/Conceptual/InstrumentsUserGuide/Art/instruments_trace_document_timeline_pane_selectedrange_2x.png">
+<meta property="og:image" content="https://developer.apple.com/library/tvos/documentation/DeveloperTools/Conceptual/InstrumentsUserGuide/Art/instruments_trace_document_timeline_pane_selectingrange_2x.png">
+<meta property="og:image" content="https://developer.apple.com/library/tvos/documentation/DeveloperTools/Conceptual/InstrumentsUserGuide/Art/instruments_clearinspectionrange_menu_2x.png">
+<meta property="og:image" content="https://developer.apple.com/library/tvos/documentation/DeveloperTools/Conceptual/InstrumentsUserGuide/Art/instruments_trace_document_timeline_pane_flags_2x.png">
+<meta property="og:image" content="https://developer.apple.com/library/tvos/documentation/DeveloperTools/Conceptual/InstrumentsUserGuide/Art/instruments_addflag_menu_2x.png">
+<meta property="og:image" content="https://developer.apple.com/library/tvos/documentation/DeveloperTools/Conceptual/InstrumentsUserGuide/Art/instruments_manageflags_menu_2x.png">
+<meta property="og:image" content="https://developer.apple.com/library/tvos/documentation/DeveloperTools/Conceptual/InstrumentsUserGuide/Art/instruments_manageflags_menu_2x.png">
+<meta property="og:image" content="https://developer.apple.com/library/tvos/documentation/DeveloperTools/Conceptual/InstrumentsUserGuide/Art/instruments_flags_palette_disabledflag_2x.png">
+<meta property="og:image" content="https://developer.apple.com/library/tvos/documentation/DeveloperTools/Conceptual/InstrumentsUserGuide/Art/instruments_strategy_pane_multipleruns_2x.png">
+<meta property="og:image" content="https://developer.apple.com/library/tvos/documentation/DeveloperTools/Conceptual/InstrumentsUserGuide/Art/instruments_strategy_pane_disclosure_triangle_2x.png">
+<meta property="og:image" content="https://developer.apple.com/library/tvos/documentation/DeveloperTools/Conceptual/InstrumentsUserGuide/Art/instruments_strategy_pane_disclosure_triangle_2x.png">
+<meta property="og:image" content="https://developer.apple.com/library/tvos/documentation/DeveloperTools/Conceptual/InstrumentsUserGuide/Art/instruments_nextrun_menu_2x.png">
+<meta property="og:image" content="https://developer.apple.com/library/tvos/documentation/DeveloperTools/Conceptual/InstrumentsUserGuide/Art/instruments_previousrun_menu_2x.png">
+<meta property="og:image" content="https://developer.apple.com/library/tvos/documentation/DeveloperTools/Conceptual/InstrumentsUserGuide/Art/instruments_detail_pane_info_2x.png">
+<meta property="og:image" content="https://developer.apple.com/library/tvos/documentation/DeveloperTools/Conceptual/InstrumentsUserGuide/Art/instruments_view_menu_detail_menu_2x.png">
+<meta property="og:image" content="https://developer.apple.com/library/tvos/documentation/DeveloperTools/Conceptual/InstrumentsUserGuide/Art/instruments_detail_pane_toolbar_icon_2x.png">
+<meta property="og:image" content="https://developer.apple.com/library/tvos/documentation/DeveloperTools/Conceptual/InstrumentsUserGuide/Art/instruments_trace_document_strategy_pane_selectedinstrument_2x.png">
+<meta property="og:image" content="https://developer.apple.com/library/tvos/documentation/DeveloperTools/Conceptual/InstrumentsUserGuide/Art/instruments_detail_pane_detailtypelist_2x.png">
+<meta property="og:image" content="https://developer.apple.com/library/tvos/documentation/DeveloperTools/Conceptual/InstrumentsUserGuide/Art/instruments_detail_pane_calltreeexpanded_2x.png">
+<meta property="og:image" content="https://developer.apple.com/library/tvos/documentation/DeveloperTools/Conceptual/InstrumentsUserGuide/Art/instruments_detail_pane_sorting_2x.png">
+<meta property="og:image" content="https://developer.apple.com/library/tvos/documentation/DeveloperTools/Conceptual/InstrumentsUserGuide/Art/instruments_detail_pane_extendeddetail_2x.png">
+<meta property="og:image" content="https://developer.apple.com/library/tvos/documentation/DeveloperTools/Conceptual/InstrumentsUserGuide/Art/instruments_view_menu_inspectors_menu_showextendeddetail_menu_2x.png">
+<meta property="og:image" content="https://developer.apple.com/library/tvos/documentation/DeveloperTools/Conceptual/InstrumentsUserGuide/Art/instruments_extendeddetail_button_inline_2x.png">
+<meta property="og:image" content="https://developer.apple.com/library/tvos/documentation/DeveloperTools/Conceptual/InstrumentsUserGuide/Art/instruments_inspector_pane_navigation_bar_2x.png">
+<meta property="og:image" content="https://developer.apple.com/library/tvos/documentation/DeveloperTools/Conceptual/InstrumentsUserGuide/Art/inline_hidesystemcalls_button_2x.png">
+<meta property="og:image" content="https://developer.apple.com/library/tvos/documentation/DeveloperTools/Conceptual/InstrumentsUserGuide/Art/instruments_extendeddetail_pane_hiddensystemcalls_2x.png">
+<meta property="og:image" content="https://developer.apple.com/library/tvos/documentation/DeveloperTools/Conceptual/InstrumentsUserGuide/Art/instruments_detail_pane_usersourcecode_2x.png">
+<meta property="og:image" content="https://developer.apple.com/library/tvos/documentation/DeveloperTools/Conceptual/InstrumentsUserGuide/Art/instruments_detail_pane_sourcecode_viewer_2x.png">
+<meta property="og:image" content="https://developer.apple.com/library/tvos/documentation/DeveloperTools/Conceptual/InstrumentsUserGuide/Art/inline_xcode_2x.png">
+<meta property="og:image" content="https://developer.apple.com/library/tvos/documentation/DeveloperTools/Conceptual/InstrumentsUserGuide/Art/instruments_detail_pane_sourcecode_viewer_xcode_button_2x.png">
+<meta property="og:updated_time" content="2016-05-10T07:26:46.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Instruments－查看收集到的数据">
+<meta name="twitter:description" content="由于Xcode调试工具Instruments指南篇幅太长，所以本篇blog继续上篇，介绍对Instruments收集到的数据去分析。">
+<meta name="twitter:image" content="https://developer.apple.com/library/tvos/documentation/DeveloperTools/Conceptual/InstrumentsUserGuide/Art/instruments_trace_document_withdata_2x.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://ggghub.com/2015/12/29/Instruments－查看收集到的数据/"/>
+
+
+
+
+
+  <title>Instruments－查看收集到的数据 | GGGHub's Blog</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="en">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">GGGHub's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">Coding Obsession</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            Archives
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://ggghub.com/2015/12/29/Instruments－查看收集到的数据/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="LiSiYuan">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="GGGHub's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Instruments－查看收集到的数据</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2015-12-29T16:24:00+08:00">
+                2015-12-29
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Xcode/" itemprop="url" rel="index">
+                    <span itemprop="name">Xcode</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2015/12/29/Instruments－查看收集到的数据/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2015/12/29/Instruments－查看收集到的数据/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>由于<a href="http://blog.csdn.net/ggghub/article/details/50325637" target="_blank" rel="noopener">Xcode调试工具Instruments指南</a>篇幅太长，所以本篇blog继续上篇，介绍对<code>Instruments</code>收集到的数据去分析。<br><a id="more"></a></p>
+<h1 id="关于数据分析"><a href="#关于数据分析" class="headerlink" title="关于数据分析"></a>关于数据分析</h1><p><code>Instruments</code>不解决你代码中的任何问题，它帮助你更好的理解你的代码正在做什么，通过捕获你app运行的详细统计数据，并呈现它们給你去分析。由于每个app是不同的，发现和解决问题的实际步骤有所不同。因此你必须了解怎样解释那些你筛选后<code>Instruments</code>收集的数据。并探讨与你app有关的数据，你必须执行一些工作，标识代码中的数据在app中，这样你就可以做出改进。<br>执行跟踪后，你可以时间窗口中，想求窗口，指示窗口的详情区域查看所收集的数据<br><img src="https://developer.apple.com/library/tvos/documentation/DeveloperTools/Conceptual/InstrumentsUserGuide/Art/instruments_trace_document_withdata_2x.png" alt=""></p>
+<hr>
+<h1 id="查看时间线窗口"><a href="#查看时间线窗口" class="headerlink" title="查看时间线窗口"></a>查看时间线窗口</h1><p><img src="https://developer.apple.com/library/tvos/documentation/DeveloperTools/Conceptual/InstrumentsUserGuide/Art/instruments_trace_document_timeline_pane_2x.png" alt=""></p>
+<p>一个追踪文件最重要的部分为时间线窗口，介绍了由每个工具基于时间收集的数据视图。这个窗口可以很容易的发现趋势和潜在问题的区域在你的app中。例如，一个内存使用图标的尖峰表示你的app比平时分配更多的内存。这个尖峰可能是正常的，也可能表示你代码中创建了大量的对象，或者内存的缓冲区超出你的预期。一个工具，例如<code>Leaks</code>可以验证你的app没有正常的处理内存如果<code>Leaks</code>的时间线窗口追踪是稀疏的填充，你知道你的app是正确的行为，如果追踪不为空你可能要检查原因。</p>
+<p>一下各节提供有关时间线窗口的信息，以及如何配置它。</p>
+<h2 id="放大和缩小"><a href="#放大和缩小" class="headerlink" title="放大和缩小"></a>放大和缩小</h2><p>如果你已经在追踪中捕获了大量的数据，你可以扩大或者缩小在时间线窗口中显示的细节，让你更专注在指定的数据上。<br><img src="https://developer.apple.com/library/tvos/documentation/DeveloperTools/Conceptual/InstrumentsUserGuide/Art/instruments_trace_document_timeline_pane_zooming_2x.png" alt=""></p>
+<p><strong>放大和缩小数据</strong><br>请执行下列操作之一：</p>
+<ul>
+<li>要放大或缩小，捏合触控板</li>
+<li>要放大或缩小，使用滚轮的同时按下Option键将光标定位在轨迹视图。</li>
+<li>要放大，按Option键，然后拖动隔离选中的数据</li>
+<li>要缩小，按Ctrl键，然后拖动选中的数据。</li>
+</ul>
+<p><strong>在时间线窗口记录所有合适的数据</strong><br>请执行下列操作之一：</p>
+<ul>
+<li><p><img src="https://developer.apple.com/library/tvos/documentation/DeveloperTools/Conceptual/InstrumentsUserGuide/Art/instruments_view_menu_snaptracktofit_menuitem_2x.png" alt=""></p>
+</li>
+<li><p>按 Command-Control-Z</p>
+</li>
+</ul>
+<p><strong>在时间线窗口中增加数据显示的尺寸</strong><br>请执行下列操作之一：</p>
+<ul>
+<li><p><img src="https://developer.apple.com/library/tvos/documentation/DeveloperTools/Conceptual/InstrumentsUserGuide/Art/instruments_view_menu_increasedecksize_menuitem_2x.png" alt=""></p>
+</li>
+<li><p>按Command-Plus (+)<br>这个轨迹增加当前选中工具的高度，允许你查看它更多的细节。<br><img src="https://developer.apple.com/library/tvos/documentation/DeveloperTools/Conceptual/InstrumentsUserGuide/Art/instruments_trace_document_timeline_pane_largertrack_2x.png" alt=""></p>
+</li>
+</ul>
+<p><strong>在时间线窗口中减少数据显示的尺寸</strong><br>请执行下列操作之一：</p>
+<ul>
+<li><p><img src="https://developer.apple.com/library/tvos/documentation/DeveloperTools/Conceptual/InstrumentsUserGuide/Art/instruments_view_menu_decreasedecksize_menuitem_2x.png" alt=""></p>
+</li>
+<li><p>按Command-Minus (-)</p>
+</li>
+</ul>
+<h2 id="过滤数据的范围"><a href="#过滤数据的范围" class="headerlink" title="过滤数据的范围"></a>过滤数据的范围</h2><p><code>Instruments</code>收集大量的信息作为它的配置文件，你可以快速的过滤这些数据通过设置详情窗口，展示特定时间范围内发生的唯一的事件。<br><img src="https://developer.apple.com/library/tvos/documentation/DeveloperTools/Conceptual/InstrumentsUserGuide/Art/instruments_trace_document_timeline_pane_selectedrange_2x.png" alt=""></p>
+<p><strong>选择一个时间段进行检查</strong><br>1.拖动数据的一部分，不使用任何按键，只有你拖动数据显示。<br><img src="https://developer.apple.com/library/tvos/documentation/DeveloperTools/Conceptual/InstrumentsUserGuide/Art/instruments_trace_document_timeline_pane_selectingrange_2x.png" alt=""><br>你指定的范围在时间线窗口高亮的内容。</p>
+<p><strong>清除检查范围</strong><br>请执行下列操作之一：</p>
+<ul>
+<li>点击时间线选中范围的外面</li>
+<li><img src="https://developer.apple.com/library/tvos/documentation/DeveloperTools/Conceptual/InstrumentsUserGuide/Art/instruments_clearinspectionrange_menu_2x.png" alt=""></li>
+</ul>
+<h2 id="设置标示"><a href="#设置标示" class="headerlink" title="设置标示"></a>设置标示</h2><p>标示可以让你在时间线窗口中快速访问感兴趣的点，你可以为每个标志添加名字和描述。<br><img src="https://developer.apple.com/library/tvos/documentation/DeveloperTools/Conceptual/InstrumentsUserGuide/Art/instruments_trace_document_timeline_pane_flags_2x.png" alt=""></p>
+<p>在当前时间线窗口的播放指示器设置一个标示<br>请执行下列操作之一：</p>
+<ul>
+<li><p><img src="https://developer.apple.com/library/tvos/documentation/DeveloperTools/Conceptual/InstrumentsUserGuide/Art/instruments_addflag_menu_2x.png" alt=""></p>
+</li>
+<li><p>按Command–Down Arrow</p>
+</li>
+</ul>
+<p><strong>在你时间线标示中查看</strong><br>1.<img src="https://developer.apple.com/library/tvos/documentation/DeveloperTools/Conceptual/InstrumentsUserGuide/Art/instruments_manageflags_menu_2x.png" alt=""></p>
+<p>2.在标示中点击一个标示然后在时间线面板中查看</p>
+<p><strong>删除一个标示</strong><br>把标示拖拽出时间线导航栏</p>
+<p><strong>隐藏一个标示</strong><br>1.<img src="https://developer.apple.com/library/tvos/documentation/DeveloperTools/Conceptual/InstrumentsUserGuide/Art/instruments_manageflags_menu_2x.png" alt=""><br>2.<img src="https://developer.apple.com/library/tvos/documentation/DeveloperTools/Conceptual/InstrumentsUserGuide/Art/instruments_flags_palette_disabledflag_2x.png" alt=""></p>
+<h2 id="访问多个运行的追踪数据"><a href="#访问多个运行的追踪数据" class="headerlink" title="访问多个运行的追踪数据"></a>访问多个运行的追踪数据</h2><p>一个追踪文件可以在你的app运行过程中记录多个数据，当这样做时不会丢弃先前记录的数据<br><img src="https://developer.apple.com/library/tvos/documentation/DeveloperTools/Conceptual/InstrumentsUserGuide/Art/instruments_strategy_pane_multipleruns_2x.png" alt=""></p>
+<p><strong>查看一个选中工具的运行列表</strong><br><img src="https://developer.apple.com/library/tvos/documentation/DeveloperTools/Conceptual/InstrumentsUserGuide/Art/instruments_strategy_pane_disclosure_triangle_2x.png" alt=""></p>
+<p>该工具展开以显示运行的列表</p>
+<p><strong>查看一个选中工具的运行数据</strong><br>1.<img src="https://developer.apple.com/library/tvos/documentation/DeveloperTools/Conceptual/InstrumentsUserGuide/Art/instruments_strategy_pane_disclosure_triangle_2x.png" alt=""><br>2.在时间线窗口中选择所需的运行轨迹</p>
+<p><strong>移动到下一个选中工具的运行</strong><br>请执行下列操作之一：</p>
+<ul>
+<li><p><img src="https://developer.apple.com/library/tvos/documentation/DeveloperTools/Conceptual/InstrumentsUserGuide/Art/instruments_nextrun_menu_2x.png" alt=""></p>
+<ul>
+<li>按Command-Apostrophe (‘)</li>
+</ul>
+<p><strong>移动到上一个选中工具的运行</strong><br>请执行下列操作之一：</p>
+</li>
+<li><p><img src="https://developer.apple.com/library/tvos/documentation/DeveloperTools/Conceptual/InstrumentsUserGuide/Art/instruments_previousrun_menu_2x.png" alt=""></p>
+</li>
+<li><p>按 Command-Quotation (“)</p>
+</li>
+</ul>
+<hr>
+<h1 id="查看详情窗口"><a href="#查看详情窗口" class="headerlink" title="查看详情窗口"></a>查看详情窗口</h1><p>当你在时间线窗口辨认出一个潜在问题区域，使用详情窗口在这个区域检查数据，这个详情窗口显示与所选择的工具当前追踪运行的相关数据，<code>Instruments</code>在详情窗口只显示一段时间的一个工具。因此你必须选择不同的工具来开不同组的信息。<br><img src="https://developer.apple.com/library/tvos/documentation/DeveloperTools/Conceptual/InstrumentsUserGuide/Art/instruments_detail_pane_info_2x.png" alt=""></p>
+<p><strong>打开或者关闭详情面板</strong><br>请执行下列操作之一：</p>
+<ul>
+<li><p><img src="https://developer.apple.com/library/tvos/documentation/DeveloperTools/Conceptual/InstrumentsUserGuide/Art/instruments_view_menu_detail_menu_2x.png" alt=""></p>
+</li>
+<li><p>在工具栏的右端点击<img src="https://developer.apple.com/library/tvos/documentation/DeveloperTools/Conceptual/InstrumentsUserGuide/Art/instruments_detail_pane_toolbar_icon_2x.png" alt=""></p>
+</li>
+</ul>
+<p><strong>在详情窗口查看指定工具的数据</strong><br>1.<img src="https://developer.apple.com/library/tvos/documentation/DeveloperTools/Conceptual/InstrumentsUserGuide/Art/instruments_trace_document_strategy_pane_selectedinstrument_2x.png" alt=""></p>
+<h2 id="在详情窗口中查看不同种类的数据"><a href="#在详情窗口中查看不同种类的数据" class="headerlink" title="在详情窗口中查看不同种类的数据"></a>在详情窗口中查看不同种类的数据</h2><p>对于某些工具你可以显示一个以上格式的数据，例如<code>Activity Monitor</code>允许你查看数据的汇总，父子信息与采样列表。<br><strong>在详情种类切换</strong><br><img src="https://developer.apple.com/library/tvos/documentation/DeveloperTools/Conceptual/InstrumentsUserGuide/Art/instruments_detail_pane_detailtypelist_2x.png" alt=""></p>
+<p>工具的模式支持取决于工具收集数据的种类<br>对于一些详情的种类，像Allocations可以调用树模式，你可以使用展开一个特定的行，进一步分解成相应的层次，点击一个三角形展开或者关闭一个给定的行。<br><img src="https://developer.apple.com/library/tvos/documentation/DeveloperTools/Conceptual/InstrumentsUserGuide/Art/instruments_detail_pane_calltreeexpanded_2x.png" alt=""></p>
+<h2 id="在详情窗口排序"><a href="#在详情窗口排序" class="headerlink" title="在详情窗口排序"></a>在详情窗口排序</h2><p>根据特定的列的数据在详情窗口排序信息显示。请点击相应的列的页眉，在每个工具在详情窗口中的列不同。<br><img src="https://developer.apple.com/library/tvos/documentation/DeveloperTools/Conceptual/InstrumentsUserGuide/Art/instruments_detail_pane_sorting_2x.png" alt=""></p>
+<h2 id="使用扩展详情窗口"><a href="#使用扩展详情窗口" class="headerlink" title="使用扩展详情窗口"></a>使用扩展详情窗口</h2><p>对于一些工具，在指示窗口扩展详情的区域展示有关当前在详细信息窗格中选择项目的附加信息，这个扩展的详细信息可包括探针描述或被记录的时间，栈追踪，和当记录信息的时间，以及其他信息。<br><img src="https://developer.apple.com/library/tvos/documentation/DeveloperTools/Conceptual/InstrumentsUserGuide/Art/instruments_detail_pane_extendeddetail_2x.png" alt=""></p>
+<p><strong>打开或者关闭指示窗口的扩展详情区域</strong><br>请执行下列操作之一：</p>
+<ul>
+<li><p><img src="https://developer.apple.com/library/tvos/documentation/DeveloperTools/Conceptual/InstrumentsUserGuide/Art/instruments_view_menu_inspectors_menu_showextendeddetail_menu_2x.png" alt=""></p>
+</li>
+<li><p>按Command-2</p>
+</li>
+<li><p>点击<img src="https://developer.apple.com/library/tvos/documentation/DeveloperTools/Conceptual/InstrumentsUserGuide/Art/instruments_extendeddetail_button_inline_2x.png" alt="">按钮<br><img src="https://developer.apple.com/library/tvos/documentation/DeveloperTools/Conceptual/InstrumentsUserGuide/Art/instruments_inspector_pane_navigation_bar_2x.png" alt=""></p>
+</li>
+</ul>
+<p>您可以通过单击折叠按钮<img src="https://developer.apple.com/library/tvos/documentation/DeveloperTools/Conceptual/InstrumentsUserGuide/Art/inline_hidesystemcalls_button_2x.png" alt="">隐藏在堆栈跟踪系统调用<br><img src="https://developer.apple.com/library/tvos/documentation/DeveloperTools/Conceptual/InstrumentsUserGuide/Art/instruments_extendeddetail_pane_hiddensystemcalls_2x.png" alt=""></p>
+<hr>
+<h1 id="查看app的源代码"><a href="#查看app的源代码" class="headerlink" title="查看app的源代码"></a>查看app的源代码</h1><p>如果你有一个Xcode项目在栈追踪符号列表的源代码，<code>Instruments</code>可以显示你的代码，并可以在Xcode中打开，这样就可以做出任何期望的改变。<br>使用栈追踪符号找到你写的源代码，用户端啊栈追踪符号出现在详情窗口与黑色背景上的小方块用户图标，为了更方便的找到符号代码，你可以实现使用显示设置区域在指示器窗口筛选出隐藏符号和系统库。</p>
+<p><strong>查看app的源代码</strong><br>1.<img src="https://developer.apple.com/library/tvos/documentation/DeveloperTools/Conceptual/InstrumentsUserGuide/Art/instruments_detail_pane_usersourcecode_2x.png" alt=""><br>2.双击<br><img src="https://developer.apple.com/library/tvos/documentation/DeveloperTools/Conceptual/InstrumentsUserGuide/Art/instruments_detail_pane_sourcecode_viewer_2x.png" alt=""><br>3.点击<img src="https://developer.apple.com/library/tvos/documentation/DeveloperTools/Conceptual/InstrumentsUserGuide/Art/inline_xcode_2x.png" alt="">在详情窗口的右上角打开Xcode，并显示你的源代码，下面截图显示出现在详情窗口顶部的Xcode按钮的位置。它出现后你双击符号或详情窗口或指示窗口中扩展的详情区域中的图标显示在详细信息窗格中的代码。<br><img src="https://developer.apple.com/library/tvos/documentation/DeveloperTools/Conceptual/InstrumentsUserGuide/Art/instruments_detail_pane_sourcecode_viewer_xcode_button_2x.png" alt=""></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2015/12/25/轻量级分享框架源码与扩展说明/" rel="next" title="轻量级分享框架源码与扩展说明">
+                <i class="fa fa-chevron-left"></i> 轻量级分享框架源码与扩展说明
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016/02/20/HTTPS通信机制/" rel="prev" title="HTTPS通信机制">
+                HTTPS通信机制 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      <div class="ds-thread" data-thread-key="2015/12/29/Instruments－查看收集到的数据/"
+           data-title="Instruments－查看收集到的数据" data-url="http://ggghub.com/2015/12/29/Instruments－查看收集到的数据/">
+      </div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">LiSiYuan</p>
+              <p class="site-description motion-element" itemprop="description">Hi! I'm GGGHub, Welcome here！</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">15</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                
+                  <span class="site-state-item-count">6</span>
+                  <span class="site-state-item-name">categories</span>
+                
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                
+                  <span class="site-state-item-count">12</span>
+                  <span class="site-state-item-name">tags</span>
+                
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/ggghub" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-globe"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://www.developboot.com" target="_blank" title="developboot">
+                      
+                        <i class="fa fa-fw fa-globe"></i>developboot</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://blog.csdn.net/ggghub" target="_blank" title="CSDN">
+                      
+                        <i class="fa fa-fw fa-globe"></i>CSDN</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#关于数据分析"><span class="nav-number">1.</span> <span class="nav-text">关于数据分析</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#查看时间线窗口"><span class="nav-number">2.</span> <span class="nav-text">查看时间线窗口</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#放大和缩小"><span class="nav-number">2.1.</span> <span class="nav-text">放大和缩小</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#过滤数据的范围"><span class="nav-number">2.2.</span> <span class="nav-text">过滤数据的范围</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#设置标示"><span class="nav-number">2.3.</span> <span class="nav-text">设置标示</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#访问多个运行的追踪数据"><span class="nav-number">2.4.</span> <span class="nav-text">访问多个运行的追踪数据</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#查看详情窗口"><span class="nav-number">3.</span> <span class="nav-text">查看详情窗口</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#在详情窗口中查看不同种类的数据"><span class="nav-number">3.1.</span> <span class="nav-text">在详情窗口中查看不同种类的数据</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#在详情窗口排序"><span class="nav-number">3.2.</span> <span class="nav-text">在详情窗口排序</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#使用扩展详情窗口"><span class="nav-number">3.3.</span> <span class="nav-text">使用扩展详情窗口</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#查看app的源代码"><span class="nav-number">4.</span> <span class="nav-text">查看app的源代码</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">LiSiYuan</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Muse</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"ggghub"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+    
+    <script src="/lib/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/js/src/hook-duoshuo.js"></script>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

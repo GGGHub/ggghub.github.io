@@ -1,0 +1,824 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="en">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="布局," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="概述 UIStackView是iOS 9中新增的API，类似于Android中的线性布局。UIStackView相当于一个容器，根据向UIStackView中添加视图的顺序，UIStackView会自动给这些视图添加约束，让这些视图根据内容，垂直或水平排列。由于UIStackView会自动给它里面的子视图添加约束，所以我们不必再为那些子视图添加约束，我们只要给UIStackView设置一些属性与其">
+<meta name="keywords" content="布局">
+<meta property="og:type" content="article">
+<meta property="og:title" content="iOS9中UIStackView的使用">
+<meta property="og:url" content="http://ggghub.com/2015/10/19/iOS9中UIStackView的使用/index.html">
+<meta property="og:site_name" content="GGGHub&#39;s Blog">
+<meta property="og:description" content="概述 UIStackView是iOS 9中新增的API，类似于Android中的线性布局。UIStackView相当于一个容器，根据向UIStackView中添加视图的顺序，UIStackView会自动给这些视图添加约束，让这些视图根据内容，垂直或水平排列。由于UIStackView会自动给它里面的子视图添加约束，所以我们不必再为那些子视图添加约束，我们只要给UIStackView设置一些属性与其">
+<meta property="og:locale" content="en">
+<meta property="og:image" content="http://img.blog.csdn.net/20151019171454651">
+<meta property="og:image" content="http://img.blog.csdn.net/20151019171627077">
+<meta property="og:image" content="http://img.blog.csdn.net/20151019171805429">
+<meta property="og:image" content="http://img.blog.csdn.net/20151019171932202">
+<meta property="og:image" content="http://img.blog.csdn.net/20151019172044158">
+<meta property="og:image" content="http://img.blog.csdn.net/20151019175938599">
+<meta property="og:image" content="http://img.blog.csdn.net/20151019180037809">
+<meta property="og:image" content="http://img.blog.csdn.net/20151019180136163">
+<meta property="og:image" content="http://img.blog.csdn.net/20151019180231329">
+<meta property="og:image" content="http://img.blog.csdn.net/20151019180346898">
+<meta property="og:image" content="http://img.blog.csdn.net/20151019180445789">
+<meta property="og:image" content="http://img.blog.csdn.net/20151019180544612">
+<meta property="og:image" content="http://img.blog.csdn.net/20151019180636412">
+<meta property="og:image" content="http://img.blog.csdn.net/20151020100815667">
+<meta property="og:image" content="http://img.blog.csdn.net/20151020103526651">
+<meta property="og:updated_time" content="2016-05-11T07:36:49.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="iOS9中UIStackView的使用">
+<meta name="twitter:description" content="概述 UIStackView是iOS 9中新增的API，类似于Android中的线性布局。UIStackView相当于一个容器，根据向UIStackView中添加视图的顺序，UIStackView会自动给这些视图添加约束，让这些视图根据内容，垂直或水平排列。由于UIStackView会自动给它里面的子视图添加约束，所以我们不必再为那些子视图添加约束，我们只要给UIStackView设置一些属性与其">
+<meta name="twitter:image" content="http://img.blog.csdn.net/20151019171454651">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://ggghub.com/2015/10/19/iOS9中UIStackView的使用/"/>
+
+
+
+
+
+  <title>iOS9中UIStackView的使用 | GGGHub's Blog</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="en">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">GGGHub's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">Coding Obsession</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            Archives
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://ggghub.com/2015/10/19/iOS9中UIStackView的使用/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="LiSiYuan">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="GGGHub's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">iOS9中UIStackView的使用</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2015-10-19T16:17:00+08:00">
+                2015-10-19
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/iOS/" itemprop="url" rel="index">
+                    <span itemprop="name">iOS</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2015/10/19/iOS9中UIStackView的使用/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2015/10/19/iOS9中UIStackView的使用/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><hr>
+<p><code>UIStackView</code>是<code>iOS 9</code>中新增的API，类似于<code>Android</code>中的线性布局。<code>UIStackView</code>相当于一个容器，根据向<code>UIStackView</code>中添加视图的顺序，<code>UIStackView</code>会自动给这些视图添加约束，让这些视图根据内容，垂直或水平排列。由于<code>UIStackView</code>会自动给它里面的子视图添加约束，所以我们不必再为那些子视图添加约束，我们只要给<code>UIStackView</code>设置一些属性与其子视图的压缩或者拉伸的优先级就可以简单的实现视图布局。<br>如果稍微复杂的界面可以嵌套使用<code>UIStackView</code>，可以向<code>UIStackView</code>中添加<code>UIStackView</code>，本质上都是继承<code>UIView</code>。<br><a id="more"></a></p>
+<h2 id="UIStackView介绍"><a href="#UIStackView介绍" class="headerlink" title="UIStackView介绍"></a>UIStackView介绍</h2><p>介绍<code>UIStackView</code>中主要的<code>API</code>。图片来自于<code>苹果官方文档</code></p>
+<hr>
+<ul>
+<li><p><strong>初始化</strong></p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">- (<span class="keyword">instancetype</span>)initWithArrangedSubviews:(<span class="built_in">NSArray</span>&lt;__kindof <span class="built_in">UIView</span> *&gt; *)views;</span><br><span class="line"><span class="comment">//初始化方法传入需要用UIStackView管理的存放子视图的数组,并按照数组中的顺序添加这些子视图。</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>添加/移除子视图</strong></p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">- (<span class="keyword">void</span>)addArrangedSubview:(<span class="built_in">UIView</span> *)view;</span><br><span class="line"><span class="comment">//添加view到UIStackView对象上并且让UIStackView管理这个view布局</span></span><br><span class="line"></span><br><span class="line">- (<span class="keyword">void</span>)removeArrangedSubview:(<span class="built_in">UIView</span> *)view;</span><br><span class="line"><span class="comment">//取消UIStackView的管理，但是这个view不从UIStackView上移除</span></span><br><span class="line"></span><br><span class="line">- (<span class="keyword">void</span>)insertArrangedSubview:(<span class="built_in">UIView</span> *)view atIndex:(<span class="built_in">NSUInteger</span>)stackIndex;</span><br><span class="line"><span class="comment">//UIStackView管理存放子视图的数组，按照顺序来布局，这个方法是向这个数组里指定位置添加view</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>UIStackView排列方式</strong></p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="built_in">NS_ENUM</span>(<span class="built_in">NSInteger</span>, <span class="built_in">UILayoutConstraintAxis</span>) &#123;</span><br><span class="line">    <span class="built_in">UILayoutConstraintAxisHorizontal</span> = <span class="number">0</span>, <span class="comment">//子视图水平排列</span></span><br><span class="line">    <span class="built_in">UILayoutConstraintAxisVertical</span> = <span class="number">1</span> <span class="comment">//子视图垂直排列</span></span><br><span class="line">&#125;;</span><br><span class="line"><span class="keyword">@property</span>(<span class="keyword">nonatomic</span>) <span class="built_in">UILayoutConstraintAxis</span> axis;</span><br><span class="line"><span class="comment">//这个属性是用来设置UIStackView中子视图的排列方式</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>子视图分布样式</strong></p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="built_in">NS_ENUM</span>(<span class="built_in">NSInteger</span>, <span class="built_in">UIStackViewDistribution</span>) &#123;</span><br><span class="line">    <span class="built_in">UIStackViewDistributionFill</span> = <span class="number">0</span>,</span><br><span class="line">    <span class="built_in">UIStackViewDistributionFillEqually</span>,</span><br><span class="line">    <span class="built_in">UIStackViewDistributionFillProportionally</span>,</span><br><span class="line">    <span class="built_in">UIStackViewDistributionEqualSpacing</span>,</span><br><span class="line">    <span class="built_in">UIStackViewDistributionEqualCentering</span>,</span><br><span class="line">&#125; <span class="built_in">NS_ENUM_AVAILABLE_IOS</span>(<span class="number">9</span>_0);</span><br><span class="line"></span><br><span class="line"><span class="keyword">@property</span>(<span class="keyword">nonatomic</span>) <span class="built_in">UIStackViewDistribution</span> distribution;</span><br><span class="line"><span class="comment">//UIStackView中子视图的分布样式</span></span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<p><strong>UIStackViewDistributionFill</strong><br>根据<code>UIStackView</code>的排列方式，用子视图铺满填充指定的方向，如果指定的<code>UIStackView</code>是垂直排列那么<code>UIStackView</code>中的子视图将填充满<code>UIStackView</code>的高度。如果指定的<code>UIStackView</code>是水平排列那么<code>UIStackView</code>中的子视图将填充满<code>UIStackView</code>的宽度。下图就是填充<code>UIStackView</code>的宽度示例。由于每个视图是由<code>UIStackView</code>自动添加约束的，要进行铺满操作就对视图进行拉伸，指定某个视图拉伸，可以更改其压缩或者拉伸的优先级实现。<br><img src="http://img.blog.csdn.net/20151019171454651" alt="" title="UIStackViewDistributionFill"></p>
+<p><strong>UIStackViewDistributionFillEqually</strong><br><code>UIStackViewDistributionFillEqually</code>保证铺满后如果是垂直排列所有的子视图高度相等，如果是水平排列所有的子视图宽度相等。<br><img src="http://img.blog.csdn.net/20151019171627077" alt="" title="UIStackViewDistributionFillEqually"></p>
+<p><strong>UIStackViewDistributionFillProportionally</strong><br>根据每个子视图里面内容的尺寸来进行填充操作<br><img src="http://img.blog.csdn.net/20151019171805429" alt="" title="UIStackViewDistributionFillProportionally"></p>
+<p><strong>UIStackViewDistributionEqualSpacing</strong><br>排列视图，保证每个子视图之间的间距相等<br><img src="http://img.blog.csdn.net/20151019171932202" alt="" title="UIStackViewDistributionEqualSpacing"></p>
+<p><strong>UIStackViewDistributionEqualCentering</strong><br>排列视图，保证每个子视图中心直接的间距相等<br><img src="http://img.blog.csdn.net/20151019172044158" alt="" title="UIStackViewDistributionEqualCentering"></p>
+<ul>
+<li><strong>子视图对齐方式</strong><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="built_in">NS_ENUM</span>(<span class="built_in">NSInteger</span>, <span class="built_in">UIStackViewAlignment</span>) &#123;</span><br><span class="line">    <span class="built_in">UIStackViewAlignmentFill</span>,</span><br><span class="line">    <span class="built_in">UIStackViewAlignmentLeading</span>,</span><br><span class="line">    <span class="built_in">UIStackViewAlignmentTop</span> = <span class="built_in">UIStackViewAlignmentLeading</span>,</span><br><span class="line">    <span class="built_in">UIStackViewAlignmentFirstBaseline</span>,</span><br><span class="line">    <span class="built_in">UIStackViewAlignmentCenter</span>,</span><br><span class="line">    <span class="built_in">UIStackViewAlignmentTrailing</span>,</span><br><span class="line">    <span class="built_in">UIStackViewAlignmentBottom</span> = <span class="built_in">UIStackViewAlignmentTrailing</span>,</span><br><span class="line">    <span class="built_in">UIStackViewAlignmentLastBaseline</span>, </span><br><span class="line">&#125; <span class="built_in">NS_ENUM_AVAILABLE_IOS</span>(<span class="number">9</span>_0);</span><br><span class="line"><span class="keyword">@property</span>(<span class="keyword">nonatomic</span>) <span class="built_in">UIStackViewAlignment</span> alignment;</span><br><span class="line"><span class="comment">//设置`UIStackView`中子视图对齐的方式</span></span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<p><strong>UIStackViewAlignmentFill</strong><br><code>UIStackView</code>是垂直排列那么子视图的水平方向的左右边界与<code>UIStackView</code>上下边界对齐，如果是水平排列那么子视图的垂直方向的上下边界与<code>UIStackView</code>上下边界对齐。</p>
+<p><img src="http://img.blog.csdn.net/20151019175938599" alt="" title="UIStackViewAlignmentFill"></p>
+<p><strong>UIStackViewAlignmentLeading</strong><br><code>UIStackView</code>是垂直排列时此值有效，让所有的子视图靠<code>UIStackView</code>左边界对齐。</p>
+<p><img src="http://img.blog.csdn.net/20151019180037809" alt="" title="UIStackViewAlignmentLeading"></p>
+<p><strong>UIStackViewAlignmentTop</strong><br><code>UIStackView</code>是水平排列时此值有效，让所有的子视图靠<code>UIStackView</code>上边界对齐。</p>
+<p><img src="http://img.blog.csdn.net/20151019180136163" alt="" title="UIStackViewAlignmentTop"></p>
+<p><strong>UIStackViewAlignmentFirstBaseline</strong><br><code>UIStackView</code>是水平排列时此值有效，所有的子视图以每个视图中的第一行基准线对齐。</p>
+<p><img src="http://img.blog.csdn.net/20151019180231329" alt="" title="UIStackViewAlignmentFirstBaseline"></p>
+<p><strong>UIStackViewAlignmentCenter</strong><br>所有的子视图中心与<code>UIStackView</code>的中心基准线对齐，如果<code>UIStackView</code>是水平排列那么所有子视图高度的中点与<code>UIStackView</code>高度中点对齐，如果如果<code>UIStackView</code>是垂直排列那么所有子视图宽度的中点与<code>UIStackView</code>宽度中点对齐。</p>
+<p><img src="http://img.blog.csdn.net/20151019180346898" alt="" title="UIStackViewAlignmentCenter"></p>
+<p><strong>UIStackViewAlignmentTrailing</strong><br><code>UIStackView</code>是垂直排列时此值有效，让所有的子视图靠<code>UIStackView</code>右边界对齐。</p>
+<p><img src="http://img.blog.csdn.net/20151019180445789" alt="" title="UIStackViewAlignmentTrailing"></p>
+<p><strong>UIStackViewAlignmentBottom</strong><br><code>UIStackView</code>是水平排列时此值有效，让所有的子视图靠<code>UIStackView</code>下边界对齐。</p>
+<p><img src="http://img.blog.csdn.net/20151019180544612" alt="" title="UIStackViewAlignmentBottom"></p>
+<p><strong>UIStackViewAlignmentLastBaseline</strong><br><code>UIStackView</code>是水平排列时此值有效，所有的子视图以每个视图中的最后一行基准线对齐。</p>
+<p><img src="http://img.blog.csdn.net/20151019180636412" alt="" title="UIStackViewAlignmentLastBaseline"></p>
+<ul>
+<li><strong>子视图之间的间距</strong><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">@property</span>(<span class="keyword">nonatomic</span>) <span class="built_in">CGFloat</span> spacing</span><br><span class="line"><span class="comment">//每个子视图之间的间距，在某些布局的情况下spacing将作为最小的间距。</span></span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<hr>
+<h2 id="UIStackView使用"><a href="#UIStackView使用" class="headerlink" title="UIStackView使用"></a>UIStackView使用</h2><p><strong>代码示例</strong><br><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line">- (<span class="keyword">void</span>)viewDidLoad &#123;</span><br><span class="line">    [<span class="keyword">super</span> viewDidLoad];</span><br><span class="line">    <span class="built_in">UILabel</span> *label1 = [[<span class="built_in">UILabel</span> alloc] init];</span><br><span class="line">    label1.text = <span class="string">@"label1"</span>;</span><br><span class="line">    label1.textColor = [<span class="built_in">UIColor</span> whiteColor];</span><br><span class="line">    label1.backgroundColor = [<span class="built_in">UIColor</span> orangeColor];</span><br><span class="line">    <span class="built_in">UILabel</span> *label2 = [[<span class="built_in">UILabel</span> alloc] init];</span><br><span class="line">    label2.text = <span class="string">@"label2"</span>;</span><br><span class="line">    label2.textColor = [<span class="built_in">UIColor</span> whiteColor];</span><br><span class="line">    label2.backgroundColor = [<span class="built_in">UIColor</span> grayColor];</span><br><span class="line">    <span class="built_in">UILabel</span> *label3 = [[<span class="built_in">UILabel</span> alloc] init];</span><br><span class="line">    label3.text = <span class="string">@"this is label3"</span>;</span><br><span class="line">    label3.textColor = [<span class="built_in">UIColor</span> whiteColor];</span><br><span class="line">    label3.backgroundColor = [<span class="built_in">UIColor</span> brownColor];</span><br><span class="line">    <span class="comment">// 初始化三个Label</span></span><br><span class="line">    </span><br><span class="line">    <span class="built_in">UIStackView</span> *_stackView = [[<span class="built_in">UIStackView</span> alloc] initWithArrangedSubviews:@[label1,label2,label3]];</span><br><span class="line">    _stackView.axis = <span class="built_in">UILayoutConstraintAxisHorizontal</span>;</span><br><span class="line">    <span class="comment">//_stackView中的子视图水平排列</span></span><br><span class="line">    _stackView.distribution = <span class="built_in">UIStackViewDistributionFillProportionally</span>;</span><br><span class="line">    <span class="comment">//按照内容填充水平方向_stackView的宽度。</span></span><br><span class="line">    _stackView.alignment = <span class="built_in">UIStackViewAlignmentCenter</span>;</span><br><span class="line">    <span class="comment">//所有的子视图高度的中点与_stackView的高度中点对齐</span></span><br><span class="line">    _stackView.spacing = <span class="number">5</span>;</span><br><span class="line">    <span class="comment">//子视图之间的间距为5</span></span><br><span class="line">    _stackView.frame = <span class="built_in">CGRectMake</span>(<span class="number">0</span>, <span class="number">0</span>, <span class="keyword">self</span>.view.frame.size.width, <span class="keyword">self</span>.view.frame.size.height);</span><br><span class="line">    [<span class="keyword">self</span>.view addSubview:_stackView];</span><br><span class="line">    <span class="comment">// Do any additional setup after loading the view, typically from a nib.</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p><strong>示例效果</strong><br><img src="http://img.blog.csdn.net/20151020100815667" alt="" title="示例1"></p>
+<p><strong>如果更改UIStackView对象的某些属性</strong><br><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line">- (<span class="keyword">void</span>)viewDidLoad &#123;</span><br><span class="line">    [<span class="keyword">super</span> viewDidLoad];</span><br><span class="line">    <span class="built_in">UILabel</span> *label1 = [[<span class="built_in">UILabel</span> alloc] init];</span><br><span class="line">    label1.text = <span class="string">@"label1"</span>;</span><br><span class="line">    label1.textColor = [<span class="built_in">UIColor</span> whiteColor];</span><br><span class="line">    label1.backgroundColor = [<span class="built_in">UIColor</span> orangeColor];</span><br><span class="line">    <span class="built_in">UILabel</span> *label2 = [[<span class="built_in">UILabel</span> alloc] init];</span><br><span class="line">    label2.text = <span class="string">@"label2"</span>;</span><br><span class="line">    label2.textColor = [<span class="built_in">UIColor</span> whiteColor];</span><br><span class="line">    label2.backgroundColor = [<span class="built_in">UIColor</span> grayColor];</span><br><span class="line">    </span><br><span class="line">    <span class="built_in">UILabel</span> *label3 = [[<span class="built_in">UILabel</span> alloc] init];</span><br><span class="line">    label3.text = <span class="string">@"this is label3"</span>;</span><br><span class="line">    label3.textColor = [<span class="built_in">UIColor</span> whiteColor];</span><br><span class="line">    label3.backgroundColor = [<span class="built_in">UIColor</span> brownColor];</span><br><span class="line">    <span class="comment">// 初始化三个Label</span></span><br><span class="line">    </span><br><span class="line">    <span class="built_in">UIStackView</span> *_stackView = [[<span class="built_in">UIStackView</span> alloc] initWithArrangedSubviews:@[label1,label2,label3]];</span><br><span class="line">    _stackView.axis = <span class="built_in">UILayoutConstraintAxisHorizontal</span>;</span><br><span class="line">    <span class="comment">//_stackView中的子视图水平排列</span></span><br><span class="line">    _stackView.distribution = <span class="built_in">UIStackViewDistributionFill</span>;</span><br><span class="line">    <span class="comment">//让所有子视图填充满UIStackView的宽度</span></span><br><span class="line">    [label2 setContentHuggingPriority:<span class="number">100</span> forAxis:<span class="built_in">UILayoutConstraintAxisHorizontal</span>];</span><br><span class="line">    <span class="comment">//设置label2的拉伸优先级priority值越低优先级越高，所以_stackView会优先拉伸label2。</span></span><br><span class="line">    _stackView.alignment = <span class="built_in">UIStackViewAlignmentFill</span>;</span><br><span class="line">    <span class="comment">//让子视图的上下边界与_stackView上下边界对齐</span></span><br><span class="line">    _stackView.spacing = <span class="number">5</span>;</span><br><span class="line">    <span class="comment">//子视图之间的间距为5</span></span><br><span class="line">    _stackView.frame = <span class="built_in">CGRectMake</span>(<span class="number">0</span>, <span class="number">0</span>, <span class="keyword">self</span>.view.frame.size.width, <span class="keyword">self</span>.view.frame.size.height);</span><br><span class="line">    [<span class="keyword">self</span>.view addSubview:_stackView];</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p><strong>示例效果</strong><br><img src="http://img.blog.csdn.net/20151020103526651" alt="" title="示例2"></p>
+<hr>
+<p><strong>上面的示例只是简单的介绍了UIStackView的基本用法合理的嵌套使用可以实现很多复杂的界面布局。</strong></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/布局/" rel="tag"># 布局</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2015/09/24/iOS相册实现与AssetsLibrary框架使用/" rel="next" title="iOS相册实现与AssetsLibrary框架使用">
+                <i class="fa fa-chevron-left"></i> iOS相册实现与AssetsLibrary框架使用
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2015/11/30/iOS富文本（二）初识Text Kit/" rel="prev" title="iOS富文本（二）初识Text Kit">
+                iOS富文本（二）初识Text Kit <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      <div class="ds-thread" data-thread-key="2015/10/19/iOS9中UIStackView的使用/"
+           data-title="iOS9中UIStackView的使用" data-url="http://ggghub.com/2015/10/19/iOS9中UIStackView的使用/">
+      </div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">LiSiYuan</p>
+              <p class="site-description motion-element" itemprop="description">Hi! I'm GGGHub, Welcome here！</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">15</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                
+                  <span class="site-state-item-count">6</span>
+                  <span class="site-state-item-name">categories</span>
+                
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                
+                  <span class="site-state-item-count">12</span>
+                  <span class="site-state-item-name">tags</span>
+                
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/ggghub" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-globe"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://www.developboot.com" target="_blank" title="developboot">
+                      
+                        <i class="fa fa-fw fa-globe"></i>developboot</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://blog.csdn.net/ggghub" target="_blank" title="CSDN">
+                      
+                        <i class="fa fa-fw fa-globe"></i>CSDN</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#概述"><span class="nav-number">1.</span> <span class="nav-text">概述</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#UIStackView介绍"><span class="nav-number">2.</span> <span class="nav-text">UIStackView介绍</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#UIStackView使用"><span class="nav-number">3.</span> <span class="nav-text">UIStackView使用</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">LiSiYuan</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Muse</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"ggghub"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+    
+    <script src="/lib/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/js/src/hook-duoshuo.js"></script>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

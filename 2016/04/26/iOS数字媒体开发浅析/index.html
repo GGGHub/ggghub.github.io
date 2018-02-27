@@ -1,0 +1,780 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="en">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="多媒体," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="概述自然界中的所有看到的听到的都是模拟信号，模拟信号是随时间连续变化，然而手机电脑等信息都属于数字媒体，它们所呈现的内容就是把自然界中这些模拟信号转换成数字信号然后再传递给我们。数字信号不是连续的是离散的，只有0与1两种状态，所以要把模拟信号转化成数字信号即把这些信息数字化这一过程称作A/D(模/数)转化，要进行这一过程就要必须对模拟信号进行采样，采样率越高数字信号越接近真正的模拟信号。当然还有D">
+<meta name="keywords" content="多媒体">
+<meta property="og:type" content="article">
+<meta property="og:title" content="iOS数字媒体开发浅析">
+<meta property="og:url" content="http://ggghub.com/2016/04/26/iOS数字媒体开发浅析/index.html">
+<meta property="og:site_name" content="GGGHub&#39;s Blog">
+<meta property="og:description" content="概述自然界中的所有看到的听到的都是模拟信号，模拟信号是随时间连续变化，然而手机电脑等信息都属于数字媒体，它们所呈现的内容就是把自然界中这些模拟信号转换成数字信号然后再传递给我们。数字信号不是连续的是离散的，只有0与1两种状态，所以要把模拟信号转化成数字信号即把这些信息数字化这一过程称作A/D(模/数)转化，要进行这一过程就要必须对模拟信号进行采样，采样率越高数字信号越接近真正的模拟信号。当然还有D">
+<meta property="og:locale" content="en">
+<meta property="og:image" content="http://img.blog.csdn.net/20160426112547708">
+<meta property="og:image" content="http://img.blog.csdn.net/20160426112504678">
+<meta property="og:updated_time" content="2016-05-10T07:38:58.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="iOS数字媒体开发浅析">
+<meta name="twitter:description" content="概述自然界中的所有看到的听到的都是模拟信号，模拟信号是随时间连续变化，然而手机电脑等信息都属于数字媒体，它们所呈现的内容就是把自然界中这些模拟信号转换成数字信号然后再传递给我们。数字信号不是连续的是离散的，只有0与1两种状态，所以要把模拟信号转化成数字信号即把这些信息数字化这一过程称作A/D(模/数)转化，要进行这一过程就要必须对模拟信号进行采样，采样率越高数字信号越接近真正的模拟信号。当然还有D">
+<meta name="twitter:image" content="http://img.blog.csdn.net/20160426112547708">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://ggghub.com/2016/04/26/iOS数字媒体开发浅析/"/>
+
+
+
+
+
+  <title>iOS数字媒体开发浅析 | GGGHub's Blog</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="en">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">GGGHub's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">Coding Obsession</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            Archives
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://ggghub.com/2016/04/26/iOS数字媒体开发浅析/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="LiSiYuan">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="GGGHub's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">iOS数字媒体开发浅析</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2016-04-26T11:28:00+08:00">
+                2016-04-26
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/iOS/" itemprop="url" rel="index">
+                    <span itemprop="name">iOS</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2016/04/26/iOS数字媒体开发浅析/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/04/26/iOS数字媒体开发浅析/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>自然界中的所有看到的听到的都是模拟信号，模拟信号是随时间连续变化，然而手机电脑等信息都属于数字媒体，它们所呈现的内容就是把自然界中这些模拟信号转换成数字信号然后再传递给我们。数字信号不是连续的是离散的，只有0与1两种状态，所以要把模拟信号转化成数字信号即把这些信息数字化这一过程称作A/D(模/数)转化，要进行这一过程就要必须对模拟信号进行采样，采样率越高数字信号越接近真正的模拟信号。当然还有D/A(数/模)转换的过程，不再本篇考虑的范围内。<br><a id="more"></a></p>
+<h2 id="媒体数字化"><a href="#媒体数字化" class="headerlink" title="媒体数字化"></a>媒体数字化</h2><p>对媒体数字化主要包括两种方式：时间采样与空间采样</p>
+<ul>
+<li>时间采样：捕捉信号在一段时间周期内变化，主要用于音频信号数字化。</li>
+<li>空间采样：对一幅图片在一定分辨率之下捕捉取亮度和色度，进而创建由该图片的像素点数据所构成的数字化结果，主要用于图像信号数字化。<br><strong>注</strong>：视频是一段时间内由一帧帧图像组成所以时间信号可以用这两种采样方式。</li>
+</ul>
+<hr>
+<h2 id="编解码压缩"><a href="#编解码压缩" class="headerlink" title="编解码压缩"></a>编解码压缩</h2><p>通过采样得到的数字媒体文件一半都很庞大，为了方便存储和传输文件我们需要对这些文件使用压缩技术，一半我们再网上，电视上看到的视频都是经过一定程度的压缩，对数字媒体压缩后通常会大幅度缩小文件的尺寸，例如一个1920*1080帧率是30FPS的视频文件未经压缩的大小大概是178MB／s，大部分的音频与视频是通过编解码器来进行压缩的。</p>
+<hr>
+<h2 id="音频"><a href="#音频" class="headerlink" title="音频"></a>音频</h2><h3 id="音频采样"><a href="#音频采样" class="headerlink" title="音频采样"></a>音频采样</h3><p><img src="http://img.blog.csdn.net/20160426112547708" alt=""></p>
+<p>纵轴表示振幅即音量大小，横轴表示时间，上图对一个正弦信号进行采样，每秒钟采样的次数称作采样率。采样率越高越接近真实的模拟信号。在音频数字化的过程中包含一个编码的方法，称为脉冲编解码（PCM）与线性脉冲编解码（LPCM）。</p>
+<h3 id="脉冲编解码（PCM）与线性脉冲编解码（LPCM）"><a href="#脉冲编解码（PCM）与线性脉冲编解码（LPCM）" class="headerlink" title="脉冲编解码（PCM）与线性脉冲编解码（LPCM）"></a>脉冲编解码（PCM）与线性脉冲编解码（LPCM）</h3><p><code>PCM</code>与<code>LPCM</code>都是模拟信号变换为数字信号的编码方式，是对连续变化的模拟信号进行抽样、量化和编码的过程。唯一不同的是LPCM是非压缩音频数字化过程。</p>
+<h3 id="iOS中音频编解码器"><a href="#iOS中音频编解码器" class="headerlink" title="iOS中音频编解码器"></a>iOS中音频编解码器</h3><p>一般的音频文件都是通过<code>PCM</code>音频进行再一次的编码与解码，以<code>mp3</code>格式为例，在<code>PCM</code>基础上进行<code>mp3</code>格式编码生成<code>mp3</code>格式的文件，如果把<code>mp3</code>格式转换成<code>wma</code>那么需要把需要这样的一个过程：mp3解码－&gt;pcm-&gt;wma编码。<br><code>iOS</code>中的<code>Core Audio</code>框架支持的音频编解码格式参考<a href="https://developer.apple.com/library/mac/documentation/MusicAudio/Conceptual/CoreAudioOverview/SupportedAudioFormatsMacOSX/SupportedAudioFormatsMacOSX.html#//apple_ref/doc/uid/TP40003577-CH7-SW1" target="_blank" rel="noopener">官方文档</a><br><strong>注</strong>：<code>Core Audio</code>提供对<code>MP3</code>数据的解码支持，但是不支持对<code>MP3</code>数据编码<br>在音频媒体没有使用<code>线性PCM</code>编码时只能使用<code>ACC</code>格式编解码。</p>
+<hr>
+<h2 id="视频"><a href="#视频" class="headerlink" title="视频"></a>视频</h2><h3 id="视频采样"><a href="#视频采样" class="headerlink" title="视频采样"></a>视频采样</h3><p>视频数据显示是使用<code>YCbCr</code>色彩模式，而对视频采样就是减少<code>YCbCr</code>色彩模式中的颜色数据，这个过程称为色彩二抽样。</p>
+<h3 id="色彩二抽样"><a href="#色彩二抽样" class="headerlink" title="色彩二抽样"></a>色彩二抽样</h3><p>关于YCbCr颜色模式的介绍引用<a href="http://baike.baidu.com/link?url=Bvg2FcTnI94yIyW3w-tEZkyTFPxwWFKZRjyNfCRz-xM4nUpVDgY56byy807tYsq_oDzPjh2MNvCxg7QYmN_BEK" target="_blank" rel="noopener">百度百科</a>：YCbCr或Y’CbCr有的时候会被写作：YCBCR或是Y’CBCR，是色彩空间的一种，通常会用于影片中的影像连续处理，或是数字摄影系统中。Y’为颜色的亮度(luma)成分、而CB和CR则为蓝色和红色的浓度偏移量成份。Y’和Y是不同的，而Y就是所谓的流明(luminance)，表示光的浓度且为非线性，使用伽马修正(gamma correction)编码处理。<br>采样格式包括YCbCr 4:1:1、YCbCr 4:2:0、YCbCr 4:2:2和 YCbCr 4:4:4</p>
+<p><img src="http://img.blog.csdn.net/20160426112504678" alt=""></p>
+<hr>
+<h3 id="iOS中视频编解码器"><a href="#iOS中视频编解码器" class="headerlink" title="iOS中视频编解码器"></a>iOS中视频编解码器</h3><p><code>iOS</code>与<code>OS X</code>中只提供苹果公司认定的目前主流的几种媒体类型支持。对于视频文件来说主要有<code>H.264</code>与<code>Apple ProRes</code>视频格式标准。凡是符合这两个视频标准的文件苹果都提供对其编解码的支持。<br><strong>注</strong>：<code>ProRes</code>编解码器只能在<code>OS X</code>上使用。</p>
+<ul>
+<li>H.264:H.264/MPEG-4第10部分（MPEG-4第10部分也称为AVC，即Advanced Video Coding，高级视频编码）是一种视频压缩标准，一种被广泛使用的高精度视频的录制、压缩和发布格式。</li>
+<li>Apple ProRes:<code>ProRes</code>是一个由苹果公司开发压缩技术，最大能支援5K分辨率。它于2007年随Final Cut Studio 2继承了Apple Intermediate Codec。<br><code>ProRes</code>被认为是一个中间件或中间层编解码器，因为它的目的是为了专业编辑和生产工作流服务。<br>因为ProRes只能在<code>OS X</code>上使用，如果在<code>iOS</code>上进行开发只能使用<code>H.264</code>。然而苹果公司提供了一种方法，当我们捕捉图像对其编辑时，可以将目标变成通用的<code>H.264</code>编码格式。</li>
+</ul>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/多媒体/" rel="tag"># 多媒体</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/03/03/iOS9 class dump header/" rel="next" title="iOS9 class dump header">
+                <i class="fa fa-chevron-left"></i> iOS9 class dump header
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016/05/09/Objective-C中的同步线程的锁/" rel="prev" title="Objective-C中的同步线程的锁">
+                Objective-C中的同步线程的锁 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      <div class="ds-thread" data-thread-key="2016/04/26/iOS数字媒体开发浅析/"
+           data-title="iOS数字媒体开发浅析" data-url="http://ggghub.com/2016/04/26/iOS数字媒体开发浅析/">
+      </div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">LiSiYuan</p>
+              <p class="site-description motion-element" itemprop="description">Hi! I'm GGGHub, Welcome here！</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">15</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                
+                  <span class="site-state-item-count">6</span>
+                  <span class="site-state-item-name">categories</span>
+                
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                
+                  <span class="site-state-item-count">12</span>
+                  <span class="site-state-item-name">tags</span>
+                
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/ggghub" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-globe"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://www.developboot.com" target="_blank" title="developboot">
+                      
+                        <i class="fa fa-fw fa-globe"></i>developboot</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://blog.csdn.net/ggghub" target="_blank" title="CSDN">
+                      
+                        <i class="fa fa-fw fa-globe"></i>CSDN</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#概述"><span class="nav-number">1.</span> <span class="nav-text">概述</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#媒体数字化"><span class="nav-number">2.</span> <span class="nav-text">媒体数字化</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#编解码压缩"><span class="nav-number">3.</span> <span class="nav-text">编解码压缩</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#音频"><span class="nav-number">4.</span> <span class="nav-text">音频</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#音频采样"><span class="nav-number">4.1.</span> <span class="nav-text">音频采样</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#脉冲编解码（PCM）与线性脉冲编解码（LPCM）"><span class="nav-number">4.2.</span> <span class="nav-text">脉冲编解码（PCM）与线性脉冲编解码（LPCM）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#iOS中音频编解码器"><span class="nav-number">4.3.</span> <span class="nav-text">iOS中音频编解码器</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#视频"><span class="nav-number">5.</span> <span class="nav-text">视频</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#视频采样"><span class="nav-number">5.1.</span> <span class="nav-text">视频采样</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#色彩二抽样"><span class="nav-number">5.2.</span> <span class="nav-text">色彩二抽样</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#iOS中视频编解码器"><span class="nav-number">5.3.</span> <span class="nav-text">iOS中视频编解码器</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">LiSiYuan</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Muse</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"ggghub"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+    
+    <script src="/lib/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/js/src/hook-duoshuo.js"></script>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

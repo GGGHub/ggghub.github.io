@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="en">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="互斥锁," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="概述在多线程编程中往往会遇到多个线程同时访问共享的资源，这种情况我们需要通过同步线程来避免。也就是给线程加锁。因为Objective-C是C语言的超集。，严格的来说是真超集。所以C语言当中的pthread互斥锁在Objective-C中也可以使用，但是Objective-C中定义了本身自己的锁对象和锁协议，所以本篇介绍Objective-C中的锁。">
+<meta name="keywords" content="互斥锁">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Objective-C中的同步线程的锁">
+<meta property="og:url" content="http://ggghub.com/2016/05/09/Objective-C中的同步线程的锁/index.html">
+<meta property="og:site_name" content="GGGHub&#39;s Blog">
+<meta property="og:description" content="概述在多线程编程中往往会遇到多个线程同时访问共享的资源，这种情况我们需要通过同步线程来避免。也就是给线程加锁。因为Objective-C是C语言的超集。，严格的来说是真超集。所以C语言当中的pthread互斥锁在Objective-C中也可以使用，但是Objective-C中定义了本身自己的锁对象和锁协议，所以本篇介绍Objective-C中的锁。">
+<meta property="og:locale" content="en">
+<meta property="og:updated_time" content="2016-05-11T07:35:16.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Objective-C中的同步线程的锁">
+<meta name="twitter:description" content="概述在多线程编程中往往会遇到多个线程同时访问共享的资源，这种情况我们需要通过同步线程来避免。也就是给线程加锁。因为Objective-C是C语言的超集。，严格的来说是真超集。所以C语言当中的pthread互斥锁在Objective-C中也可以使用，但是Objective-C中定义了本身自己的锁对象和锁协议，所以本篇介绍Objective-C中的锁。">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://ggghub.com/2016/05/09/Objective-C中的同步线程的锁/"/>
+
+
+
+
+
+  <title>Objective-C中的同步线程的锁 | GGGHub's Blog</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="en">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">GGGHub's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">Coding Obsession</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            Archives
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://ggghub.com/2016/05/09/Objective-C中的同步线程的锁/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="LiSiYuan">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="GGGHub's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Objective-C中的同步线程的锁</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2016-05-09T16:01:00+08:00">
+                2016-05-09
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Objective-C/" itemprop="url" rel="index">
+                    <span itemprop="name">Objective-C</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2016/05/09/Objective-C中的同步线程的锁/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/05/09/Objective-C中的同步线程的锁/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>在多线程编程中往往会遇到多个线程同时访问共享的资源，这种情况我们需要通过同步线程来避免。也就是给线程加锁。<br>因为<code>Objective-C</code>是<code>C</code>语言的超集。，严格的来说是真超集。所以<code>C</code>语言当中的<code>pthread</code>互斥锁在<code>Objective-C</code>中也可以使用，但是<code>Objective-C</code>中定义了本身自己的锁对象和锁协议，所以本篇介绍<code>Objective-C</code>中的锁。<a id="more"></a></p>
+<h2 id="NSLock"><a href="#NSLock" class="headerlink" title="NSLock"></a>NSLock</h2><h3 id="NSLocking协议"><a href="#NSLocking协议" class="headerlink" title="NSLocking协议"></a>NSLocking协议</h3><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">@protocol</span> <span class="title">NSLocking</span></span></span><br><span class="line">- (<span class="keyword">void</span>)lock;</span><br><span class="line">- (<span class="keyword">void</span>)unlock;</span><br><span class="line"><span class="keyword">@end</span></span><br></pre></td></tr></table></figure>
+<p>后面介绍的几种锁类型<code>NSLock</code>,<code>NSConditionLock</code>,<code>NSRecursiveLock</code>,都实现了该协议可以统一用<code>lock</code>与<code>unlock</code>进行加锁与解锁。</p>
+<hr>
+<h3 id="NSLock使用"><a href="#NSLock使用" class="headerlink" title="NSLock使用"></a>NSLock使用</h3><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">NSLock</span> *lock = [[<span class="built_in">NSLock</span> alloc] init];</span><br><span class="line"><span class="built_in">dispatch_async</span>(dispatch_get_global_queue(<span class="number">0</span>, <span class="number">0</span>), ^&#123;</span><br><span class="line">    [lock lock];                <span class="comment">//获取锁</span></span><br><span class="line">    <span class="built_in">NSLog</span>(<span class="string">@"lock success"</span>);</span><br><span class="line">    sleep(<span class="number">5</span>);</span><br><span class="line">    <span class="built_in">NSLog</span>(<span class="string">@"sleep end"</span>);</span><br><span class="line">    [lock unlock];              <span class="comment">//放弃之前获取的锁</span></span><br><span class="line">&#125;);</span><br><span class="line"><span class="built_in">dispatch_async</span>(dispatch_get_global_queue(<span class="number">0</span>, <span class="number">0</span>), ^&#123;</span><br><span class="line">    [lock lock];               <span class="comment">//获取锁，如果获取不到阻塞当前线程直到获取到锁</span></span><br><span class="line">    <span class="built_in">NSLog</span>(<span class="string">@"remove lock"</span>);</span><br><span class="line">    [lock unlock];             <span class="comment">//放弃获取到的锁</span></span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+<p>输出结果<br><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">lock success</span><br><span class="line">sleep end</span><br><span class="line">remove lock</span><br></pre></td></tr></table></figure></p>
+<p>当<code>NSLock</code>对象发送<code>lock</code>消息时先检查能不能获取到这个锁，如果此时在其他线程中正在使用这个锁那么阻塞当前线程一直等待其他线程使用完这个锁<code>unlock</code>放弃这个锁后，才可以在自己当前的线程重新获取到，线程恢复。如果一直获取不到这个锁那么线程将一直阻塞，所以<code>lock</code>与<code>unlock</code>这两个方法一定要成对出现。当然还有不阻塞调用锁的线程方法<code>tryLock</code>与<code>lockBeforeDate:</code></p>
+<hr>
+<p><strong>tryLock</strong><br><code>tryLock</code>尝试获取锁，如果获取不到返回<code>NO</code>，反之<code>YES</code>，不会阻塞当前调用它的线程<br><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">NSLock</span> *lock = [[<span class="built_in">NSLock</span> alloc] init];</span><br><span class="line"><span class="built_in">dispatch_async</span>(dispatch_get_global_queue(<span class="number">0</span>, <span class="number">0</span>), ^&#123;</span><br><span class="line">    [lock lock];                <span class="comment">//获取锁</span></span><br><span class="line">    <span class="built_in">NSLog</span>(<span class="string">@"lock success"</span>);</span><br><span class="line">    sleep(<span class="number">5</span>);</span><br><span class="line">    <span class="built_in">NSLog</span>(<span class="string">@"sleep end"</span>);</span><br><span class="line">    [lock unlock];              <span class="comment">//放弃之前获取的锁</span></span><br><span class="line">&#125;);</span><br><span class="line"><span class="built_in">dispatch_async</span>(dispatch_get_global_queue(<span class="number">0</span>, <span class="number">0</span>), ^&#123;</span><br><span class="line">    <span class="keyword">if</span> ([lock tryLock])         <span class="comment">//尝试获取锁，如果获取不到返回NO，不会阻塞该线程</span></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="built_in">NSLog</span>(<span class="string">@"remove lock"</span>);</span><br><span class="line">        [lock unlock];</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span>&#123;</span><br><span class="line">        <span class="built_in">NSLog</span>(<span class="string">@"obtain failure"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure></p>
+<p>输出结果<br><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">lock success</span><br><span class="line">obtain failure</span><br><span class="line">sleep end</span><br></pre></td></tr></table></figure></p>
+<p>获取失败是因为当前锁正在其他线程中使用。如果当前锁没有使用那么会返回<code>YES</code>。<br><strong>lockBeforeDate</strong><br><code>lockBeforeDate</code>阻塞调用它的线程，如果给定时间内不能够获取锁那么放弃获取并恢复线程。<br><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">NSLock</span> *lock = [[<span class="built_in">NSLock</span> alloc] init];</span><br><span class="line"><span class="built_in">dispatch_async</span>(dispatch_get_global_queue(<span class="number">0</span>, <span class="number">0</span>), ^&#123;</span><br><span class="line">    [lock lock];                <span class="comment">//获取锁</span></span><br><span class="line">    <span class="built_in">NSLog</span>(<span class="string">@"lock success"</span>);</span><br><span class="line">    sleep(<span class="number">5</span>);</span><br><span class="line">    <span class="built_in">NSLog</span>(<span class="string">@"sleep end"</span>);</span><br><span class="line">    [lock unlock];              <span class="comment">//放弃之前获取的锁</span></span><br><span class="line">&#125;);</span><br><span class="line"><span class="built_in">dispatch_async</span>(dispatch_get_global_queue(<span class="number">0</span>, <span class="number">0</span>), ^&#123;</span><br><span class="line">    <span class="built_in">NSDate</span> *date = [[<span class="built_in">NSDate</span> alloc] initWithTimeIntervalSinceNow:<span class="number">3</span>];</span><br><span class="line">    <span class="keyword">if</span> ([lock lockBeforeDate:date]) <span class="comment">//尝试在未来的3s内获取锁，并阻塞该线程，如果3s内获取不到恢复线程</span></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="built_in">NSLog</span>(<span class="string">@"remove lock"</span>);</span><br><span class="line">        [lock unlock];</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span>&#123;</span><br><span class="line">        <span class="built_in">NSLog</span>(<span class="string">@"obtain failure"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure></p>
+<p>输出结果<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">lock success</span><br><span class="line">obtain failure</span><br><span class="line">sleep end</span><br></pre></td></tr></table></figure></p>
+<p>如果3s内获取不到则返回NO，否则返回<code>YES</code></p>
+<h2 id="synchronized"><a href="#synchronized" class="headerlink" title="@synchronized"></a>@synchronized</h2><p>synchronized对一个对象提供锁定和解锁机制。synchronized会阻塞调用它的线程<br><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">dispatch_async</span>(dispatch_get_global_queue(<span class="number">0</span>, <span class="number">0</span>), ^&#123;</span><br><span class="line">    <span class="keyword">@synchronized</span> (<span class="keyword">self</span>) &#123;</span><br><span class="line">        [<span class="keyword">self</span> logging:<span class="string">@"lock success"</span>];</span><br><span class="line">        sleep(<span class="number">5</span>);</span><br><span class="line">        [<span class="keyword">self</span> logging:<span class="string">@"sleep end"</span>];</span><br><span class="line">    &#125;</span><br><span class="line">&#125;);</span><br><span class="line"><span class="built_in">dispatch_async</span>(dispatch_get_global_queue(<span class="number">0</span>, <span class="number">0</span>), ^&#123;</span><br><span class="line">    <span class="keyword">@synchronized</span> (<span class="keyword">self</span>)    <span class="comment">//等到上面线程执行完后才回执行下面的代码，此时会阻塞当前线程</span></span><br><span class="line">    &#123;</span><br><span class="line">        [<span class="keyword">self</span> logging:<span class="string">@"remove lock"</span>];</span><br><span class="line">    &#125;</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure></p>
+<p>输出结果<br><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">lock success</span><br><span class="line">sleep end</span><br><span class="line">remove lock</span><br></pre></td></tr></table></figure></p>
+<p>上面对自身对象进行加锁直到上面第一个GCD全部执行结束才会执行下面加锁的代码。<br><strong>注意</strong><br><code>Objective-C</code>类自身也是对象所以可以对这些类对象使用<code>synchronized</code>，此时是对整个对象类型进行线程同步。例如：<br><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">@synchronized</span> ([<span class="keyword">self</span> <span class="keyword">class</span>]) &#123;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h2 id="NSConditionLock"><a href="#NSConditionLock" class="headerlink" title="NSConditionLock"></a>NSConditionLock</h2><p><code>NSConditionLock</code>条件锁，获取锁时必须与之前设置解锁的条件一样时才可以获取到，否则当前线程一直阻塞，直到条件一致时线程才可以恢复。<br>最典型的例子就是生产者-消费者场景，当数据为空时生产者生产数据此时消费者不能够获取数据，生产者生产数据后，消费者处理数据，直到消费者处理所有数据后，数据又为空，此时生产者继续生产数据。示例代码如下：<br><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">enum</span> &#123;NO_DATA_IN_QUEUE = <span class="number">0</span>,HAS_DATA_IN_QUEUE&#125;;</span><br><span class="line"><span class="built_in">NSConditionLock</span> *conditionLock = [[<span class="built_in">NSConditionLock</span> alloc] initWithCondition:NO_DATA_IN_QUEUE];</span><br><span class="line"></span><br><span class="line"><span class="built_in">dispatch_async</span>(dispatch_get_global_queue(<span class="number">0</span>, <span class="number">0</span>), ^&#123;</span><br><span class="line">    <span class="keyword">while</span> (<span class="literal">YES</span>) &#123;</span><br><span class="line">        [conditionLock lockWhenCondition:NO_DATA_IN_QUEUE];</span><br><span class="line">        <span class="built_in">NSLog</span>(<span class="string">@"insert data"</span>);</span><br><span class="line">        sleep(<span class="number">3</span>);</span><br><span class="line">        <span class="built_in">NSLog</span>(<span class="string">@"intset success"</span>);</span><br><span class="line">        [conditionLock unlockWithCondition:HAS_DATA_IN_QUEUE];</span><br><span class="line">    &#125;</span><br><span class="line">&#125;);</span><br><span class="line"><span class="built_in">dispatch_async</span>(dispatch_get_global_queue(<span class="number">0</span>, <span class="number">0</span>), ^&#123;</span><br><span class="line">    <span class="keyword">while</span> (<span class="literal">YES</span>) &#123;</span><br><span class="line">        [conditionLock lockWhenCondition:HAS_DATA_IN_QUEUE];</span><br><span class="line">        <span class="built_in">NSLog</span>(<span class="string">@"delete data"</span>);</span><br><span class="line">        sleep(<span class="number">3</span>);</span><br><span class="line">        <span class="built_in">NSLog</span>(<span class="string">@"delete success"</span>);</span><br><span class="line">        [conditionLock unlockWithCondition:NO_DATA_IN_QUEUE];</span><br><span class="line">    &#125;</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure></p>
+<p>输出结果：<br><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">insert data</span><br><span class="line">intset success</span><br><span class="line">delete data</span><br><span class="line">delete success</span><br><span class="line">insert data</span><br><span class="line">intset success</span><br><span class="line">delete data</span><br><span class="line">delete success</span><br><span class="line">...</span><br></pre></td></tr></table></figure></p>
+<h2 id="NSRecursiveLock"><a href="#NSRecursiveLock" class="headerlink" title="NSRecursiveLock"></a>NSRecursiveLock</h2><p><code>NSRecursiveLock</code>递归锁，当我们对一个递归函数同步线程时会在同一个线程多次获取锁，导致线程死锁，<code>NSRecursiveLock</code>可以在同一个线程多次获取锁不会死锁。<br><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">NSRecursiveLock</span> *recursiveLock = [[<span class="built_in">NSRecursiveLock</span> alloc] init];</span><br><span class="line">    <span class="built_in">dispatch_async</span>(dispatch_get_global_queue(<span class="number">0</span>, <span class="number">0</span>), ^&#123;</span><br><span class="line">        </span><br><span class="line">       <span class="keyword">static</span> <span class="keyword">void</span> (^recursive)(<span class="keyword">int</span> count);</span><br><span class="line">        recursive = ^(<span class="keyword">int</span> count)&#123;</span><br><span class="line">            [recursiveLock lock];</span><br><span class="line">            <span class="keyword">if</span> (count&gt;<span class="number">0</span>) &#123;</span><br><span class="line">                <span class="built_in">NSLog</span>(<span class="string">@"success lock"</span>);</span><br><span class="line">                sleep(<span class="number">3</span>);</span><br><span class="line">                recursive(--count);</span><br><span class="line">            &#125;</span><br><span class="line">            [recursiveLock unlock];</span><br><span class="line">        &#125;;</span><br><span class="line">        recursive(<span class="number">3</span>);</span><br><span class="line">        </span><br><span class="line">    &#125;);</span><br></pre></td></tr></table></figure></p>
+<p>上面这种情况如果使用<code>NSLock</code>在没有解锁时继续获取锁，就会造成死锁导致线程一致堵塞。</p>
+<h2 id="NSDistributedLock"><a href="#NSDistributedLock" class="headerlink" title="NSDistributedLock"></a>NSDistributedLock</h2><p>NSDistributedLock是<code>Mac</code>多线程开发中的互斥锁解决方案，在此不多做介绍。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/互斥锁/" rel="tag"># 互斥锁</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/04/26/iOS数字媒体开发浅析/" rel="next" title="iOS数字媒体开发浅析">
+                <i class="fa fa-chevron-left"></i> iOS数字媒体开发浅析
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016/05/18/JavaScript编写Web脚本最佳实现/" rel="prev" title="JavaScript编写Web脚本最佳实现">
+                JavaScript编写Web脚本最佳实现 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      <div class="ds-thread" data-thread-key="2016/05/09/Objective-C中的同步线程的锁/"
+           data-title="Objective-C中的同步线程的锁" data-url="http://ggghub.com/2016/05/09/Objective-C中的同步线程的锁/">
+      </div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">LiSiYuan</p>
+              <p class="site-description motion-element" itemprop="description">Hi! I'm GGGHub, Welcome here！</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">15</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                
+                  <span class="site-state-item-count">6</span>
+                  <span class="site-state-item-name">categories</span>
+                
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                
+                  <span class="site-state-item-count">12</span>
+                  <span class="site-state-item-name">tags</span>
+                
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/ggghub" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-globe"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://www.developboot.com" target="_blank" title="developboot">
+                      
+                        <i class="fa fa-fw fa-globe"></i>developboot</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://blog.csdn.net/ggghub" target="_blank" title="CSDN">
+                      
+                        <i class="fa fa-fw fa-globe"></i>CSDN</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#概述"><span class="nav-number">1.</span> <span class="nav-text">概述</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#NSLock"><span class="nav-number">2.</span> <span class="nav-text">NSLock</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#NSLocking协议"><span class="nav-number">2.1.</span> <span class="nav-text">NSLocking协议</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#NSLock使用"><span class="nav-number">2.2.</span> <span class="nav-text">NSLock使用</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#synchronized"><span class="nav-number">3.</span> <span class="nav-text">@synchronized</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#NSConditionLock"><span class="nav-number">4.</span> <span class="nav-text">NSConditionLock</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#NSRecursiveLock"><span class="nav-number">5.</span> <span class="nav-text">NSRecursiveLock</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#NSDistributedLock"><span class="nav-number">6.</span> <span class="nav-text">NSDistributedLock</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">LiSiYuan</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Muse</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"ggghub"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+    
+    <script src="/lib/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/js/src/hook-duoshuo.js"></script>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
