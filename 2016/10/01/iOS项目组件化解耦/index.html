@@ -1,0 +1,791 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="en">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="ios," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="最近给公司的一个iOS项目进行组件化解耦。本身项目早期开发就不是很规范，而且刚刚开始熟悉这个项目对业务方面也不是很熟悉所以并没有对所有的模块进行组件化。而且组件化解耦后还存在一些问题在文章中都会写出来。原理和蘑菇街 App 的组件化之路类似，但是也有一些不同并没有加入「组件A」要调用「组件B」的某个方法这种业务场景。所有组件化的模块都是「组件A」要调用「组件B」的这种情况。「组件A」与「组件B」之">
+<meta name="keywords" content="ios">
+<meta property="og:type" content="article">
+<meta property="og:title" content="iOS项目组件化解耦">
+<meta property="og:url" content="http://ggghub.com/2016/10/01/iOS项目组件化解耦/index.html">
+<meta property="og:site_name" content="GGGHub&#39;s Blog">
+<meta property="og:description" content="最近给公司的一个iOS项目进行组件化解耦。本身项目早期开发就不是很规范，而且刚刚开始熟悉这个项目对业务方面也不是很熟悉所以并没有对所有的模块进行组件化。而且组件化解耦后还存在一些问题在文章中都会写出来。原理和蘑菇街 App 的组件化之路类似，但是也有一些不同并没有加入「组件A」要调用「组件B」的某个方法这种业务场景。所有组件化的模块都是「组件A」要调用「组件B」的这种情况。「组件A」与「组件B」之">
+<meta property="og:locale" content="en">
+<meta property="og:image" content="http://img.blog.csdn.net/20160930204348629">
+<meta property="og:image" content="http://img.blog.csdn.net/20160930205950587">
+<meta property="og:updated_time" content="2018-02-27T07:44:39.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="iOS项目组件化解耦">
+<meta name="twitter:description" content="最近给公司的一个iOS项目进行组件化解耦。本身项目早期开发就不是很规范，而且刚刚开始熟悉这个项目对业务方面也不是很熟悉所以并没有对所有的模块进行组件化。而且组件化解耦后还存在一些问题在文章中都会写出来。原理和蘑菇街 App 的组件化之路类似，但是也有一些不同并没有加入「组件A」要调用「组件B」的某个方法这种业务场景。所有组件化的模块都是「组件A」要调用「组件B」的这种情况。「组件A」与「组件B」之">
+<meta name="twitter:image" content="http://img.blog.csdn.net/20160930204348629">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://ggghub.com/2016/10/01/iOS项目组件化解耦/"/>
+
+
+
+
+
+  <title>iOS项目组件化解耦 | GGGHub's Blog</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="en">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">GGGHub's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">Coding Obsession</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            Archives
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://ggghub.com/2016/10/01/iOS项目组件化解耦/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="LiSiYuan">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="GGGHub's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">iOS项目组件化解耦</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2016-10-01T11:06:00+08:00">
+                2016-10-01
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/ios/" itemprop="url" rel="index">
+                    <span itemprop="name">ios</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2016/10/01/iOS项目组件化解耦/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/10/01/iOS项目组件化解耦/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>最近给公司的一个<code>iOS</code>项目进行组件化解耦。本身项目早期开发就不是很规范，而且刚刚开始熟悉这个项目对业务方面也不是很熟悉所以并没有对所有的模块进行组件化。而且组件化解耦后还存在一些问题在文章中都会写出来。<br>原理和<a href="http://limboy.me/tech/2016/03/10/mgj-components.html" target="_blank" rel="noopener">蘑菇街 App 的组件化之路</a>类似，但是也有一些不同并没有加入<code>「组件A」要调用「组件B」的某个方法</code>这种业务场景。所有组件化的模块都是<code>「组件A」要调用「组件B」</code>的这种情况。<code>「组件A」与「组件B」之间是透明的</code>。<br><a id="more"></a></p>
+<h2 id="为何要对项目组件化"><a href="#为何要对项目组件化" class="headerlink" title="为何要对项目组件化"></a>为何要对项目组件化</h2><ul>
+<li>对每个模块间相互调用解耦</li>
+<li>统一wap与本地调用</li>
+</ul>
+<p>首先说一下组件化带来的最大好处就是给每个模块间解耦。之前模块间调用不得不相互引用，这就导致了各个模块间相互依赖。想象一种场景：A，B，C，D是四个VC，四个VC之间是这样的关系，A与B相互跳转、B与C相互跳转、D与A，B相互跳转。它们之间的关系如下图：</p>
+<p><img src="http://img.blog.csdn.net/20160930204348629" alt=""></p>
+<p>而组件化在项目中引入了<code>Mediator</code>对象与Action对象，引入这两个对象后，A，B，C，D之间的关系如下图：</p>
+<p><img src="http://img.blog.csdn.net/20160930205950587" alt=""></p>
+<p>这样结构就很清楚了而且不管多少个组件结构都是这个样子。下面会说明<code>Mediator</code>对象与<code>Action</code>对象的实现。</p>
+<hr>
+<p>对于一个<code>App</code>来说必不可免的会有<code>wap</code>页面调用<code>Native</code>的功能。通过<code>URL注册</code>实现组件化方案可以实现同一个<code>URL</code>即可以在本地调用组件也可以在<code>wap</code>页面调用组件。这样原本要在两处同时处理的逻辑统一放在了<code>Mediator</code>对象中处理。<br>当然这样做有一个缺点就是如果<code>wap</code>页面调用与本地调用同一个模块需要做不同的处理时无法区分是在哪里调用的，因为都是通过一样的<code>URL</code>来调用的。目前在我优化的项目中并没有这样的需求。所以当前的方案是可行的。如果真的要区分的话可以通过传递不同的参数来确定是从哪里发起的调用。</p>
+<hr>
+<h2 id="组件化方案的实现"><a href="#组件化方案的实现" class="headerlink" title="组件化方案的实现"></a>组件化方案的实现</h2><p>通过程序启动时注册<code>URL</code>来实现组件化，<code>URL</code>注册用通过<a href="https://github.com/joeldev/JLRoutes" target="_blank" rel="noopener">JLRoutes</a>实现的。<br>具体使用如下：</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">- (<span class="built_in">BOOL</span>)application:(<span class="built_in">UIApplication</span> *)application didFinishLaunchingWithOptions:(<span class="built_in">NSDictionary</span> *)launchOptions &#123;</span><br><span class="line"></span><br><span class="line">    JLRoutes *routes = [JLRoutes routesForScheme:scheme_url];</span><br><span class="line">    </span><br><span class="line">    [routes addRoute: LSYKey1 handler:^<span class="built_in">BOOL</span>(<span class="built_in">NSDictionary</span>&lt;<span class="built_in">NSString</span> *,<span class="built_in">NSString</span> *&gt; * _Nonnull parameters) &#123;</span><br><span class="line">        <span class="comment">//要处理的逻辑</span></span><br><span class="line">        <span class="keyword">return</span> <span class="literal">YES</span>; <span class="comment">//判断返回值来决定是否执行该处代码</span></span><br><span class="line">    &#125;];</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>在上面的代码中<code>scheme_url</code>是app自定义的协议，<code>LSYKey1</code>是<code>URL</code>的路径，<code>parameters</code>是<code>URL</code>的参数。通过程序启动初始化<code>JLRoutes</code>对象，并注册不同的<code>URL</code>，当尝试打开<code>scheme_url</code>协议的<code>URL</code>时就会执行对应注册路径下<code>block</code>内的代码。</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">-(<span class="built_in">BOOL</span>)application:(<span class="built_in">UIApplication</span> *)application openURL:(<span class="built_in">NSURL</span> *)url sourceApplication:(<span class="built_in">NSString</span> *)sourceApplication annotation:(<span class="keyword">id</span>)annotation   <span class="comment">//当程序尝试打开URL或者处理完从其它应用返回时会调用该方法 (不同版本的系统需要实现的方法不同)</span></span><br><span class="line">&#123;   </span><br><span class="line">    <span class="keyword">if</span> ([url.scheme isEqualToString:scheme_url]) &#123;</span><br><span class="line">       <span class="keyword">return</span>  [JLRoutes routeURL:url];</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">YES</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>如果尝试打开<code>scheme_url://LSYKey1?oid=123&amp;amount=456</code>这样的<code>url</code>时就会执行上面代码中注册的<code>block</code>。通过<code>parameters</code>取得该<code>url</code>的参数。</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">JLRoutes *routes = [JLRoutes routesForScheme:scheme_url];</span><br><span class="line"></span><br><span class="line">[routes addRoute: LSYKey1 handler:^<span class="built_in">BOOL</span>(<span class="built_in">NSDictionary</span>&lt;<span class="built_in">NSString</span> *,<span class="built_in">NSString</span> *&gt; * _Nonnull parameters) &#123;</span><br><span class="line">    <span class="built_in">NSInteger</span> oid = [parameters[<span class="string">@"oid"</span>] integerValue]; <span class="comment">//获取url中oid参数</span></span><br><span class="line">    <span class="built_in">NSInteger</span> amount = [parameters[<span class="string">@"amount"</span>] integerValue]; <span class="comment">//获取url中amount参数</span></span><br><span class="line">    </span><br><span class="line">    <span class="keyword">return</span> <span class="literal">YES</span>; </span><br><span class="line">&#125;];</span><br></pre></td></tr></table></figure>
+<hr>
+<p>上面说明如何通过<code>JLRoutes</code>注册<code>URL</code>的，具体组件化解耦是<code>Mediator</code>对象与<code>Action</code>对象配合<code>JLRoutes</code>来实现的。<br>首先我们需要有一个文件来统一管理本地模块的Key值，这里在<code>ComponentKey.h</code>文件中进行管理</p>
+<p>ComponentKey.h<br><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#import <span class="meta-string">&lt;Foundation/Foundation.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">static</span> <span class="built_in">NSString</span> * <span class="keyword">const</span> LSYKey1 = <span class="string">@"LSYKey1"</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">static</span> <span class="built_in">NSString</span> * <span class="keyword">const</span> LSYKey2 = <span class="string">@"LSYKey2"</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">static</span> <span class="built_in">NSString</span> * <span class="keyword">const</span> LSYKey3 = <span class="string">@"LSYKey3"</span>;</span><br><span class="line"></span><br><span class="line">...</span><br></pre></td></tr></table></figure></p>
+<p><code>Mediator</code>对象实现的方法如下：</p>
+<p>Mediator.h<br><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#import <span class="meta-string">&lt;Foundation/Foundation.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">@interface</span> <span class="title">Mediator</span> : <span class="title">NSObject</span></span></span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> JLRountes注册的url</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line">+(<span class="keyword">void</span>)componentRegister;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> 本地通过key打开模块</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment"> @param key 模块key</span></span><br><span class="line"><span class="comment"> @param dic 传递的参数</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line">+(<span class="keyword">void</span>)openComponentForKey:(<span class="built_in">NSString</span> *)key parameter:(<span class="built_in">NSDictionary</span> *)dic;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> 该方法通过运行时的机制让Mediator对象与Action对象解耦并将消息转发给Action对象执行</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment"> @param targetName Action对象名</span></span><br><span class="line"><span class="comment"> @param actionName 方法名</span></span><br><span class="line"><span class="comment"> @param params     传递的参数</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line">+(<span class="keyword">void</span>)performTarget:(<span class="built_in">NSString</span> *)targetName action:(<span class="built_in">NSString</span> *)actionName params:(<span class="built_in">NSDictionary</span> *)params;</span><br><span class="line"><span class="keyword">@end</span></span><br></pre></td></tr></table></figure></p>
+<p>Mediator.m<br><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">@implementation</span> <span class="title">Mediator</span></span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">+(<span class="keyword">void</span>)componentRegister</span><br><span class="line">&#123;</span><br><span class="line">    JLRoutes *routes = [JLRoutes routesForScheme:scheme_url];</span><br><span class="line">    </span><br><span class="line">    [routes addRoute: LSYKey1 handler:^<span class="built_in">BOOL</span>(<span class="built_in">NSDictionary</span>&lt;<span class="built_in">NSString</span> *,<span class="built_in">NSString</span> *&gt; * _Nonnull parameters) &#123;</span><br><span class="line">        [<span class="keyword">self</span> performTarget:<span class="string">@"Action"</span> action:<span class="string">@"performActionA"</span> params:parameters];</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">YES</span>;</span><br><span class="line">    &#125;];</span><br><span class="line">    </span><br><span class="line">        [routes addRoute: LSYKey2 handler:^<span class="built_in">BOOL</span>(<span class="built_in">NSDictionary</span>&lt;<span class="built_in">NSString</span> *,<span class="built_in">NSString</span> *&gt; * _Nonnull parameters) &#123;</span><br><span class="line">        [<span class="keyword">self</span> performTarget:<span class="string">@"Action"</span> action:<span class="string">@"performActionB"</span> params:parameters];</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">YES</span>;</span><br><span class="line">    &#125;];</span><br><span class="line"></span><br><span class="line">    </span><br><span class="line">&#125;</span><br><span class="line">+(<span class="keyword">void</span>)openComponentForKey:(<span class="built_in">NSString</span> *)key parameter:(<span class="built_in">NSDictionary</span> *)dic</span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">//将本地调用传入的Key与参数转拼接成url最后通过JLRoutes处理</span></span><br><span class="line">    <span class="keyword">if</span> (!key.length) &#123;</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">NSMutableString</span> *urlString = [<span class="built_in">NSMutableString</span> stringWithString:[<span class="built_in">NSString</span> stringWithFormat:<span class="string">@"%@://%@"</span>,scheme_url,key]];</span><br><span class="line">    [urlString appendString:<span class="string">@"?"</span>];</span><br><span class="line">    [dic enumerateKeysAndObjectsUsingBlock:^(<span class="keyword">id</span>  _Nonnull key, <span class="keyword">id</span>  _Nonnull obj, <span class="built_in">BOOL</span> * _Nonnull stop) &#123;</span><br><span class="line">        [urlString appendString:[<span class="built_in">NSString</span> stringWithFormat:<span class="string">@"%@=%@&amp;"</span>,key,obj]];</span><br><span class="line">    &#125;];</span><br><span class="line">    [urlString deleteCharactersInRange:<span class="built_in">NSMakeRange</span>(urlString.length<span class="number">-1</span>, <span class="number">1</span>)];</span><br><span class="line">    <span class="built_in">NSURL</span> *url = [<span class="built_in">NSURL</span> URLWithString:[urlString <span class="keyword">copy</span>]];</span><br><span class="line">    [JLRoutes routeURL:url];</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">+(<span class="keyword">void</span>)performTarget:(<span class="built_in">NSString</span> *)targetName action:(<span class="built_in">NSString</span> *)actionName params:(<span class="built_in">NSDictionary</span> *)params</span><br><span class="line">&#123;</span><br><span class="line">    <span class="built_in">NSString</span> *targetClassString = [<span class="built_in">NSString</span> stringWithFormat:<span class="string">@"%@"</span>, targetName];</span><br><span class="line">    <span class="built_in">NSString</span> *actionString = [<span class="built_in">NSString</span> stringWithFormat:<span class="string">@"%@:"</span>, actionName];</span><br><span class="line">    </span><br><span class="line">    Class targetClass = <span class="built_in">NSClassFromString</span>(targetClassString);</span><br><span class="line">    <span class="keyword">id</span> target = [[targetClass alloc] init];</span><br><span class="line">    SEL action = <span class="built_in">NSSelectorFromString</span>(actionString);</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">if</span> ([target respondsToSelector:action]) &#123;</span><br><span class="line"><span class="meta">#pragma clang diagnostic push</span></span><br><span class="line"><span class="meta">#pragma clang diagnostic ignored <span class="meta-string">"-Warc-performSelector-leaks"</span></span></span><br><span class="line">         [target performSelector:action withObject:params];</span><br><span class="line"><span class="meta">#pragma clang diagnostic pop</span></span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="comment">// 这里是处理无响应请求的地方</span></span><br><span class="line">            </span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">@end</span></span><br></pre></td></tr></table></figure></p>
+<hr>
+<p>Action对象是处理从Mediator对象转发过来的消息。上面分别执行了<code>performActionA</code>与<code>performActionB</code>的方法。我们可以根据功能给这些方法分类，如果<code>performActionA</code>与<code>performActionB</code>的方法都是执行跳转操作，那么我们添加一个<code>Action(Jump)</code>的category专门来处理跳转操作。将这两个方法写入category中。</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#import <span class="meta-string">"Action+Jump.h"</span></span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">@implementation</span> <span class="title">Action</span> (<span class="title">Jump</span>)</span></span><br><span class="line">-(<span class="keyword">void</span>)performActionA:(<span class="built_in">NSDictionary</span> *)params</span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">//跳转A界面</span></span><br><span class="line">&#125;</span><br><span class="line">-(<span class="keyword">void</span>)performActionB:(<span class="built_in">NSDictionary</span> *)params</span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">//跳转B界面</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">@end</span></span><br></pre></td></tr></table></figure>
+<p>此时我们想要在本地调用<code>LSYKey1</code>模块并要传入<code>oid与amount</code>这两个参数只要执行下面代码即可：<br><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[Mediator openComponentForKey:LSYKey1 parameter:@&#123;<span class="string">@"oid"</span>:@<span class="number">123</span>,<span class="string">@"amount"</span>:<span class="string">@"456"</span>&#125;];</span><br></pre></td></tr></table></figure></p>
+<p>远程调用直接返回：<br><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[JLRoutes routeURL:url];</span><br></pre></td></tr></table></figure></p>
+<p> 因为我们在程序启动已经注册了所有的<code>url</code>：</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[Mediator componentRegister];</span><br></pre></td></tr></table></figure>
+<h2 id="存在的问题"><a href="#存在的问题" class="headerlink" title="存在的问题"></a>存在的问题</h2><p>上面虽然实现了组件化但是还是存在一些问题需要后续改进</p>
+<ul>
+<li>本地调用与远程调用混在一起无法区别开</li>
+<li>无法实现<code>「组件A」要调用「组件B」的某个方法</code>这种业务场景</li>
+<li>组件过多有可能影响程序启动速度</li>
+</ul>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/ios/" rel="tag"># ios</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/07/22/Core Data系列文章（一）Core Data基础/" rel="next" title="Core Data系列文章（一）Core Data基础">
+                <i class="fa fa-chevron-left"></i> Core Data系列文章（一）Core Data基础
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      <div class="ds-thread" data-thread-key="2016/10/01/iOS项目组件化解耦/"
+           data-title="iOS项目组件化解耦" data-url="http://ggghub.com/2016/10/01/iOS项目组件化解耦/">
+      </div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">LiSiYuan</p>
+              <p class="site-description motion-element" itemprop="description">Hi! I'm GGGHub, Welcome here！</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">25</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                
+                  <span class="site-state-item-count">7</span>
+                  <span class="site-state-item-name">categories</span>
+                
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                
+                  <span class="site-state-item-count">17</span>
+                  <span class="site-state-item-name">tags</span>
+                
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/ggghub" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-globe"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://www.developboot.com" target="_blank" title="developboot">
+                      
+                        <i class="fa fa-fw fa-globe"></i>developboot</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://blog.csdn.net/ggghub" target="_blank" title="CSDN">
+                      
+                        <i class="fa fa-fw fa-globe"></i>CSDN</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#为何要对项目组件化"><span class="nav-number">1.</span> <span class="nav-text">为何要对项目组件化</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#组件化方案的实现"><span class="nav-number">2.</span> <span class="nav-text">组件化方案的实现</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#存在的问题"><span class="nav-number">3.</span> <span class="nav-text">存在的问题</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">LiSiYuan</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Muse</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"ggghub"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+    
+    <script src="/lib/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/js/src/hook-duoshuo.js"></script>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
